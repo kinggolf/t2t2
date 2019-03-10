@@ -1,19 +1,26 @@
-import {
-  ActionReducer,
-  ActionReducerMap,
-  createFeatureSelector,
-  createSelector,
-  MetaReducer
-} from '@ngrx/store';
-import { environment } from '../../environments/environment';
+import { ActionReducerMap } from '@ngrx/store';
+import { APPStore, LoginModel, TodoListModel } from '../models';
+import { LoginAction, LoginActionTypes, TodoListAction, TodoListActionTypes } from '../actions';
 
-export interface State {
-
-}
-
-export const reducers: ActionReducerMap<State> = {
-
+export const reducers: ActionReducerMap<APPStore> = {
+  loginObject: loginReducer,
+  todoLists: todoListReducer
 };
 
+export function loginReducer(state: LoginModel, action: LoginAction): LoginModel {
+  switch (action.type) {
+    case LoginActionTypes.LoginAction:
+      return action.payload;
+    default:
+      return state;
+  }
+}
 
-export const metaReducers: MetaReducer<State>[] = !environment.production ? [] : [];
+export function todoListReducer(state: TodoListModel[], action: TodoListAction): TodoListModel[] {
+  switch (action.type) {
+    case TodoListActionTypes.TodoListAction:
+      return action.payload;
+    default:
+      return state;
+  }
+}
