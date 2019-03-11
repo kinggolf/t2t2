@@ -1,17 +1,20 @@
 [
   {
-    "name": "List 1 Name",
     "id": "1A",
-    "note": "My First List"
+    "name": "List 1 Name",
+    "itemsPending": 2,
+    "itemsCompleted": 1
   },
   {
-    "name": "List 2 Name",
     "id": "2B",
-    "note": "My 2nd List"
+    "name": "List 2 Name",
+    "itemsPending": 1,
+    "itemsCompleted": 2
   },
   {
-    "name": "List 3 Name",
     "id": "3C",
-    "note": "My 3rd List"
+    "name": "List 3 Name",
+    "itemsPending": 3,
+    "itemsCompleted": 0
   }
 ]

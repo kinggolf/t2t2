@@ -1,8 +1,10 @@
 import { TodoModel } from './todo.model';
 
 export interface TodoListModel {
+  id: string;
   name: string;
-  id?: string;
-  note?: string;
-  todos?: TodoModel[];
+  itemsPending: number;
+  itemsCompleted: number;
+  items?: TodoModel[];
+  showListDetails?: boolean;
 }

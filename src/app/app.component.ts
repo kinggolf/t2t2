@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AuthService } from './services/auth.service';
-import { APPStore, UserModel, TodoListModel, TodoModel, LoginModel } from './models';
-import { SubscriptionLike } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { AuthService } from './services/auth.service';
+import { APPStore, UserModel, TodoModel, LoginModel } from './models';
+import { SubscriptionLike } from 'rxjs';
 import { TodosService } from './services/todos.service';
+import { TodoListsAction } from './actions';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,6 @@ import { TodosService } from './services/todos.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   currentUser: UserModel;
-  todoLists: TodoListModel[];
   todos: TodoModel[];
   loginSub: SubscriptionLike;
   todoListsSub: SubscriptionLike;
@@ -21,25 +21,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.currentUser = null;
-    // this.todosService.getTodoLists().subscribe(resp => {
-    //   this.todoLists = resp;
-    // });
     this.loginSub = this.store.select<LoginModel>('loginObject').subscribe(loginObject => {
-      // this.loginSub = this.store.select<LoginModel>(state => state.loginObject).subscribe(loginObject => {
       if (loginObject) {
         this.authService.submitLogin(loginObject);
       }
     });
-    /*
-    this.todoListsSub = this.store.select<TodoListModel[]>('todoLists').subscribe(todolists => {
-      if (todolists) {
-        console.log(todolists);
-      }
-    });
-    this.todosService.getTodoLists(); */
     this.todoListsSub = this.todosService.getTodoLists().subscribe(todolists => {
         if (todolists) {
           console.log(todolists);
+          this.store.dispatch(new TodoListsAction(todolists));
         }
       }
     );
@@ -54,11 +44,11 @@ export class AppComponent implements OnInit, OnDestroy {
   submitLogin(loginObject) {
     console.log('In AppComponent, loginObject = ', loginObject);
     this.authService.submitLogin(loginObject);
-  } */
+  }
 
   getTodosOfList(listId) {
-    this.todosService.getTodos(listId).subscribe(resp => {
+    this.todosService.getTodoListDetails(listId).subscribe(resp => {
       this.todos = resp;
     });
-  }
+  } */
 }

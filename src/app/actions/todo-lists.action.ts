@@ -1,12 +1,26 @@
 import { Action } from '@ngrx/store';
-import { TodoListModel } from '../models';
+import { TodoListModel, TodoModel } from '../models';
 
 export enum TodoListActionTypes {
-  TodoListAction = 'TodoListAction',
+  TodoListsAction = 'TodoListsAction',
+  TodoListDetailsAction = 'TodoListDetailsAction',
+  UpdateTodosForListAction = 'UpdateTodosForListAction',
 }
 
-export class TodoListAction implements Action {
-  readonly type = TodoListActionTypes.TodoListAction;
+export class TodoListsAction implements Action {
+  readonly type = TodoListActionTypes.TodoListsAction;
+
+  constructor(public payload: TodoListModel[]) {}
+}
+
+export class TodoListDetailsAction implements Action {
+  readonly type = TodoListActionTypes.TodoListDetailsAction;
+
+  constructor(public payload: TodoListModel) {}
+}
+
+export class UpdateTodosForListAction implements Action {
+  readonly type = TodoListActionTypes.UpdateTodosForListAction;
 
   constructor(public payload: TodoListModel[]) {}
 }

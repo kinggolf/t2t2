@@ -1,4 +1,4 @@
-import { UserModel } from './user.model';
+// import { UserModel } from './user.model';
 import { TodoListModel } from './todo-list.model';
 import { LoginModel } from './login.model';
 // user: UserModel;
@@ -6,4 +6,5 @@ import { LoginModel } from './login.model';
 export interface APPStore {
   loginObject: LoginModel;
   todoLists: TodoListModel[];
+  todoListDetails: TodoListModel;
 }

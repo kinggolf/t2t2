@@ -1,23 +1,23 @@
-[
-  {
-    "task": "Mow Grass",
-    "order": 0,
-    "id": "3C-0",
-    "note": "grass is too high!",
-    "completed": false
-  },
-  {
-    "task": "Groceries",
-    "order": 1,
-    "id": "3C-1",
-    "note": "Trader Joe's on way home",
-    "completed": false
-  },
-  {
-    "task": "Sleep",
-    "order": 2,
-    "id": "3C-2",
-    "note": "",
-    "completed": false
-  }
-]
+{
+  "id": "3C",
+  "name": "List 3 Name",
+  "itemsPending": 3,
+  "itemsCompleted": 0,
+  "items":[
+    {
+      "id": "3C-0",
+      "label": "List 3 - Label 1",
+      "completed": false
+    },
+    {
+      "id": "3C-1",
+      "label": "List 3 - Label 2",
+      "completed": false
+    },
+    {
+      "id": "3C-2",
+      "label": "List 3 - Label 3",
+      "completed": false
+    }
+  ]
+}

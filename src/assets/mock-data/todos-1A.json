@@ -1,23 +1,23 @@
-[
-  {
-    "task": "Mow Grass",
-    "order": 0,
-    "id": "1A-0",
-    "note": "grass is too high!",
-    "completed": false
-  },
-  {
-    "task": "Groceries",
-    "order": 1,
-    "id": "1A-1",
-    "note": "Trader Joe's on way home",
-    "completed": false
-  },
-  {
-    "task": "Sleep",
-    "order": 2,
-    "id": "1A-2",
-    "note": "",
-    "completed": false
-  }
-]
+{
+  "id": "1A",
+  "name": "List 1 Name",
+  "itemsPending": 2,
+  "itemsCompleted": 1,
+  "items":[
+    {
+      "id": "1A-0",
+      "label": "List 1 - Label 1",
+      "completed": false
+    },
+    {
+      "id": "1A-1",
+      "label": "List 1 - Label 2",
+      "completed": true
+    },
+    {
+      "id": "1A-2",
+      "label": "List 1 - Label 3",
+      "completed": false
+    }
+  ]
+}

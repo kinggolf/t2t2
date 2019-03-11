@@ -1,13 +1,52 @@
-<div *ngFor="let todoList of todoLists">
-  <mat-card>
+<div *ngFor="let todoList of (todoLists$ | async); let i = index;" style="margin-top: 2rem;">
+  <mat-card (click)="showTodos(i)" style="margin: 2rem 0.5rem; background-color: lightgray;">
     <mat-card-header>
       <mat-card-title>{{ todoList.name }}</mat-card-title>
     </mat-card-header>
-    <mat-card-content>
-      <p>{{ todoList.note }}</p>
+    <mat-card-content *ngIf="todoLists[i].showListDetails">
+      <app-todos [@opening]="todoLists[i].showListDetails ? 'show' : 'hide'" style="overflow: hidden;"></app-todos>
     </mat-card-content>
     <mat-card-actions>
-      <mat-checkbox>Completed</mat-checkbox>
+      <div style="display: table; width: 100%; text-align: center;">
+        <div style="display: table-cell; width: 20%;">
+          <div class="base-mat-icon">
+            <div class="icon-font-spec">{{ todoList.itemsCompleted }}</div>
+            <div>Completed</div>
+          </div>
+        </div>
+        <div style="display: table-cell; width: 20%;">
+          <div class="base-mat-icon">
+            <div class="icon-font-spec">{{ todoList.itemsPending }}</div>
+            <div>Pending</div>
+          </div>
+        </div>
+        <div style="display: table-cell; width: 20%;">
+          <button (click)="editListInfo(i)" class="base-mat-icon" title="Edit List Info">
+            <i class="material-icons icon-font-spec">border_color</i>
+            <div>Edit List Info</div>
+          </button>
+        </div>
+        <div style="display: table-cell; width: 20%;">
+          <button (click)="addTodoToList(i)" class="base-mat-icon" title="Add Todo">
+            <i class="material-icons icon-font-spec">add_circle</i>
+            <div>Add Todo</div>
+          </button>
+        </div>
+        <div style="display: table-cell; width: 20%;">
+          <button (click)="deleteList(i)" class="base-mat-icon" title="Delete List">
+            <i class="material-icons icon-font-spec">delete</i>
+            <div>Delete List</div>
+          </button>
+        </div>
+      </div>
     </mat-card-actions>
   </mat-card>
+  <!--
+  <div *ngIf="todoList.todos">
+    <app-todos [@opening]="showListTodos[i] ? 'show' : 'hide'" style="overflow: hidden;"></app-todos>
+  </div>
+  <div *ngIf="todoList.showListDetails">
+    <app-todos [@opening]="todoLists[i].showListDetails ? 'show' : 'hide'" style="overflow: hidden;"></app-todos>
+  </div> -->
+
 </div>

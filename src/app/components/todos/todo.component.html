@@ -1,0 +1,30 @@
+<div *ngFor="let todo of (todoListDetails$ | async).items; let i = index;">
+  <mat-card style="margin: 0.25rem 0.5rem; background-color: lightblue;">
+    <mat-card-header>
+      <mat-card-title style="font-size: 1rem;">{{ todo.label }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-actions>
+      <div style="display: table; width: 100%; text-align: center;">
+        <div style="display: table-cell; width: 33.3%;">
+          <button (click)="toggleTodoComplete(i)" class="base-mat-icon" title="Completed">
+            <i *ngIf="todo.completed" class="material-icons icon-font-spec">check_box</i>
+            <i *ngIf="!todo.completed" class="material-icons icon-font-spec">check_box_outline_blank</i>
+            <div>Complete</div>
+          </button>
+        </div>
+        <div style="display: table-cell; width: 33.3%;">
+          <button (click)="editTodoInfo(i)" class="base-mat-icon" title="Edit Todo Info">
+            <i class="material-icons icon-font-spec">border_color</i>
+            <div>Edit</div>
+          </button>
+        </div>
+        <div style="display: table-cell; width: 33.3%;">
+          <button (click)="deleteTodo(i)" class="base-mat-icon" title="Delete Todo">
+            <i class="material-icons icon-font-spec">delete</i>
+            <div>Delete</div>
+          </button>
+        </div>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</div>
