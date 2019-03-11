@@ -1,17 +1,27 @@
 import { ActionReducerMap } from '@ngrx/store';
-import { APPStore, LoginModel, TodoListModel } from '../models';
+import { APPStore, LoginModel, TodoListModel, UserModel } from '../models';
 import { UpdateTodosForListAction, LoginAction, LoginActionTypes, TodoListsAction,
-         TodoListDetailsAction, TodoListActionTypes } from '../actions';
+         TodoListDetailsAction, TodoListActionTypes, UserAction, UserActionTypes } from '../actions';
 
 export const reducers: ActionReducerMap<APPStore> = {
   loginObject: loginReducer,
   todoLists: todoListsReducer,
-  todoListDetails: todoListDetailReducer
+  todoListDetails: todoListDetailReducer,
+  currentUser: userReducer
 };
 
 export function loginReducer(state: LoginModel, action: LoginAction): LoginModel {
   switch (action.type) {
     case LoginActionTypes.LoginAction:
+      return action.payload;
+    default:
+      return state;
+  }
+}
+
+export function userReducer(state: UserModel, action: UserAction): UserModel {
+  switch (action.type) {
+    case UserActionTypes.UserAction:
       return action.payload;
     default:
       return state;

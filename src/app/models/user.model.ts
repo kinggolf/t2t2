@@ -1,5 +1,9 @@
 export interface UserModel {
-  email: string;
-  id?: string;
-  authenticated: boolean;
+  token: string;
+  user: {
+    name: string;
+    email: string;
+    role: string;
+    scope?: string;
+  };
 }

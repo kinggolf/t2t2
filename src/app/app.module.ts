@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule, MatInputModule, MatFormFieldModule, MatCardModule,
          MatToolbarModule, MatMenuModule } from '@angular/material';
@@ -13,13 +13,14 @@ import { reducers } from './reducers';
 import { LoginComponent } from './components/login/login.component';
 import { TodoListComponent } from './components/todo-list/todo-list.component';
 import { TodoComponent } from './components/todos/todo.component';
+import { JwtInterceptor } from './services/jwt-interceptor.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     TodoListComponent,
-    TodoComponent
+    TodoComponent,
   ],
   imports: [
     BrowserModule,
@@ -35,7 +36,9 @@ import { TodoComponent } from './components/todos/todo.component';
     MatToolbarModule,
     MatMenuModule,
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+  ],
   bootstrap: [
     AppComponent
   ]

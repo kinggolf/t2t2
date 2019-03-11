@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpInterceptor, HttpRequest, HttpEvent, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { LoginModel } from '../models';
-
-const BASE_URL = 'https://os.hallpassandfriends.com/api/auth';
-const SCOPE = '2bcf85b6-698d-4ab4-9910-ecb905b87828';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Store } from '@ngrx/store';
+import { APPStore, BASE_URL, SCOPE, LoginModel, UserModel } from '../models';
+import { UserAction } from '../actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private store: Store<APPStore>) { }
 
   submitLogin(loginObject: LoginModel): void {
+    // httpOptions probably not required, but included here for completeness
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -25,23 +24,14 @@ export class AuthService {
       password: loginObject.password,
       scope: SCOPE
     };
-    console.log('In AuthService, loginURL = ' , loginURL);
-    console.log('In AuthService, loginBody = ' , loginBody);
-    this.http.post(loginURL, loginBody, httpOptions)
-      .subscribe(response => {
-        console.log(response);
+    this.http.post<UserModel>(loginURL, loginBody, httpOptions)
+      .subscribe(user => {
+        console.log(user);
+        if (user && user.token) {
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          // localStorage.setItem('userToken', response.token);
+        }
+        this.store.dispatch(new UserAction(user));
       });
   }
 }
-/*
-    console.log('In AuthService, loginBody1 = ' , loginBody1);
-    const loginBody1 = JSON.stringify({
-      email: loginObject.email,
-      password: loginObject.password,
-      scope: SCOPE
-    });
-    'Accept': 'application/json'
-        const httpOptions1 = {
-      headers: new HttpHeaders().set('Content-Type', 'application/json')
-    };
- */

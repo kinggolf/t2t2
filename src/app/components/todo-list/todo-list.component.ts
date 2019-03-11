@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { APPStore, TodoListModel, TodoModel } from '../../models';
+import { APPStore, TodoListModel } from '../../models';
 import { Observable, SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { state, style, transition, trigger, animate } from '@angular/animations';
@@ -48,7 +48,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
   }
 
   showTodos(i) {
-    console.log('In showTodos, i = ' + i + ' and this.todoLists[i] = ', this.todoLists[i]);
     if (this.currentOpenListIndex === i) {
       this.todoLists[i].showListDetails = false;
       this.currentOpenListIndex = -1;
@@ -57,7 +56,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
         this.todoLists[this.currentOpenListIndex].showListDetails = false;
       }
       this.todosSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
-        console.log(listDetails);
         listDetails.showListDetails = this.todoLists[i].showListDetails = true;
         this.store.dispatch(new TodoListDetailsAction(listDetails));
         this.currentOpenListIndex = i;
