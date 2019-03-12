@@ -43,19 +43,23 @@
   </mat-card>
 
   <mat-card *ngIf="todoList.editingName" style="margin: 2rem 0.5rem; background-color: lightgray;">
-    <mat-form-field style="margin-left: 1.2rem;">
-      <input matInput placeholder="List Name">
-    </mat-form-field>
+    <form novalidate [formGroup]="newTodoListName">
+      <mat-form-field style="margin-left: 1.2rem;">
+        <input matInput placeholder="List Name" formControlName="newListName">
+      </mat-form-field>
 
-    <mat-card-actions>
-      <div style="display: table; width: 100%; text-align: center;">
-        <div style="display: table-cell; width: 50%;">
-          <button (click)="cancelEditName(i)" class="base-mat-icon-text-only" title="Cancel Edit Name">Cancel</button>
+      <mat-card-actions>
+        <div style="display: table; width: 100%; text-align: center;">
+          <div style="display: table-cell; width: 50%;">
+            <button (click)="clearAddedList(i)" class="base-mat-icon-text-only">Cancel</button>
+          </div>
+          <div style="display: table-cell; width: 50%;">
+            <button (click)="saveEditName(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListName.valid">
+              Save
+            </button>
+          </div>
         </div>
-        <div style="display: table-cell; width: 50%;">
-          <button (click)="saveEditName(i)" class="base-mat-icon-text-only" title="Save Edit Name">Save</button>
-        </div>
-      </div>
-    </mat-card-actions>
+      </mat-card-actions>
+    </form>
   </mat-card>
 </div>

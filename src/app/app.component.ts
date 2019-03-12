@@ -20,7 +20,6 @@ export class AppComponent implements OnInit, OnDestroy {
   todoListsFromServerSub: SubscriptionLike;
   newListName: string;
   prevTodoLists: TodoListModel[];
-  // todoListsSub: SubscriptionLike;
 
   constructor(private authService: AuthService, private todosService: TodosService,
               private store: Store<APPStore>) {}
@@ -58,25 +57,21 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.todoListsFromServerSub) {
       this.todoListsFromServerSub.unsubscribe();
     }
-    /*
-    if (this.todoListsSub) {
-      this.todoListsSub.unsubscribe();
-    } */
   }
 
   createNewList(): void {
-    console.log('createNewList');
     this.store.select('todoLists').subscribe(todoLists => {
       this.prevTodoLists = Object.assign(todoLists);
     }).unsubscribe();
-    const newTodoList = {
+    const newTodoList = [];
+    newTodoList.push({
       id: '',
       name: '',
       itemsPending: 0,
       itemsCompleted: 0,
-      editingName: true
-    };
-    this.store.dispatch(new TodoListsAction(this.prevTodoLists.concat(newTodoList)));
+    });
+    // this.store.dispatch(new TodoListsAction(this.prevTodoLists.concat(newTodoList)));
+    this.store.dispatch(new TodoListsAction(newTodoList.concat(this.prevTodoLists)));
   }
 
   logout(): void {

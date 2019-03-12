@@ -4,7 +4,8 @@ import { APPStore, TodoListModel } from '../../models';
 import { SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { state, style, transition, trigger, animate } from '@angular/animations';
-import {TodoListDetailsAction, TodoListsAction} from '../../actions';
+import { TodoListDetailsAction, TodoListsAction } from '../../actions';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-todo-list',
@@ -30,12 +31,19 @@ export class TodoListComponent implements OnInit, OnDestroy {
   todoLists: TodoListModel[];
   todoListsSub: SubscriptionLike;
   currentOpenListIndex: number;
+  newTodoListName: FormGroup;
 
-  constructor(private todosService: TodosService, private store: Store<APPStore>) { }
+  constructor(private todosService: TodosService, private store: Store<APPStore>, private fb: FormBuilder) { }
 
   ngOnInit() {
     this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
-      this.todoLists = todoList;
+      if (todoList) {
+        this.todoLists = todoList;
+        if (todoList[0].id === '') {
+          // Adding a new list
+          this.editListInfo(0);
+        }
+      }
     });
     this.currentOpenListIndex = -1;
   }
@@ -71,17 +79,23 @@ export class TodoListComponent implements OnInit, OnDestroy {
 
   editListInfo(i) {
     this.todoLists[i].editingName = true;
+    this.newTodoListName = this.fb.group({
+      newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
+    });
   }
 
-  cancelEditName(i) {
+  saveEditName(i) {
+    this.clearAddedList(i);
+    this.todosService.createNewList(this.newTodoListName.value.newListName).subscribe(newTodoList => {
+      this.store.dispatch(new TodoListsAction(this.todoLists.concat(newTodoList)));
+    });
+  }
+
+  clearAddedList(i) {
     this.todoLists[i].editingName = false;
     if (this.todoLists[i].id === '') {
-      this.store.dispatch(new TodoListsAction(this.todoLists.slice(0, this.todoLists.length - 1)));
-    }}
-
-  saveEditName(i) {
-    this.todoLists[i].editingName = false;
-    // Save this new name
+      this.store.dispatch(new TodoListsAction(this.todoLists.slice(1, this.todoLists.length)));
+    }
   }
 
   addTodoToList(i) {
