@@ -17,3 +17,14 @@ From services folder: `ng generate service auth` & `ng generate service todos`
 From components folder: `ng generate component login` & `ng generate component todo-list`
 
 `ng build --prod`
+
+
+#Concepts used
+
+angular/material
+
+ngrx/store
+
+reactive forms
+
+HTTP Interceptor
