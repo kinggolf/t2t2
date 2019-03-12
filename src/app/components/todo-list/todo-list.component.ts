@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { APPStore, TodoListModel } from '../../models';
-import { Observable, SubscriptionLike } from 'rxjs';
+import { SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { state, style, transition, trigger, animate } from '@angular/animations';
-import { TodoListDetailsAction } from '../../actions';
+import {TodoListDetailsAction, TodoListsAction} from '../../actions';
 
 @Component({
   selector: 'app-todo-list',
@@ -26,7 +26,6 @@ import { TodoListDetailsAction } from '../../actions';
   ]
 })
 export class TodoListComponent implements OnInit, OnDestroy {
-  todoLists$: Observable<TodoListModel[]>;
   todosSub: SubscriptionLike;
   todoLists: TodoListModel[];
   todoListsSub: SubscriptionLike;
@@ -35,21 +34,24 @@ export class TodoListComponent implements OnInit, OnDestroy {
   constructor(private todosService: TodosService, private store: Store<APPStore>) { }
 
   ngOnInit() {
-    this.todoLists$ = this.store.select('todoLists');
-    this.todoListsSub = this.todoLists$.subscribe(todoList => {
+    this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
       this.todoLists = todoList;
     });
     this.currentOpenListIndex = -1;
   }
 
   ngOnDestroy(): void {
-    this.todoListsSub.unsubscribe();
-    this.todosSub.unsubscribe();
+    if (this.todoListsSub) {
+      this.todoListsSub.unsubscribe();
+    }
+    if (this.todosSub) {
+      this.todosSub.unsubscribe();
+    }
   }
 
   showTodos(i) {
     if (this.currentOpenListIndex === i) {
-      this.todoLists[i].showListDetails = false;
+      this.todoLists[i].showListDetails = this.todoLists[i].editingName = false;
       this.currentOpenListIndex = -1;
     } else {
       if (this.currentOpenListIndex > -1) {
@@ -68,7 +70,18 @@ export class TodoListComponent implements OnInit, OnDestroy {
   }
 
   editListInfo(i) {
-    console.log('Edit this list info, i = ' + i);
+    this.todoLists[i].editingName = true;
+  }
+
+  cancelEditName(i) {
+    this.todoLists[i].editingName = false;
+    if (this.todoLists[i].id === '') {
+      this.store.dispatch(new TodoListsAction(this.todoLists.slice(0, this.todoLists.length - 1)));
+    }}
+
+  saveEditName(i) {
+    this.todoLists[i].editingName = false;
+    // Save this new name
   }
 
   addTodoToList(i) {

@@ -23,8 +23,6 @@ export class LoginComponent implements OnInit {
   }
 
   submit() {
-    console.log(this.loginForm.value);
-    // this.loginObject.emit(this.loginForm.value);
     this.store.dispatch(new LoginAction(this.loginForm.value));
   }
 }

@@ -1,9 +1,14 @@
 <mat-toolbar style="position: sticky; top: 0; z-index: 100; background-color: lightskyblue;">
   <span>The Docket</span>
+  <button mat-button [matMenuTriggerFor]="menu" style="position: absolute; right: 0;">
+    <i class="material-icons icon-font-spec-more">more_horiz</i>
+  </button>
+  <mat-menu #menu="matMenu" xPosition="after">
+    <button mat-menu-item (click)="createNewList()">Create A New List</button>
+    <button mat-menu-item (click)="logout()">Logout</button>
+  </mat-menu>
 </mat-toolbar>
 
 <app-login *ngIf="!currentUser"></app-login>
-<!--
-<app-login *ngIf="!currentUser" (loginObject)="submitLogin($event)"></app-login> -->
 
-<app-todo-list *ngIf="currentUser"></app-todo-list> <!--  *ngIf="currentUser" -->
+<app-todo-list *ngIf="currentUser"></app-todo-list>

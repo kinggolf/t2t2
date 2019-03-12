@@ -1,5 +1,5 @@
-<div *ngFor="let todo of (todoListDetails$ | async).items; let i = index;">
-  <mat-card style="margin: 0.25rem 0.5rem; background-color: lightblue;">
+<div *ngFor="let todo of todoListDetails.items; let i = index;">
+  <mat-card *ngIf="!todo.editingTask" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
     <mat-card-header>
       <mat-card-title style="font-size: 1rem;">{{ todo.label }}</mat-card-title>
     </mat-card-header>
@@ -23,6 +23,24 @@
             <i class="material-icons icon-font-spec">delete</i>
             <div>Delete</div>
           </button>
+        </div>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+
+  <mat-card *ngIf="todo.editingTask" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
+    <mat-form-field style="margin-left: 1.2rem;">
+      <input matInput placeholder="Task Name">
+    </mat-form-field>
+    <mat-card-actions>
+      <div style="display: table; width: 100%; text-align: center;">
+        <div style="display: table; width: 100%; text-align: center;">
+          <div style="display: table-cell; width: 50%;">
+            <button (click)="cancelEditTask(i)" class="base-mat-icon-text-only">Cancel</button>
+          </div>
+          <div style="display: table-cell; width: 50%;">
+            <button (click)="saveEditTask(i)" class="base-mat-icon-text-only">Save</button>
+          </div>
         </div>
       </div>
     </mat-card-actions>

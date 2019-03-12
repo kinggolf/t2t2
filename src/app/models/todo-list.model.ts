@@ -7,4 +7,5 @@ export interface TodoListModel {
   itemsCompleted: number;
   items?: TodoModel[];
   showListDetails?: boolean;
+  editingName?: boolean;
 }

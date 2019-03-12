@@ -26,12 +26,16 @@ export class AuthService {
     };
     this.http.post<UserModel>(loginURL, loginBody, httpOptions)
       .subscribe(user => {
-        console.log(user);
         if (user && user.token) {
           localStorage.setItem('currentUser', JSON.stringify(user));
-          // localStorage.setItem('userToken', response.token);
         }
         this.store.dispatch(new UserAction(user));
       });
   }
+
+  logout() {
+    localStorage.removeItem('currentUser');
+    this.store.dispatch(new UserAction(null));
+  }
+
 }

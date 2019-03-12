@@ -14,6 +14,15 @@ body {
   font-size: 0.6rem;
   text-align: center;
 }
+.base-mat-icon-text-only {
+  border: none;
+  background-color: transparent;
+  font-size: 1.2rem;
+  text-align: center;
+}
 .icon-font-spec {
   font-size: 1.2rem;
+}
+.icon-font-spec-more {
+  font-size: 2.5rem;
 }
