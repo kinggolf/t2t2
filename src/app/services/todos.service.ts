@@ -29,18 +29,16 @@ export class TodosService {
     return this.http.post<TodoListModel>(createNewListURL, createNewListBody);
   }
 
-  updateList(updatedList, nameOrCompleted): Observable<TodoListModel> {
-    const updateListURL = BASE_URL + '/api/docket/todo/item/' + updatedList.id;
+  updateList(updatedList, name): Observable<TodoListModel> {
+    const updateListURL = BASE_URL + '/api/docket/todo/' + updatedList.id;
     let updateListBody;
-    if (nameOrCompleted === 'name') {
+    if (name === 'name') {
       updateListBody = {
         op: 'replace',
-        path: '/label',
-        name: updatedList.name
+        path: '/name',
+        value: updatedList.name
       };
     }
-    console.log('updateListURL = ' + updateListURL);
-    console.log('updateListBody = ', updateListBody);
     return this.http.patch<any>(updateListURL, updateListBody);
   }
 
@@ -49,4 +47,18 @@ export class TodosService {
     return this.http.delete(deleteListURL);
   }
 
+  updateTodo(updatedList, nameOrCompleted): Observable<TodoListModel> {
+    const updateListURL = BASE_URL + '/api/docket/todo/item/' + updatedList.id;
+    let updateListBody;
+    if (nameOrCompleted === 'name') {
+      updateListBody = {
+        op: 'replace',
+        path: '/label',
+        value: updatedList.name
+      };
+    }
+    console.log('updateListURL = ' + updateListURL);
+    console.log('updateListBody = ', updateListBody);
+    return this.http.patch<any>(updateListURL, updateListBody);
+  }
 }

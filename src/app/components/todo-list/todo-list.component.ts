@@ -75,23 +75,18 @@ export class TodoListComponent implements OnInit, OnDestroy {
     // Use prevTodoLists to store current lists & revert back to this if user cancels editing a list name
     this.store.select('todoLists').subscribe(todoLists => {
       prevTodoLists = todoLists.slice(0);
-      // prevTodoLists = Object.assign(todoLists);
       this.store.dispatch(new PrevTodoListsAction(prevTodoLists));
     }).unsubscribe();
     this.todoLists[i].editingName = true;
     this.newTodoListName = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
-    console.log('In editListName, this.todoLists = ', this.todoLists);
   }
 
   saveEditName(i): void {
     this.clearAddedList(i, 'Save');
     if (this.creatingNewList) {
       this.todosService.createNewList(this.newTodoListName.value.newListName).subscribe(newTodoListObj => {
-        // console.log('First slice = ', ...this.todoLists.slice(0, i));
-        // console.log('newTodoList = ', [newTodoListObj]);
-        // console.log('Final slice = ', ...this.todoLists.slice(i + 1));
         this.store.dispatch((new TodoListsAction([
           ...this.todoLists.slice(0, i),
           ...[newTodoListObj],
@@ -106,6 +101,11 @@ export class TodoListComponent implements OnInit, OnDestroy {
         name: this.newTodoListName.value.newListName
       });
       console.log('In saveEditName, updatedList = ', updatedList);
+      this.store.dispatch((new TodoListsAction([
+        ...this.todoLists.slice(0, i),
+        ...[updatedList],
+        ...this.todoLists.slice(i + 1)
+      ])));
       this.todosService.updateList(updatedList, 'name').subscribe(resp => {
         console.log('In saveEditName, resp = ', resp);
       });
@@ -118,12 +118,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
     this.store.select('prevTodoLists').subscribe(prevTodoLists => {
       this.store.dispatch((new TodoListsAction(prevTodoLists)));
     }).unsubscribe();
-    /*
-    if ((saveOrCancel !== 'Save' && !this.todoLists[i].editingName) || this.creatingNewList) {
-      this.store.dispatch((new TodoListsAction([
-        ...this.todoLists.slice(1)
-      ])));
-    } */
     this.store.dispatch(new CreatingNewListAction(false));
   }
 
