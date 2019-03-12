@@ -13,6 +13,7 @@ body {
   background-color: transparent;
   font-size: 0.6rem;
   text-align: center;
+  outline: none;
 }
 .base-mat-icon-text-only {
   border: none;

@@ -4,8 +4,7 @@ import { AuthService } from './services/auth.service';
 import { APPStore, UserModel, LoginModel, TodoListModel } from './models';
 import { SubscriptionLike } from 'rxjs';
 import { TodosService } from './services/todos.service';
-import { TodoListsAction, UserAction } from './actions';
-import { MatDialog } from '@angular/material';
+import { TodoListsAction, PrevTodoListsAction, UserAction, CreatingNewListAction } from './actions';
 
 
 @Component({
@@ -18,8 +17,9 @@ export class AppComponent implements OnInit, OnDestroy {
   loginSub: SubscriptionLike;
   currentUserSub: SubscriptionLike;
   todoListsFromServerSub: SubscriptionLike;
+  creatingNewListSub: SubscriptionLike;
+  creatingNewList: boolean;
   newListName: string;
-  prevTodoLists: TodoListModel[];
 
   constructor(private authService: AuthService, private todosService: TodosService,
               private store: Store<APPStore>) {}
@@ -37,10 +37,14 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       }
     });
-    const currentUserFormLocalStorage = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUserFormLocalStorage && (typeof currentUserFormLocalStorage !== 'undefined')) {
-      // No need for log in, but when do we need to refresh the token?
-      this.store.dispatch(new UserAction(currentUserFormLocalStorage));
+    // Use creatingNewList to prevent multiple create lists from being open at the same time
+    this.creatingNewListSub = this.store.select('creatingNewList').subscribe(creatingNewList => {
+      this.creatingNewList = creatingNewList;
+    });
+    const currentUserFromLocalStorage = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUserFromLocalStorage && (typeof currentUserFromLocalStorage !== 'undefined')) {
+      // No need for log in, but when do we need to refresh the token, app restart?
+      this.store.dispatch(new UserAction(currentUserFromLocalStorage));
     } else {
       this.loginSub = this.store.select<LoginModel>('loginObject').subscribe(loginObject => {
         if (loginObject) {
@@ -57,11 +61,18 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.todoListsFromServerSub) {
       this.todoListsFromServerSub.unsubscribe();
     }
+    if (this.creatingNewListSub) {
+      this.creatingNewListSub.unsubscribe();
+    }
   }
 
   createNewList(): void {
+    let prevTodoLists: TodoListModel[];
+    // Use prevTodoLists to store current lists & revert back to this if user cancels creating a new list
     this.store.select('todoLists').subscribe(todoLists => {
-      this.prevTodoLists = Object.assign(todoLists);
+      prevTodoLists = todoLists.slice(0);
+      // prevTodoLists = Object.assign(todoLists);
+      this.store.dispatch(new PrevTodoListsAction(prevTodoLists));
     }).unsubscribe();
     const newTodoList = [];
     newTodoList.push({
@@ -69,9 +80,13 @@ export class AppComponent implements OnInit, OnDestroy {
       name: '',
       itemsPending: 0,
       itemsCompleted: 0,
+      editingName: true
     });
-    // this.store.dispatch(new TodoListsAction(this.prevTodoLists.concat(newTodoList)));
-    this.store.dispatch(new TodoListsAction(newTodoList.concat(this.prevTodoLists)));
+    this.store.dispatch(new TodoListsAction(([
+      ...newTodoList,
+      ...prevTodoLists
+    ])));
+    this.store.dispatch(new CreatingNewListAction(true));
   }
 
   logout(): void {

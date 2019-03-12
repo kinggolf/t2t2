@@ -1,9 +1,11 @@
 import { Action } from '@ngrx/store';
-import { TodoListModel, TodoModel } from '../models';
+import { TodoListModel } from '../models';
 
 export enum TodoListActionTypes {
   TodoListsAction = 'TodoListsAction',
+  PrevTodoListsAction = 'PrevTodoListsAction',
   TodoListDetailsAction = 'TodoListDetailsAction',
+  PrevTodoListDetailsAction = 'PrevTodoListDetailsAction',
   UpdateTodosForListAction = 'UpdateTodosForListAction',
 }
 
@@ -13,8 +15,20 @@ export class TodoListsAction implements Action {
   constructor(public payload: TodoListModel[]) {}
 }
 
+export class PrevTodoListsAction implements Action {
+  readonly type = TodoListActionTypes.PrevTodoListsAction;
+
+  constructor(public payload: TodoListModel[]) {}
+}
+
 export class TodoListDetailsAction implements Action {
   readonly type = TodoListActionTypes.TodoListDetailsAction;
+
+  constructor(public payload: TodoListModel) {}
+}
+
+export class PrevTodoListDetailsAction implements Action {
+  readonly type = TodoListActionTypes.PrevTodoListDetailsAction;
 
   constructor(public payload: TodoListModel) {}
 }

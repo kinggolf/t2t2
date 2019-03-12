@@ -4,7 +4,7 @@
       <mat-card-title>{{ todoList.name }}</mat-card-title>
     </mat-card-header>
     <mat-card-content *ngIf="todoList.showListDetails">
-      <app-todos [@opening]="todoList.showListDetails ? 'show' : 'hide'" style="overflow: hidden;"></app-todos>
+      <app-todos></app-todos>
     </mat-card-content>
     <mat-card-actions>
       <div style="display: table; width: 100%; text-align: center;">
@@ -21,7 +21,7 @@
           </div>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="editListInfo(i)" class="base-mat-icon" title="Edit Name">
+          <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name">
             <i class="material-icons icon-font-spec">border_color</i>
             <div>Edit List Name</div>
           </button>
@@ -33,7 +33,7 @@
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="deleteList(i)" class="base-mat-icon" title="Delete List">
+          <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List">
             <i class="material-icons icon-font-spec">delete</i>
             <div>Delete List</div>
           </button>
@@ -51,7 +51,7 @@
       <mat-card-actions>
         <div style="display: table; width: 100%; text-align: center;">
           <div style="display: table-cell; width: 50%;">
-            <button (click)="clearAddedList(i)" class="base-mat-icon-text-only">Cancel</button>
+            <button (click)="clearAddedList(i, 'Cancel')" class="base-mat-icon-text-only">Cancel</button>
           </div>
           <div style="display: table-cell; width: 50%;">
             <button (click)="saveEditName(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListName.valid">

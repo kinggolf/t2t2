@@ -10,4 +10,3 @@ export class UserAction implements Action {
 
   constructor(public payload: UserModel) {}
 }
-

@@ -9,5 +9,8 @@ export interface APPStore {
   loginObject: LoginModel;
   todoLists: TodoListModel[];
   todoListDetails: TodoListModel;
+  prevTodoLists: TodoListModel[];
+  prevTodoListDetails: TodoListModel;
   currentUser: UserModel;
+  creatingNewList: boolean;
 }
