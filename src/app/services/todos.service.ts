@@ -42,31 +42,40 @@ export class TodosService {
     return this.http.patch<any>(updateListURL, updateListBody);
   }
 
-  deleteList(todoListId): Observable<any> {
+  deleteTodoList(todoListId): Observable<any> {
     const deleteListURL = BASE_URL + '/api/docket/todo/' + todoListId;
     return this.http.delete(deleteListURL);
   }
 
-  createNewTodo(todoListId, newTodoName): Observable<TodoModel> {
+  createNewTodo(todoListId, newTodoLabel): Observable<TodoListModel> {
     const createNewTodoURL = BASE_URL + '/api/docket/todo/' + todoListId;
     const createNewTodoBody = {
-      label: newTodoName
+      label: newTodoLabel
     };
-    return this.http.post<TodoModel>(createNewTodoURL, createNewTodoBody);
+    return this.http.post<TodoListModel>(createNewTodoURL, createNewTodoBody);
   }
 
-  updateTodo(updatedList, nameOrCompleted): Observable<TodoListModel> {
-    const updateListURL = BASE_URL + '/api/docket/todo/item/' + updatedList.id;
+  updateTodo(todoItemId, updatedTodoLabel, completed): Observable<TodoListModel> {
+    const updateListURL = BASE_URL + '/api/docket/todo/item/' + todoItemId;
     let updateListBody;
-    if (nameOrCompleted === 'name') {
+    if (updatedTodoLabel !== '') {
       updateListBody = {
         op: 'replace',
         path: '/label',
-        value: updatedList.name
+        value: updatedTodoLabel
+      };
+    } else {
+      updateListBody = {
+        op: 'replace',
+        path: '/completed',
+        value: completed
       };
     }
-    console.log('updateListURL = ' + updateListURL);
-    console.log('updateListBody = ', updateListBody);
     return this.http.patch<any>(updateListURL, updateListBody);
+  }
+
+  deleteTodo(todoItemId): Observable<any> {
+    const deleteTodoURL = BASE_URL + '/api/docket/todo/item/' + todoItemId;
+    return this.http.delete(deleteTodoURL);
   }
 }

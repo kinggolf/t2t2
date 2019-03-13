@@ -1,73 +1,54 @@
-<div *ngFor="let todo of todoListDetails.items; let i = index;">
-  <mat-card *ngIf="!todo.editingTask" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
-    <mat-card-header>
-      <mat-card-title style="font-size: 1rem;">{{ todo.label }} + {{ todo.editingTask }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-actions>
-      <div style="display: table; width: 100%; text-align: center;">
-        <div style="display: table-cell; width: 33.3%;">
-          <button (click)="toggleTodoComplete(i)" class="base-mat-icon" title="Completed">
-            <i *ngIf="todo.completed" class="material-icons icon-font-spec">check_box</i>
-            <i *ngIf="!todo.completed" class="material-icons icon-font-spec">check_box_outline_blank</i>
-            <div>Complete</div>
-          </button>
-        </div>
-        <div style="display: table-cell; width: 33.3%;">
-          <button (click)="editTodoInfo(i)" class="base-mat-icon" title="Edit Todo Info">
-            <i class="material-icons icon-font-spec">border_color</i>
-            <div>Edit</div>
-          </button>
-        </div>
-        <div style="display: table-cell; width: 33.3%;">
-          <button (click)="deleteTodo(i)" class="base-mat-icon" title="Delete Todo">
-            <i class="material-icons icon-font-spec">delete</i>
-            <div>Delete</div>
-          </button>
-        </div>
-      </div>
-    </mat-card-actions>
-  </mat-card>
-
-  <mat-card *ngIf="todo.editingTask" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
-    <form novalidate [formGroup]="newTodoListLabel">
-      <mat-form-field style="margin-left: 1.2rem;">
-        <input matInput placeholder="Task Name">
-      </mat-form-field>
+<div *ngIf="todoListDetails">
+  <div *ngFor="let todo of todoListDetails.items; let i = index;">
+    <mat-card *ngIf="!todo.editingTask" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
+      <mat-card-header>
+        <mat-card-title style="font-size: 1rem;">{{ todo.label }}</mat-card-title>
+      </mat-card-header>
       <mat-card-actions>
         <div style="display: table; width: 100%; text-align: center;">
-          <div style="display: table; width: 100%; text-align: center;">
-            <div style="display: table-cell; width: 50%;">
-              <button (click)="cancelEditTask(i)" class="base-mat-icon-text-only">Cancel</button>
-            </div>
-            <div style="display: table-cell; width: 50%;">
-              <button (click)="saveEditTask(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListLabel.valid">
-                Save
-              </button>
-            </div>
+          <div style="display: table-cell; width: 33.3%;">
+            <button (click)="toggleTodoComplete(i)" class="base-mat-icon" title="Completed">
+              <i *ngIf="todo.completed" class="material-icons icon-font-spec">check_box</i>
+              <i *ngIf="!todo.completed" class="material-icons icon-font-spec">check_box_outline_blank</i>
+              <div>Complete</div>
+            </button>
           </div>
-        </div>
-      </mat-card-actions>
-    </form>
-  </mat-card>
-  <!--
-  <mat-card *ngIf="todoList.editingName" style="margin: 2rem 0.5rem; background-color: lightgray;">
-    <form novalidate [formGroup]="newTodoListName">
-      <mat-form-field style="margin-left: 1.2rem;">
-        <input matInput placeholder="List Name" formControlName="newListName">
-      </mat-form-field>
-
-      <mat-card-actions>
-        <div style="display: table; width: 100%; text-align: center;">
-          <div style="display: table-cell; width: 50%;">
-            <button (click)="clearAddedList(i, 'Cancel')" class="base-mat-icon-text-only">Cancel</button>
+          <div style="display: table-cell; width: 33.3%;">
+            <button (click)="editTodoInfo(i)" class="base-mat-icon" title="Edit Todo Info">
+              <i class="material-icons icon-font-spec">border_color</i>
+              <div>Edit</div>
+            </button>
           </div>
-          <div style="display: table-cell; width: 50%;">
-            <button (click)="saveEditName(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListName.valid">
-              Save
+          <div style="display: table-cell; width: 33.3%;">
+            <button (click)="deleteTodo(i)" class="base-mat-icon" title="Delete Todo">
+              <i class="material-icons icon-font-spec">delete</i>
+              <div>Delete</div>
             </button>
           </div>
         </div>
       </mat-card-actions>
-    </form>
-  </mat-card> -->
+    </mat-card>
+
+    <mat-card *ngIf="todo.editingTask" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
+      <form novalidate [formGroup]="newTodoListLabel">
+        <mat-form-field style="margin-left: 1.2rem;">
+          <input matInput placeholder="Task Label" formControlName="newTodoLabel">
+        </mat-form-field>
+        <mat-card-actions>
+          <div style="display: table; width: 100%; text-align: center;">
+            <div style="display: table; width: 100%; text-align: center;">
+              <div style="display: table-cell; width: 50%;">
+                <button (click)="cancelEditLabel(i)" class="base-mat-icon-text-only">Cancel</button>
+              </div>
+              <div style="display: table-cell; width: 50%;">
+                <button (click)="saveEditLabel(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListLabel.valid">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-card-actions>
+      </form>
+    </mat-card>
+  </div>
 </div>
