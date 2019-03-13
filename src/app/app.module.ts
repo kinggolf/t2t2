@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule, MatInputModule, MatFormFieldModule, MatCardModule,
-         MatToolbarModule, MatMenuModule, MatDialogModule } from '@angular/material';
+         MatToolbarModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule } from '@angular/material';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
@@ -36,6 +36,7 @@ import { JwtInterceptor } from './services/jwt-interceptor.service';
     MatToolbarModule,
     MatMenuModule,
     MatDialogModule,
+    MatProgressSpinnerModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

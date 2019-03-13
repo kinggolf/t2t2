@@ -20,18 +20,27 @@ export class AppComponent implements OnInit, OnDestroy {
   creatingNewListSub: SubscriptionLike;
   creatingNewList: boolean;
   newListName: string;
+  showLoadingSpinner: boolean;
 
   constructor(private authService: AuthService, private todosService: TodosService,
               private store: Store<APPStore>) {}
 
   ngOnInit(): void {
+    this.showLoadingSpinner = false;
+    const currentUserFromLocalStorage = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUserFromLocalStorage && (typeof currentUserFromLocalStorage !== 'undefined')) {
+      // No need for log in, but when do we need to refresh the token, app restart?
+      this.store.dispatch(new UserAction(currentUserFromLocalStorage));
+    }
     this.currentUserSub = this.store.select('currentUser').subscribe(user => {
       this.currentUser = user;
       if (this.currentUser && (typeof this.currentUser !== 'undefined')) {
         if (this.currentUser.token) {
+          this.showLoadingSpinner = true;
           this.todoListsFromServerSub = this.todosService.getTodoLists().subscribe(todoLists => {
             if (todoLists) {
               this.store.dispatch(new TodoListsAction(todoLists));
+              this.showLoadingSpinner = false;
             }
           });
         }
@@ -41,17 +50,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.creatingNewListSub = this.store.select('creatingNewList').subscribe(creatingNewList => {
       this.creatingNewList = creatingNewList;
     });
-    const currentUserFromLocalStorage = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUserFromLocalStorage && (typeof currentUserFromLocalStorage !== 'undefined')) {
-      // No need for log in, but when do we need to refresh the token, app restart?
-      this.store.dispatch(new UserAction(currentUserFromLocalStorage));
-    } else {
-      this.loginSub = this.store.select<LoginModel>('loginObject').subscribe(loginObject => {
-        if (loginObject) {
-          this.authService.submitLogin(loginObject);
-        }
-      });
-    }
+    this.loginSub = this.store.select<LoginModel>('loginObject').subscribe(loginObject => {
+      if (loginObject) {
+        this.authService.submitLogin(loginObject);
+      }
+    });
   }
 
   ngOnDestroy(): void {

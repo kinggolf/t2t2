@@ -8,6 +8,7 @@ export { PrevTodoListsAction } from './todo-lists.action';
 export { PrevTodoListDetailsAction } from './todo-lists.action';
 export { UpdateTodosForListAction } from './todo-lists.action';
 export { TodoListDetailsAction } from './todo-lists.action';
+export { UpdateListDetailsLoadingAction } from './todo-lists.action';
 export { CreatingNewListAction } from './creatingNewList.action';
 export { CreatingNewListActionTypes } from './creatingNewList.action';
 export { CreatingNewTodoAction } from './creatingNewList.action';

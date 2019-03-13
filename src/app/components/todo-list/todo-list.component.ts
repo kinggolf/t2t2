@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { APPStore, TodoListModel, TodoModel } from '../../models';
-import { SubscriptionLike } from 'rxjs';
+import { SubscriptionLike, Observable } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { TodoListDetailsAction, TodoListsAction, CreatingNewListAction, CreatingNewTodoAction,
-         PrevTodoListsAction, PrevTodoListDetailsAction } from '../../actions';
+         PrevTodoListsAction, PrevTodoListDetailsAction, UpdateListDetailsLoadingAction } from '../../actions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -20,6 +20,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
   creatingNewTodoSub: SubscriptionLike;
   todoListDetails: TodoListModel;
   todoListDetailsSub: SubscriptionLike;
+  todoListDetailsLoading$: Observable<boolean>;
   currentOpenListIndex: number;
   newTodoListName: FormGroup;
   creatingNewList: boolean;
@@ -29,7 +30,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
-      console.log('In ngOnInit, todoList = ', todoList);
       if (todoList) {
         this.todoLists = todoList;
       }
@@ -45,8 +45,10 @@ export class TodoListComponent implements OnInit, OnDestroy {
     // Use creatingNewTodo to prevent multiple create todos from being open at the same time
     this.creatingNewTodoSub = this.store.select('creatingNewTodo').subscribe(creatingNewTodo => {
       this.creatingNewTodo = creatingNewTodo;
+      console.log('In ngOnInit, this.creatingNewTodo = ', this.creatingNewTodo);
     });
     this.currentOpenListIndex = -1;
+    this.todoListDetailsLoading$ = this.store.select('listDetailsLoading');
   }
 
   ngOnDestroy(): void {
@@ -76,34 +78,40 @@ export class TodoListComponent implements OnInit, OnDestroy {
         if (this.currentOpenListIndex > -1) {
           this.todoLists[this.currentOpenListIndex].showListDetails = false;
         }
+        this.store.dispatch(new UpdateListDetailsLoadingAction(true));
+        this.todoLists[i].showListDetails = true;
         this.todosHttpSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
-          listDetails.showListDetails = this.todoLists[i].showListDetails = true;
+          listDetails.showListDetails = true;
           this.store.dispatch(new TodoListDetailsAction(Object.assign({}, listDetails)));
           this.currentOpenListIndex = i;
+          this.store.dispatch(new UpdateListDetailsLoadingAction(false));
         });
       }
       // Subscribe to todoListDetail in case there are updates to the list details in todo.component
       this.todoListDetailsSub = this.store.select('todoListDetails').subscribe(listDetails => {
-        if (listDetails) {
-          let completedTodos = 0;
-          let pendingTodos = 0;
-          listDetails.items.map(item => {
-            if (item.completed) {
-              completedTodos = completedTodos + 1;
-            } else {
-              pendingTodos = pendingTodos + 1;
-            }
-          });
-          const updatedTodoList = Object.assign(
-            this.todoLists[i],
-            {itemsCompleted: completedTodos},
-            {itemsPending: pendingTodos});
-          const updatedTodoLists = [
-            ...this.todoLists.slice(0, i),
-            updatedTodoList,
-            ...this.todoLists.slice(i + 1),
-          ];
-          this.store.dispatch(new TodoListsAction(updatedTodoLists));
+        if (!this.creatingNewTodo) {
+          console.log('In showListDetails, i = ' + i + ' & listDetails = ', listDetails);
+          if (listDetails) {
+            let completedTodos = 0;
+            let pendingTodos = 0;
+            listDetails.items.map(item => {
+              if (item.completed) {
+                completedTodos = completedTodos + 1;
+              } else {
+                pendingTodos = pendingTodos + 1;
+              }
+            });
+            const updatedTodoList = Object.assign(
+              this.todoLists[i],
+              {itemsCompleted: completedTodos},
+              {itemsPending: pendingTodos});
+            const updatedTodoLists = [
+              ...this.todoLists.slice(0, i),
+              updatedTodoList,
+              ...this.todoLists.slice(i + 1),
+            ];
+            this.store.dispatch(new TodoListsAction(updatedTodoLists));
+          }
         }
       });
     }
@@ -118,18 +126,20 @@ export class TodoListComponent implements OnInit, OnDestroy {
     }).unsubscribe();
     this.todoLists[i].editingName = true;
     this.newTodoListName = this.fb.group({
-      newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
+      newListName: [this.todoLists[i].name, Validators.compose([Validators.required, Validators.minLength(1)])]
     });
   }
 
   saveEditName(i): void {
-    this.clearAddedList(i, 'Save');
+    this.todoLists[i].editingName = false;
+    this.store.select('prevTodoLists').subscribe(prevTodoLists => {
+      this.store.dispatch((new TodoListsAction(prevTodoLists)));
+    }).unsubscribe();
     if (this.creatingNewList) {
       this.todosService.createNewList(this.newTodoListName.value.newListName).subscribe(newTodoListObj => {
         this.store.dispatch((new TodoListsAction([
-          ...this.todoLists.slice(0, i),
           ...[newTodoListObj],
-          ...this.todoLists.slice(i + 1)
+          ...this.todoLists.slice(0)
         ])));
       });
     } else {
@@ -138,7 +148,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
         ...this.todoLists[i],
         name: this.newTodoListName.value.newListName
       });
-      console.log('In saveEditName, updatedList = ', updatedList);
       this.store.dispatch((new TodoListsAction([
         ...this.todoLists.slice(0, i),
         ...[updatedList],
@@ -149,13 +158,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
       });
     }
     this.todoLists[i].editingName = false;
-  }
-
-  clearAddedList(i, saveOrCancel): void {
-    this.todoLists[i].editingName = false;
-    this.store.select('prevTodoLists').subscribe(prevTodoLists => {
-      this.store.dispatch((new TodoListsAction(prevTodoLists)));
-    }).unsubscribe();
     this.store.dispatch(new CreatingNewListAction(false));
   }
 
@@ -171,11 +173,14 @@ export class TodoListComponent implements OnInit, OnDestroy {
       });
       let newTodoListItems: TodoModel[];
       let prevTodoListDetails: TodoListModel;
+      console.log('this.currentOpenListIndex = ' + this.currentOpenListIndex + ' & i = ' + i);
       if (this.currentOpenListIndex === i) {
         // adding todo to already open list details, so add blank todo with open form, index 0
         this.store.select('todoListDetails').subscribe(listDetails => {
           prevTodoListDetails = Object.assign({}, listDetails);
-          this.store.dispatch(new PrevTodoListDetailsAction(prevTodoListDetails));
+          // console.log('this.currentOpenListIndex = ' + this.currentOpenListIndex + ' & prevTodoListDetails = ', prevTodoListDetails);
+          console.log('dispatch PrevTodoListDetailsAction 1');
+          this.store.dispatch(new PrevTodoListDetailsAction(Object.assign({}, listDetails)));
           newTodoListItems = [
             ...newTodo,
             ...listDetails.items
@@ -191,8 +196,9 @@ export class TodoListComponent implements OnInit, OnDestroy {
           // Fetch list details
           this.todosHttpSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
             listDetails.showListDetails = this.todoLists[i].showListDetails = true;
-            prevTodoListDetails = Object.assign({}, listDetails);
-            this.store.dispatch(new PrevTodoListDetailsAction(prevTodoListDetails));
+            // prevTodoListDetails = Object.assign({}, listDetails);
+            console.log('dispatch PrevTodoListDetailsAction 2');
+            this.store.dispatch(new PrevTodoListDetailsAction(Object.assign({}, listDetails)));
             this.store.dispatch(
               new TodoListDetailsAction(Object.assign(listDetails, {
                 items: [
@@ -205,14 +211,31 @@ export class TodoListComponent implements OnInit, OnDestroy {
           });
         } else {
           // This list has no todos
+          console.log('this.todoLists[i] = ', this.todoLists[i]);
           this.store.dispatch(new PrevTodoListDetailsAction(null));
+          const todoLists3 = Object.assign({}, this.todoLists[i]);
+          console.log('todoLists3 = ', todoLists3);
+          this.todoLists[i].showListDetails = true;
           this.store.dispatch(
-            new TodoListDetailsAction(Object.assign(this.todoLists[i], {items: newTodo}, {showListDetails: true}))
+            new TodoListDetailsAction(Object.assign(todoLists3, {items: newTodo}, {showListDetails: true}))
           );
         }
       }
     }
+    /*
+    this.store.select('prevTodoListDetails').subscribe(prevTodoListDetails => {
+      console.log(prevTodoListDetails);
+    }).unsubscribe(); */
   }
+
+  cancelEditListName(i): void {
+    this.todoLists[i].editingName = false;
+    this.store.select('prevTodoLists').subscribe(prevTodoLists => {
+      this.store.dispatch((new TodoListsAction(prevTodoLists)));
+    }).unsubscribe();
+    this.store.dispatch(new CreatingNewListAction(false));
+  }
+
 
   confirmDeleteList(i): void {
     const confirmDelete = window.confirm('Confirm Delete ' + this.todoLists[i].name);

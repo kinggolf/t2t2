@@ -7,6 +7,7 @@ export enum TodoListActionTypes {
   TodoListDetailsAction = 'TodoListDetailsAction',
   PrevTodoListDetailsAction = 'PrevTodoListDetailsAction',
   UpdateTodosForListAction = 'UpdateTodosForListAction',
+  UpdateListDetailsLoadingAction = 'UpdateListDetailsLoadingAction',
 }
 
 export class TodoListsAction implements Action {
@@ -37,4 +38,10 @@ export class UpdateTodosForListAction implements Action {
   readonly type = TodoListActionTypes.UpdateTodosForListAction;
 
   constructor(public payload: TodoListModel[]) {}
+}
+
+export class UpdateListDetailsLoadingAction implements Action {
+  readonly type = TodoListActionTypes.UpdateListDetailsLoadingAction;
+
+  constructor(public payload: boolean) {}
 }

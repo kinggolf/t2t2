@@ -71,23 +71,31 @@ export class TodoComponent implements OnInit, OnDestroy {
 
   cancelEditLabel(i) {
     this.store.dispatch(new CreatingNewTodoAction(false));
-    this.store.select('prevTodoListDetails').subscribe(todoListDetails => {
-      if (todoListDetails) {
-        this.store.dispatch(new TodoListDetailsAction(Object.assign(todoListDetails)));
+    this.store.select('prevTodoListDetails').subscribe(prevTodoListDetails => {
+      console.log(prevTodoListDetails);
+      if (prevTodoListDetails) {
+        this.store.dispatch(new TodoListDetailsAction(Object.assign(prevTodoListDetails)));
+        // this.todoListDetails.items[i].editingTask = false;
       } else {
+        const todoListsNoShow = [];
+        this.store.select('todoLists').subscribe(todoLists => {
+          console.log('todoLists 1 = ', todoLists);
+          todoLists.map(list => {
+            todoListsNoShow.push(Object.assign(list, {showListDetails: false}));
+          });
+          console.log('todoLists 2 = ', todoLists);
+        }).unsubscribe();
+        this.store.dispatch(new TodoListsAction([...todoListsNoShow.slice(0)]));
         this.store.dispatch(new TodoListDetailsAction(null));
       }
     }).unsubscribe();
-    this.todoListDetails.items[i].editingTask = false;
   }
 
   saveEditLabel(i) {
     this.todoListDetails.items[i].editingTask = false;
-    console.log('saveEditLabel, i = ' + i + ' & todoListDetails = ', this.todoListDetails);
     if (this.creatingNewTodo) {
       this.todosService.createNewTodo(this.todoListDetails.id, this.newTodoListLabel.value.newTodoLabel)
         .subscribe(updatedTodoDetails => {
-          console.log('Server Create Todo Item updatedTodoDetails = ', updatedTodoDetails);
           this.store.dispatch((new TodoListDetailsAction(Object.assign({}, updatedTodoDetails))));
         });
     } else {

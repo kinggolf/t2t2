@@ -9,6 +9,8 @@
   </mat-menu>
 </mat-toolbar>
 
+<mat-spinner *ngIf="showLoadingSpinner" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
+
 <app-login *ngIf="!currentUser"></app-login>
 
 <app-todo-list *ngIf="currentUser"></app-todo-list>

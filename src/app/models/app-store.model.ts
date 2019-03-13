@@ -14,4 +14,5 @@ export interface APPStore {
   currentUser: UserModel;
   creatingNewList: boolean;
   creatingNewTodo: boolean;
+  listDetailsLoading: boolean;
 }

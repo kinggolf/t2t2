@@ -3,17 +3,18 @@ import { APPStore, LoginModel, TodoListModel, UserModel } from '../models';
 import { UpdateTodosForListAction, LoginAction, LoginActionTypes, TodoListsAction,
          TodoListDetailsAction, TodoListActionTypes, UserAction, UserActionTypes,
          CreatingNewListAction, CreatingNewListActionTypes, CreatingNewTodoAction,
-         PrevTodoListsAction, PrevTodoListDetailsAction} from '../actions';
+         PrevTodoListsAction, PrevTodoListDetailsAction, UpdateListDetailsLoadingAction } from '../actions';
 
 export const reducers: ActionReducerMap<APPStore> = {
   loginObject: loginReducer,
   todoLists: todoListsReducer,
-  todoListDetails: todoListDetailReducer,
+  todoListDetails: todoListDetailsReducer,
   prevTodoLists: prevTodoListsReducer,
   prevTodoListDetails: prevTodoListDetailReducer,
   currentUser: userReducer,
   creatingNewList: creatingNewListReducer,
-  creatingNewTodo: creatingNewTodoReducer
+  creatingNewTodo: creatingNewTodoReducer,
+  listDetailsLoading: updateListDetailsLoadingReducer,
 };
 
 export function loginReducer(state: LoginModel, action: LoginAction): LoginModel {
@@ -52,7 +53,7 @@ export function prevTodoListsReducer(state: TodoListModel[], action: PrevTodoLis
   }
 }
 
-export function todoListDetailReducer(state: TodoListModel, action: TodoListDetailsAction): TodoListModel {
+export function todoListDetailsReducer(state: TodoListModel, action: TodoListDetailsAction): TodoListModel {
   switch (action.type) {
     case TodoListActionTypes.TodoListDetailsAction:
       return action.payload;
@@ -91,6 +92,15 @@ export function creatingNewListReducer(state: boolean, action: CreatingNewListAc
 export function creatingNewTodoReducer(state: boolean, action: CreatingNewTodoAction): boolean {
   switch (action.type) {
     case CreatingNewListActionTypes.CreatingNewTodoAction:
+      return action.payload;
+    default:
+      return state;
+  }
+}
+
+export function updateListDetailsLoadingReducer(state: boolean, action: UpdateListDetailsLoadingAction): boolean {
+  switch (action.type) {
+    case TodoListActionTypes.UpdateListDetailsLoadingAction:
       return action.payload;
     default:
       return state;
