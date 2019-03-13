@@ -1,6 +1,6 @@
 <div *ngFor="let todoList of todoLists; let i = index;" style="margin-top: 2rem;">
-  <mat-card *ngIf="!todoList.editingName" style="margin: 2rem 0.5rem; background-color: lightgray;">
-    <mat-card-header (click)="showTodos(i)">
+  <mat-card *ngIf="!todoList.editingName && !todoList.addingTodo" style="margin: 2rem 0.5rem; background-color: lightgray;">
+    <mat-card-header (click)="showListDetails(i)">
       <mat-card-title>{{ todoList.name }}</mat-card-title>
     </mat-card-header>
     <mat-card-content *ngIf="todoList.showListDetails">
@@ -27,7 +27,7 @@
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="addTodoToList(i)" class="base-mat-icon" title="Add Todo">
+          <button (click)="createNewTodo(i)" class="base-mat-icon" title="Add Todo">
             <i class="material-icons icon-font-spec">add_circle</i>
             <div>Add Todo</div>
           </button>
@@ -54,7 +54,8 @@
             <button (click)="clearAddedList(i, 'Cancel')" class="base-mat-icon-text-only">Cancel</button>
           </div>
           <div style="display: table-cell; width: 50%;">
-            <button (click)="saveEditName(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListName.valid">
+            <button (click)="saveNameOrLabel(i)" class="base-mat-icon-text-only"
+                    [disabled]="!newTodoListName.valid">
               Save
             </button>
           </div>

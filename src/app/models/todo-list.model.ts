@@ -8,4 +8,5 @@ export interface TodoListModel {
   items?: TodoModel[];
   showListDetails?: boolean;
   editingName?: boolean;
+  addingTodo?: boolean;
 }

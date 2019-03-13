@@ -13,4 +13,5 @@ export interface APPStore {
   prevTodoListDetails: TodoListModel;
   currentUser: UserModel;
   creatingNewList: boolean;
+  creatingNewTodo: boolean;
 }

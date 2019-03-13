@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { APPStore, BASE_URL, TodoListModel } from '../models';
+import { APPStore, BASE_URL, TodoListModel, TodoModel } from '../models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -45,6 +45,14 @@ export class TodosService {
   deleteList(todoListId): Observable<any> {
     const deleteListURL = BASE_URL + '/api/docket/todo/' + todoListId;
     return this.http.delete(deleteListURL);
+  }
+
+  createNewTodo(todoListId, newTodoName): Observable<TodoModel> {
+    const createNewTodoURL = BASE_URL + '/api/docket/todo/' + todoListId;
+    const createNewTodoBody = {
+      label: newTodoName
+    };
+    return this.http.post<TodoModel>(createNewTodoURL, createNewTodoBody);
   }
 
   updateTodo(updatedList, nameOrCompleted): Observable<TodoListModel> {

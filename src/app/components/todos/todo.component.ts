@@ -3,6 +3,8 @@ import { Store } from '@ngrx/store';
 import { APPStore, TodoListModel } from '../../models';
 import { SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {TodoListDetailsAction} from '../../actions';
 
 @Component({
   selector: 'app-todos',
@@ -12,22 +14,43 @@ import { TodosService } from '../../services/todos.service';
 export class TodoComponent implements OnInit, OnDestroy {
   todoListDetails: TodoListModel;
   todoListDetailsSub: SubscriptionLike;
+  creatingNewTodoSub: SubscriptionLike;
+  newTodoListLabel: FormGroup;
+  creatingNewTodo: boolean;
 
-  constructor(private todosService: TodosService, private store: Store<APPStore>) { }
+  constructor(private todosService: TodosService, private store: Store<APPStore>, private fb: FormBuilder) { }
 
   ngOnInit() {
     this.todoListDetailsSub = this.store.select('todoListDetails').subscribe(listDetails => {
+      console.log('In TodoComponent, listDetails = ', listDetails);
       this.todoListDetails = listDetails;
+      if (this.todoListDetails.items[0].editingTask) {
+        // Adding a new todo to this list
+      }
+      /*
       let i = 0;
       this.todoListDetails.items.map(item => {
         this.todoListDetails.items[i].editingTask = false;
         i++;
-      });
+      }); */
+    });
+    this.creatingNewTodoSub = this.store.select('creatingNewTodo').subscribe(creatingNewTodo => {
+      this.creatingNewTodo = creatingNewTodo;
+      if (creatingNewTodo) {
+        this.newTodoListLabel = this.fb.group({
+          newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
+        });
+      }
     });
   }
 
   ngOnDestroy(): void {
-    this.todoListDetailsSub.unsubscribe();
+    if (this.todoListDetailsSub) {
+      this.todoListDetailsSub.unsubscribe();
+    }
+    if (this.creatingNewTodoSub) {
+      this.creatingNewTodoSub.unsubscribe();
+    }
   }
 
   toggleTodoComplete(i) {

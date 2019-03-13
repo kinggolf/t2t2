@@ -71,7 +71,6 @@ export class AppComponent implements OnInit, OnDestroy {
     // Use prevTodoLists to store current lists & revert back to this if user cancels creating a new list
     this.store.select('todoLists').subscribe(todoLists => {
       prevTodoLists = todoLists.slice(0);
-      // prevTodoLists = Object.assign(todoLists);
       this.store.dispatch(new PrevTodoListsAction(prevTodoLists));
     }).unsubscribe();
     const newTodoList = [];

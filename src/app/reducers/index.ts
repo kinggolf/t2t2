@@ -2,7 +2,7 @@ import { ActionReducerMap } from '@ngrx/store';
 import { APPStore, LoginModel, TodoListModel, UserModel } from '../models';
 import { UpdateTodosForListAction, LoginAction, LoginActionTypes, TodoListsAction,
          TodoListDetailsAction, TodoListActionTypes, UserAction, UserActionTypes,
-         CreatingNewListAction, CreatingNewListActionTypes,
+         CreatingNewListAction, CreatingNewListActionTypes, CreatingNewTodoAction,
          PrevTodoListsAction, PrevTodoListDetailsAction} from '../actions';
 
 export const reducers: ActionReducerMap<APPStore> = {
@@ -12,7 +12,8 @@ export const reducers: ActionReducerMap<APPStore> = {
   prevTodoLists: prevTodoListsReducer,
   prevTodoListDetails: prevTodoListDetailReducer,
   currentUser: userReducer,
-  creatingNewList: creatingNewListReducer
+  creatingNewList: creatingNewListReducer,
+  creatingNewTodo: creatingNewTodoReducer
 };
 
 export function loginReducer(state: LoginModel, action: LoginAction): LoginModel {
@@ -81,6 +82,15 @@ export function updateTodosForListReducer(state: TodoListModel[], action: Update
 export function creatingNewListReducer(state: boolean, action: CreatingNewListAction): boolean {
   switch (action.type) {
     case CreatingNewListActionTypes.CreatingNewListAction:
+      return action.payload;
+    default:
+      return state;
+  }
+}
+
+export function creatingNewTodoReducer(state: boolean, action: CreatingNewTodoAction): boolean {
+  switch (action.type) {
+    case CreatingNewListActionTypes.CreatingNewTodoAction:
       return action.payload;
     default:
       return state;
