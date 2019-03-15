@@ -45,7 +45,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
     // Use creatingNewTodo to prevent multiple create todos from being open at the same time
     this.creatingNewTodoSub = this.store.select('creatingNewTodo').subscribe(creatingNewTodo => {
       this.creatingNewTodo = creatingNewTodo;
-      console.log('In ngOnInit, this.creatingNewTodo = ', this.creatingNewTodo);
     });
     this.currentOpenListIndex = -1;
     this.todoListDetailsLoading$ = this.store.select('listDetailsLoading');
@@ -74,6 +73,8 @@ export class TodoListComponent implements OnInit, OnDestroy {
       if (this.currentOpenListIndex === i) {
         this.todoLists[i].showListDetails = this.todoLists[i].editingName = false;
         this.currentOpenListIndex = -1;
+        // Needed for offline mode
+        this.store.dispatch(new TodoListDetailsAction(null));
       } else {
         if (this.currentOpenListIndex > -1) {
           this.todoLists[this.currentOpenListIndex].showListDetails = false;
@@ -90,7 +91,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
       // Subscribe to todoListDetail in case there are updates to the list details in todo.component
       this.todoListDetailsSub = this.store.select('todoListDetails').subscribe(listDetails => {
         if (!this.creatingNewTodo) {
-          console.log('In showListDetails, i = ' + i + ' & listDetails = ', listDetails);
           if (listDetails) {
             let completedTodos = 0;
             let pendingTodos = 0;
@@ -173,13 +173,10 @@ export class TodoListComponent implements OnInit, OnDestroy {
       });
       let newTodoListItems: TodoModel[];
       let prevTodoListDetails: TodoListModel;
-      console.log('this.currentOpenListIndex = ' + this.currentOpenListIndex + ' & i = ' + i);
       if (this.currentOpenListIndex === i) {
-        // adding todo to already open list details, so add blank todo with open form, index 0
+        // adding item to already open list details, so add blank item with open form, index 0
         this.store.select('todoListDetails').subscribe(listDetails => {
           prevTodoListDetails = Object.assign({}, listDetails);
-          // console.log('this.currentOpenListIndex = ' + this.currentOpenListIndex + ' & prevTodoListDetails = ', prevTodoListDetails);
-          console.log('dispatch PrevTodoListDetailsAction 1');
           this.store.dispatch(new PrevTodoListDetailsAction(Object.assign({}, listDetails)));
           newTodoListItems = [
             ...newTodo,
@@ -197,7 +194,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
           this.todosHttpSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
             listDetails.showListDetails = this.todoLists[i].showListDetails = true;
             // prevTodoListDetails = Object.assign({}, listDetails);
-            console.log('dispatch PrevTodoListDetailsAction 2');
             this.store.dispatch(new PrevTodoListDetailsAction(Object.assign({}, listDetails)));
             this.store.dispatch(
               new TodoListDetailsAction(Object.assign(listDetails, {
@@ -211,10 +207,8 @@ export class TodoListComponent implements OnInit, OnDestroy {
           });
         } else {
           // This list has no todos
-          console.log('this.todoLists[i] = ', this.todoLists[i]);
           this.store.dispatch(new PrevTodoListDetailsAction(null));
           const todoLists3 = Object.assign({}, this.todoLists[i]);
-          console.log('todoLists3 = ', todoLists3);
           this.todoLists[i].showListDetails = true;
           this.store.dispatch(
             new TodoListDetailsAction(Object.assign(todoLists3, {items: newTodo}, {showListDetails: true}))
@@ -222,10 +216,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
         }
       }
     }
-    /*
-    this.store.select('prevTodoListDetails').subscribe(prevTodoListDetails => {
-      console.log(prevTodoListDetails);
-    }).unsubscribe(); */
   }
 
   cancelEditListName(i): void {

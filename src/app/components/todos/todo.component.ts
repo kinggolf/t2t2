@@ -24,7 +24,6 @@ export class TodoComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.todoListDetailsSub = this.store.select('todoListDetails').subscribe(listDetails => {
       this.todoListDetails = listDetails;
-      console.log('In TodoComponent, this.todoListDetails = ', this.todoListDetails);
     });
     this.creatingNewTodoSub = this.store.select('creatingNewTodo').subscribe(creatingNewTodo => {
       this.creatingNewTodo = creatingNewTodo;
@@ -72,18 +71,15 @@ export class TodoComponent implements OnInit, OnDestroy {
   cancelEditLabel(i) {
     this.store.dispatch(new CreatingNewTodoAction(false));
     this.store.select('prevTodoListDetails').subscribe(prevTodoListDetails => {
-      console.log(prevTodoListDetails);
       if (prevTodoListDetails) {
         this.store.dispatch(new TodoListDetailsAction(Object.assign(prevTodoListDetails)));
         // this.todoListDetails.items[i].editingTask = false;
       } else {
         const todoListsNoShow = [];
         this.store.select('todoLists').subscribe(todoLists => {
-          console.log('todoLists 1 = ', todoLists);
           todoLists.map(list => {
             todoListsNoShow.push(Object.assign(list, {showListDetails: false}));
           });
-          console.log('todoLists 2 = ', todoLists);
         }).unsubscribe();
         this.store.dispatch(new TodoListsAction([...todoListsNoShow.slice(0)]));
         this.store.dispatch(new TodoListDetailsAction(null));
@@ -102,7 +98,6 @@ export class TodoComponent implements OnInit, OnDestroy {
       // Updating label of an existing todo
       this.todosService.updateTodo(this.todoListDetails.items[i].id, this.newTodoListLabel.value.newTodoLabel, false)
         .subscribe(updatedTodoItem => {
-          console.log('saveEditLabel update, updatedTodoItem = ', updatedTodoItem);
           const updatedItems = [
             ...this.todoListDetails.items.slice(0, i),
             updatedTodoItem,
@@ -118,7 +113,6 @@ export class TodoComponent implements OnInit, OnDestroy {
   }
 
   deleteTodo(i) {
-    console.log('Delete this todo, i = ' + i);
     const confirmDelete = window.confirm('Confirm Delete ' + this.todoListDetails.items[i].label);
     if (confirmDelete) {
       this.todosService.deleteTodo(this.todoListDetails.items[i].id).subscribe(resp => {
