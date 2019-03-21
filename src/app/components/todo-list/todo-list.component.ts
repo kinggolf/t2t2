@@ -6,6 +6,7 @@ import { TodosService } from '../../services/todos.service';
 import { TodoListDetailsAction, TodoListsAction, CreatingNewListAction, CreatingNewTodoAction,
          PrevTodoListsAction, PrevTodoListDetailsAction, UpdateListDetailsLoadingAction } from '../../actions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-todo-list',
@@ -25,13 +26,18 @@ export class TodoListComponent implements OnInit, OnDestroy {
   newTodoListName: FormGroup;
   creatingNewList: boolean;
   creatingNewTodo: boolean;
+  isOnline$: Observable<boolean>;
+  isOnlineSub: SubscriptionLike;
+  isOnline: boolean;
 
-  constructor(private todosService: TodosService, private store: Store<APPStore>, private fb: FormBuilder) { }
+  constructor(private todosService: TodosService, private store: Store<APPStore>,
+              private fb: FormBuilder, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
       if (todoList) {
         this.todoLists = todoList;
+        console.log('this.todoLists = ', this.todoLists);
       }
     });
     this.creatingNewListSub = this.store.select('creatingNewList').subscribe(creatingNewList => {
@@ -48,6 +54,24 @@ export class TodoListComponent implements OnInit, OnDestroy {
     });
     this.currentOpenListIndex = -1;
     this.todoListDetailsLoading$ = this.store.select('listDetailsLoading');
+    // Monitor online/offline
+    this.isOnline$ = this.todosService.monitorOnline();
+    this.isOnline = true;
+    let onlineChangeCount = 0;
+    this.isOnlineSub = this.isOnline$.subscribe(online => {
+      console.log('Online = ', online);
+      this.isOnline = online;
+      if (!online) {
+        this.snackBar.open('You are now offline. Editing disabled.', 'Got it', {
+          duration: 5000,
+        });
+      } else if (onlineChangeCount > 0) {
+        this.snackBar.open('Back online. Editing enabled.', 'OK', {
+          duration: 5000,
+        });
+      }
+      onlineChangeCount++;
+    });
   }
 
   ngOnDestroy(): void {
@@ -66,54 +90,72 @@ export class TodoListComponent implements OnInit, OnDestroy {
     if (this.creatingNewTodoSub) {
       this.creatingNewTodoSub.unsubscribe();
     }
+    if (this.isOnlineSub) {
+      this.isOnlineSub.unsubscribe();
+    }
   }
 
   showListDetails(i): void {
     if ((this.todoLists[i].itemsPending + this.todoLists[i].itemsCompleted) > 0) {
-      if (this.currentOpenListIndex === i) {
-        this.todoLists[i].showListDetails = this.todoLists[i].editingName = false;
-        this.currentOpenListIndex = -1;
-        // Needed for offline mode
-        this.store.dispatch(new TodoListDetailsAction(null));
-      } else {
-        if (this.currentOpenListIndex > -1) {
-          this.todoLists[this.currentOpenListIndex].showListDetails = false;
+      if (this.isOnline || (!this.isOnline && this.todoLists[i].items)) {
+        if (this.currentOpenListIndex === i) {
+          this.todoLists[i].showListDetails = this.todoLists[i].editingName = false;
+          this.currentOpenListIndex = -1;
+          // Needed for offline mode
+          this.store.dispatch(new TodoListDetailsAction(null));
+          console.log('this.todoLists[i] = ' , this.todoLists[i]);
+        } else {
+          if (this.currentOpenListIndex > -1) {
+            this.todoLists[this.currentOpenListIndex].showListDetails = false;
+          }
+          this.store.dispatch(new UpdateListDetailsLoadingAction(true));
+          this.todoLists[i].showListDetails = true;
+          this.todosHttpSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
+            console.log('listDetails = ', listDetails);
+            listDetails.showListDetails = true;
+            this.store.dispatch(new TodoListDetailsAction(Object.assign({}, listDetails)));
+            this.currentOpenListIndex = i;
+            this.store.dispatch(new UpdateListDetailsLoadingAction(false));
+            // Whenever a detail list is downloaded, then add this to the respective todoLists in store
+            const newListObject: TodoListModel = Object.assign({}, listDetails);
+            this.store.dispatch(new TodoListsAction([
+              ...this.todoLists.slice(0, i),
+              newListObject,
+              ...this.todoLists.slice(i + 1)
+            ]));
+          });
         }
-        this.store.dispatch(new UpdateListDetailsLoadingAction(true));
-        this.todoLists[i].showListDetails = true;
-        this.todosHttpSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
-          listDetails.showListDetails = true;
-          this.store.dispatch(new TodoListDetailsAction(Object.assign({}, listDetails)));
-          this.currentOpenListIndex = i;
-          this.store.dispatch(new UpdateListDetailsLoadingAction(false));
+        // Subscribe to todoListDetail in case there are updates to the list details in todo.component
+        this.todoListDetailsSub = this.store.select('todoListDetails').subscribe(listDetails => {
+          if (!this.creatingNewTodo) {
+            if (listDetails) {
+              let completedTodos = 0;
+              let pendingTodos = 0;
+              listDetails.items.map(item => {
+                if (item.completed) {
+                  completedTodos = completedTodos + 1;
+                } else {
+                  pendingTodos = pendingTodos + 1;
+                }
+              });
+              const updatedTodoList = Object.assign(
+                this.todoLists[i],
+                {itemsCompleted: completedTodos},
+                {itemsPending: pendingTodos});
+              const updatedTodoLists = [
+                ...this.todoLists.slice(0, i),
+                updatedTodoList,
+                ...this.todoLists.slice(i + 1),
+              ];
+              this.store.dispatch(new TodoListsAction(updatedTodoLists));
+            }
+          }
+        });
+      } else {
+        this.snackBar.open('Offline & list details have not previously been downloaded.', 'OK', {
+          duration: 5000,
         });
       }
-      // Subscribe to todoListDetail in case there are updates to the list details in todo.component
-      this.todoListDetailsSub = this.store.select('todoListDetails').subscribe(listDetails => {
-        if (!this.creatingNewTodo) {
-          if (listDetails) {
-            let completedTodos = 0;
-            let pendingTodos = 0;
-            listDetails.items.map(item => {
-              if (item.completed) {
-                completedTodos = completedTodos + 1;
-              } else {
-                pendingTodos = pendingTodos + 1;
-              }
-            });
-            const updatedTodoList = Object.assign(
-              this.todoLists[i],
-              {itemsCompleted: completedTodos},
-              {itemsPending: pendingTodos});
-            const updatedTodoLists = [
-              ...this.todoLists.slice(0, i),
-              updatedTodoList,
-              ...this.todoLists.slice(i + 1),
-            ];
-            this.store.dispatch(new TodoListsAction(updatedTodoLists));
-          }
-        }
-      });
     }
   }
 

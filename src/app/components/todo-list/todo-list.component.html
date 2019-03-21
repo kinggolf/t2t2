@@ -4,8 +4,7 @@
       <mat-card-title>{{ todoList.name }}</mat-card-title>
     </mat-card-header>
     <mat-card-content *ngIf="todoList.showListDetails">
-      <mat-spinner *ngIf="todoListDetailsLoading$ | async" [diameter]="30" style="margin: 0 auto;">
-      </mat-spinner>
+      <mat-spinner *ngIf="todoListDetailsLoading$ | async" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
       <app-todos></app-todos>
     </mat-card-content>
     <mat-card-actions>
@@ -23,19 +22,20 @@
           </div>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name">
+          <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name" [disabled]="!(isOnline$ | async)">
             <i class="material-icons icon-font-spec">border_color</i>
             <div>Edit List Name</div>
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="createNewTodo(i)" class="base-mat-icon" title="Add Todo">
+          <button (click)="createNewTodo(i)" class="base-mat-icon" title="Add Todo" [disabled]="!(isOnline$ | async)">
             <i class="material-icons icon-font-spec">add_circle</i>
             <div>Add Todo</div>
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List">
+          <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List"
+                  [disabled]="!(isOnline$ | async)">
             <i class="material-icons icon-font-spec">delete</i>
             <div>Delete List</div>
           </button>

@@ -6,7 +6,6 @@ import { SubscriptionLike } from 'rxjs';
 import { TodosService } from './services/todos.service';
 import { TodoListsAction, PrevTodoListsAction, UserAction, CreatingNewListAction } from './actions';
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -22,8 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
   newListName: string;
   showLoadingSpinner: boolean;
 
-  constructor(private authService: AuthService, private todosService: TodosService,
-              private store: Store<APPStore>) {}
+  constructor(private authService: AuthService, private todosService: TodosService, private store: Store<APPStore>) {}
 
   ngOnInit(): void {
     this.showLoadingSpinner = false;

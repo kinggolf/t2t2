@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { APPStore, BASE_URL, TodoListModel, TodoModel } from '../models';
-import { Observable } from 'rxjs';
+import { Observable, fromEvent, merge, of } from 'rxjs';
+import { mapTo } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -77,5 +78,13 @@ export class TodosService {
   deleteTodo(todoItemId): Observable<any> {
     const deleteTodoURL = BASE_URL + '/api/docket/todo/item/' + todoItemId;
     return this.http.delete(deleteTodoURL);
+  }
+
+  monitorOnline(): Observable<boolean> {
+    return merge(
+      of(navigator.onLine),
+      fromEvent(window, 'online').pipe(mapTo(true)),
+      fromEvent(window, 'offline').pipe(mapTo(false))
+    );
   }
 }
