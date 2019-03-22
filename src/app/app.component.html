@@ -4,7 +4,7 @@
     <i class="material-icons icon-font-spec-more">more_horiz</i>
   </button>
   <mat-menu #menu="matMenu" xPosition="after">
-    <button *ngIf="!this.creatingNewList" mat-menu-item (click)="createNewList()">Create A New List</button>
+    <button *ngIf="!(creatingNewList$ | async)" mat-menu-item (click)="createNewList()">Create A New List</button>
     <button mat-menu-item (click)="logout()">Logout</button>
   </mat-menu>
 </mat-toolbar>

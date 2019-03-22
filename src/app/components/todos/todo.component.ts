@@ -15,7 +15,6 @@ export class TodoComponent implements OnInit, OnDestroy {
   todoListDetails: TodoListModel;
   todoListDetailsSub: SubscriptionLike;
   creatingNewTodoSub: SubscriptionLike;
-  todosHttpSub: SubscriptionLike;
   newTodoListLabel: FormGroup;
   creatingNewTodo: boolean;
 

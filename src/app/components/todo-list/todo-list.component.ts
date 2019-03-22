@@ -15,6 +15,7 @@ import { MatSnackBar } from '@angular/material';
 })
 export class TodoListComponent implements OnInit, OnDestroy {
   todosHttpSub: SubscriptionLike;
+  todoLists$: Observable<TodoListModel[]>;
   todoLists: TodoListModel[];
   todoListsSub: SubscriptionLike;
   creatingNewListSub: SubscriptionLike;
@@ -34,9 +35,11 @@ export class TodoListComponent implements OnInit, OnDestroy {
               private fb: FormBuilder, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
+    this.todoLists$ = this.store.select('todoLists');
+    this.todoListsSub = this.todoLists$.subscribe(todoList => {
       if (todoList) {
-        this.todoLists = todoList;
+        // this.todoLists = todoList;
+        this.todoLists = todoList.slice(0);
         console.log('this.todoLists = ', this.todoLists);
       }
     });
@@ -111,16 +114,29 @@ export class TodoListComponent implements OnInit, OnDestroy {
           this.store.dispatch(new UpdateListDetailsLoadingAction(true));
           this.todoLists[i].showListDetails = true;
           this.todosHttpSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
+            // As of 21-Mar there is an API issue with Get List Details, no completedTodos or pendingTodos info is provided.
+            // If API fixed, then next 10 lines of code can be removed and change tempListDetails to listDetails (2x)
             console.log('listDetails = ', listDetails);
-            listDetails.showListDetails = true;
-            this.store.dispatch(new TodoListDetailsAction(Object.assign({}, listDetails)));
+            let completedCount = 0;
+            let pendingCount = 0;
+            listDetails.items.map(item => {
+              if (item.completed) {
+                completedCount++;
+              } else {
+                pendingCount++;
+              }
+            });
+            const tempListDetails = {...listDetails, itemsCompleted: completedCount, itemsPending: pendingCount, showListDetails: true };
+            console.log('i = ' + i + ' and tempListDetails = ', tempListDetails);
+            this.store.dispatch(new TodoListDetailsAction(
+              {...listDetails, itemsCompleted: completedCount, itemsPending: pendingCount, showListDetails: true })
+            );
             this.currentOpenListIndex = i;
             this.store.dispatch(new UpdateListDetailsLoadingAction(false));
             // Whenever a detail list is downloaded, then add this to the respective todoLists in store
-            const newListObject: TodoListModel = Object.assign({}, listDetails);
             this.store.dispatch(new TodoListsAction([
               ...this.todoLists.slice(0, i),
-              newListObject,
+              { ...listDetails, itemsCompleted: completedCount, itemsPending: pendingCount, showListDetails: true },
               ...this.todoLists.slice(i + 1)
             ]));
           });

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AuthService } from './services/auth.service';
 import { APPStore, UserModel, LoginModel, TodoListModel } from './models';
-import { SubscriptionLike } from 'rxjs';
+import {Observable, SubscriptionLike} from 'rxjs';
 import { TodosService } from './services/todos.service';
 import { TodoListsAction, PrevTodoListsAction, UserAction, CreatingNewListAction } from './actions';
 
@@ -17,7 +17,8 @@ export class AppComponent implements OnInit, OnDestroy {
   currentUserSub: SubscriptionLike;
   todoListsFromServerSub: SubscriptionLike;
   creatingNewListSub: SubscriptionLike;
-  creatingNewList: boolean;
+  creatingNewList$: Observable<boolean>;
+  // creatingNewList: boolean;
   newListName: string;
   showLoadingSpinner: boolean;
 
@@ -45,9 +46,10 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     });
     // Use creatingNewList to prevent multiple create lists from being open at the same time
-    this.creatingNewListSub = this.store.select('creatingNewList').subscribe(creatingNewList => {
-      this.creatingNewList = creatingNewList;
-    });
+    this.creatingNewList$ = this.store.select('creatingNewList');
+    // this.creatingNewListSub = this.store.select('creatingNewList').subscribe(creatingNewList => {
+    //   this.creatingNewList = creatingNewList;
+    // });
     this.loginSub = this.store.select<LoginModel>('loginObject').subscribe(loginObject => {
       if (loginObject) {
         this.authService.submitLogin(loginObject);
@@ -62,9 +64,9 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.todoListsFromServerSub) {
       this.todoListsFromServerSub.unsubscribe();
     }
-    if (this.creatingNewListSub) {
+    /* if (this.creatingNewListSub) {
       this.creatingNewListSub.unsubscribe();
-    }
+    } */
   }
 
   createNewList(): void {
