@@ -1,21 +1,23 @@
 import { ActionReducerMap } from '@ngrx/store';
 import { APPStore, LoginModel, TodoListModel, UserModel } from '../models';
-import { UpdateTodosForListAction, LoginAction, LoginActionTypes, TodoListsAction,
-         TodoListDetailsAction, TodoListActionTypes, UserAction, UserActionTypes,
-         CreatingNewListAction, CreatingNewListActionTypes, CreatingNewTodoAction,
-         PrevTodoListsAction, PrevTodoListDetailsAction, UpdateListDetailsLoadingAction } from '../actions';
+import { CreateNewTodoListAction, LoginAction, LoginActionTypes,
+         OpenCloseTodoListAction, PrevTodoListsAction, TodoListActionTypes, LoadTodoListsAction,
+         UpdateListDetailsLoadingAction, UserAction, UserActionTypes} from '../actions';
+import { todoListsReducer } from './todo-lists.reducers';
+import { todosReducer } from './todos.reducers';
 
 export const reducers: ActionReducerMap<APPStore> = {
   loginObject: loginReducer,
   todoLists: todoListsReducer,
-  todoListDetails: todoListDetailsReducer,
   prevTodoLists: prevTodoListsReducer,
-  prevTodoListDetails: prevTodoListDetailReducer,
   currentUser: userReducer,
   creatingNewList: creatingNewListReducer,
-  creatingNewTodo: creatingNewTodoReducer,
   listDetailsLoading: updateListDetailsLoadingReducer,
 };
+// creatingNewTodo: creatingNewTodoReducer, CreatingNewTodoAction,  UpdateTodosForListAction,
+// todoListDetails: todoListDetailsReducer,  TodoListDetailsAction,
+// prevTodoListDetails: prevTodoListDetailsReducer,   PrevTodoListDetailsAction,
+
 
 export function loginReducer(state: LoginModel, action: LoginAction): LoginModel {
   switch (action.type) {
@@ -34,15 +36,20 @@ export function userReducer(state: UserModel, action: UserAction): UserModel {
       return state;
   }
 }
-
-export function todoListsReducer(state: TodoListModel[], action: TodoListsAction): TodoListModel[] {
+/*
+export function todoListsReducer(state: TodoListModel[], action: LoadTodoListsAction | OpenCloseTodoListAction): TodoListModel[] {
   switch (action.type) {
-    case TodoListActionTypes.TodoListsAction:
+    case TodoListActionTypes.LoadTodoListsAction:
       return action.payload;
+    case TodoListActionTypes.OpenTodoListAction:
+      console.log('In todoListsReducer, state = ', state);
+      const updatedList = {...state[action.payload], showListDetails: !state[action.payload].showListDetails};
+      console.log('In todoListsReducer, updatedList = ', updatedList);
+      return [ ...state.slice(0, action.payload), updatedList, ...state.slice(action.payload + 1)];
     default:
       return state;
   }
-}
+} */
 
 export function prevTodoListsReducer(state: TodoListModel[], action: PrevTodoListsAction): TodoListModel[] {
   switch (action.type) {
@@ -52,7 +59,7 @@ export function prevTodoListsReducer(state: TodoListModel[], action: PrevTodoLis
       return state;
   }
 }
-
+/*
 export function todoListDetailsReducer(state: TodoListModel, action: TodoListDetailsAction): TodoListModel {
   switch (action.type) {
     case TodoListActionTypes.TodoListDetailsAction:
@@ -62,33 +69,24 @@ export function todoListDetailsReducer(state: TodoListModel, action: TodoListDet
   }
 }
 
-export function prevTodoListDetailReducer(state: TodoListModel, action: PrevTodoListDetailsAction): TodoListModel {
+export function prevTodoListDetailsReducer(state: TodoListModel, action: PrevTodoListDetailsAction): TodoListModel {
   switch (action.type) {
     case TodoListActionTypes.PrevTodoListDetailsAction:
       return action.payload;
     default:
       return state;
   }
-}
+} */
 
-export function updateTodosForListReducer(state: TodoListModel[], action: UpdateTodosForListAction): TodoListModel[] {
+export function creatingNewListReducer(state: boolean, action: CreateNewTodoListAction): boolean {
   switch (action.type) {
-    case TodoListActionTypes.UpdateTodosForListAction:
+    case TodoListActionTypes.CreateNewTodoListAction:
       return action.payload;
     default:
       return state;
   }
 }
-
-export function creatingNewListReducer(state: boolean, action: CreatingNewListAction): boolean {
-  switch (action.type) {
-    case CreatingNewListActionTypes.CreatingNewListAction:
-      return action.payload;
-    default:
-      return state;
-  }
-}
-
+/*
 export function creatingNewTodoReducer(state: boolean, action: CreatingNewTodoAction): boolean {
   switch (action.type) {
     case CreatingNewListActionTypes.CreatingNewTodoAction:
@@ -96,7 +94,7 @@ export function creatingNewTodoReducer(state: boolean, action: CreatingNewTodoAc
     default:
       return state;
   }
-}
+} */
 
 export function updateListDetailsLoadingReducer(state: boolean, action: UpdateListDetailsLoadingAction): boolean {
   switch (action.type) {

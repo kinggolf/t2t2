@@ -1,12 +1,16 @@
-<div *ngFor="let todoList of (todoLists$ | async); let i = index;" style="margin-top: 2rem;">
-  <mat-card *ngIf="!todoList.editingName && !todoList.addingTodo" style="margin: 2rem 0.5rem; background-color: lightgray;">
+<div *ngFor="let todoList of todoLists; let i = index;" style="margin-top: 2rem;">
+  <mat-card *ngIf="!todoList.editingName && !todoList.addingTodo"
+            style="margin: 2rem 0.5rem; background-color: lightgray;">
+
     <mat-card-header (click)="showListDetails(i)">
-      <mat-card-title>{{ todoList.name }}</mat-card-title>
+      <mat-card-title>{{ todoList.name }} {{ todoList.showListDetails }}</mat-card-title>
     </mat-card-header>
+
     <mat-card-content *ngIf="todoList.showListDetails">
-      <mat-spinner *ngIf="todoListDetailsLoading$ | async" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
-      <app-todos></app-todos>
+      <mat-spinner *ngIf="!todoList.items" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
+      <app-todos *ngIf="todoList.items"></app-todos>
     </mat-card-content>
+
     <mat-card-actions>
       <div style="display: table; width: 100%; text-align: center;">
         <div style="display: table-cell; width: 20%;">
@@ -41,11 +45,13 @@
           </button>
         </div>
       </div>
+
     </mat-card-actions>
   </mat-card>
 
   <mat-card *ngIf="todoList.editingName" style="margin: 2rem 0.5rem; background-color: lightgray;">
     <form novalidate [formGroup]="newTodoListName">
+
       <mat-form-field style="margin-left: 1.2rem;">
         <input matInput placeholder="List Name" formControlName="newListName">
       </mat-form-field>
@@ -63,6 +69,7 @@
           </div>
         </div>
       </mat-card-actions>
+
     </form>
   </mat-card>
 </div>

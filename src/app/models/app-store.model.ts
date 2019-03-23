@@ -8,11 +8,12 @@ export const SCOPE = '2bcf85b6-698d-4ab4-9910-ecb905b87828';
 export interface APPStore {
   loginObject: LoginModel;
   todoLists: TodoListModel[];
-  todoListDetails: TodoListModel;
   prevTodoLists: TodoListModel[];
-  prevTodoListDetails: TodoListModel;
   currentUser: UserModel;
   creatingNewList: boolean;
-  creatingNewTodo: boolean;
   listDetailsLoading: boolean;
 }
+
+// creatingNewTodo: boolean;
+// todoListDetails: TodoListModel;
+// prevTodoListDetails: TodoListModel;

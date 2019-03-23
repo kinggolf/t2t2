@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { APPStore, TodoListModel } from '../../models';
-import { SubscriptionLike } from 'rxjs';
+import { Observable, SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {TodoListDetailsAction, CreatingNewTodoAction, TodoListsAction} from '../../actions';
+import { LoadTodoListsAction, EditTodoLabelAction, DeleteTodoAction, ToggleTodoCompleteAction } from '../../actions';
 
 @Component({
   selector: 'app-todos',
@@ -14,32 +14,35 @@ import {TodoListDetailsAction, CreatingNewTodoAction, TodoListsAction} from '../
 export class TodoComponent implements OnInit, OnDestroy {
   todoListDetails: TodoListModel;
   todoListDetailsSub: SubscriptionLike;
-  creatingNewTodoSub: SubscriptionLike;
   newTodoListLabel: FormGroup;
-  creatingNewTodo: boolean;
+  todoLists$: Observable<TodoListModel[]>;
+  todoLists: TodoListModel[];
+  todoListsSub: SubscriptionLike;
 
   constructor(private todosService: TodosService, private store: Store<APPStore>, private fb: FormBuilder) { }
 
   ngOnInit() {
+    this.todoLists$ = this.store.select('todoLists');
+    this.todoListsSub = this.todoLists$.subscribe(todoList => {
+      if (todoList) {
+        this.todoLists = todoList;
+        console.log('TodoListComponent: this.todoLists = ', this.todoLists);
+      }
+    });
     this.todoListDetailsSub = this.store.select('todoListDetails').subscribe(listDetails => {
       this.todoListDetails = listDetails;
     });
-    this.creatingNewTodoSub = this.store.select('creatingNewTodo').subscribe(creatingNewTodo => {
-      this.creatingNewTodo = creatingNewTodo;
-      if (creatingNewTodo) {
-        this.newTodoListLabel = this.fb.group({
-          newTodoLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
-        });
-      }
+    this.newTodoListLabel = this.fb.group({
+      newTodoLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
   }
 
   ngOnDestroy(): void {
+    if (this.todoListsSub) {
+      this.todoListsSub.unsubscribe();
+    }
     if (this.todoListDetailsSub) {
       this.todoListDetailsSub.unsubscribe();
-    }
-    if (this.creatingNewTodoSub) {
-      this.creatingNewTodoSub.unsubscribe();
     }
   }
 
@@ -52,10 +55,7 @@ export class TodoComponent implements OnInit, OnDestroy {
           updatedTodoItem,
           ...this.todoListDetails.items.slice(i + 1),
         ];
-        this.store.dispatch((new TodoListDetailsAction(Object.assign(
-          {},
-          Object.assign(this.todoListDetails, {items: updatedItems}))))
-        );
+        this.store.dispatch(new ToggleTodoCompleteAction(i));
       });
   }
 
@@ -68,7 +68,9 @@ export class TodoComponent implements OnInit, OnDestroy {
   }
 
   cancelEditLabel(i) {
-    this.store.dispatch(new CreatingNewTodoAction(false));
+    /*
+    const updatedTodo = this.todosService.createNewTodoListObject(this.todoLists[i], [{ addingTodo: false}]);
+    this.store.dispatch(new LoadTodoListsAction(this.todosService.createNewTodoListArray(this.todoLists, updatedTodo, i)));
     this.store.select('prevTodoListDetails').subscribe(prevTodoListDetails => {
       if (prevTodoListDetails) {
         this.store.dispatch(new TodoListDetailsAction(Object.assign(prevTodoListDetails)));
@@ -80,15 +82,16 @@ export class TodoComponent implements OnInit, OnDestroy {
             todoListsNoShow.push(Object.assign(list, {showListDetails: false}));
           });
         }).unsubscribe();
-        this.store.dispatch(new TodoListsAction([...todoListsNoShow.slice(0)]));
+        this.store.dispatch(new LoadTodoListsAction([...todoListsNoShow.slice(0)]));
         this.store.dispatch(new TodoListDetailsAction(null));
       }
-    }).unsubscribe();
+    }).unsubscribe(); */
   }
 
   saveEditLabel(i) {
+    /*
     this.todoListDetails.items[i].editingTask = false;
-    if (this.creatingNewTodo) {
+    if (this.todoLists[i].addingTodo) {
       this.todosService.createNewTodo(this.todoListDetails.id, this.newTodoListLabel.value.newTodoLabel)
         .subscribe(updatedTodoDetails => {
           this.store.dispatch((new TodoListDetailsAction(Object.assign({}, updatedTodoDetails))));
@@ -108,7 +111,8 @@ export class TodoComponent implements OnInit, OnDestroy {
           );
         });
     }
-    this.store.dispatch(new CreatingNewTodoAction(false));
+    const updatedTodo = this.todosService.createNewTodoListObject(this.todoLists[i], [{ addingTodo: false}]);
+    this.store.dispatch(new LoadTodoListsAction(this.todosService.createNewTodoListArray(this.todoLists, updatedTodo, i))); */
   }
 
   deleteTodo(i) {
@@ -117,14 +121,7 @@ export class TodoComponent implements OnInit, OnDestroy {
       this.todosService.deleteTodo(this.todoListDetails.items[i].id).subscribe(resp => {
         if (!resp) {
           // Remove this list from store
-          const updatedItems = [
-            ...this.todoListDetails.items.slice(0, i),
-            ...this.todoListDetails.items.slice(i + 1),
-          ];
-          this.store.dispatch((new TodoListDetailsAction(Object.assign(
-            {},
-            Object.assign(this.todoListDetails, {items: updatedItems}))))
-          );
+          this.store.dispatch(new DeleteTodoAction(i));
         } else {
           console.log('deleteTodoList response = ', resp);
         }

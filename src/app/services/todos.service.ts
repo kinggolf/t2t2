@@ -87,4 +87,19 @@ export class TodosService {
       fromEvent(window, 'offline').pipe(mapTo(false))
     );
   }
+
+  createNewTodoListArray(currentTodoList: TodoListModel[], newTodoListObject: TodoListModel, newTodoListIndex: number): TodoListModel[] {
+    return [
+      ...currentTodoList.slice(0, newTodoListIndex),
+      newTodoListObject,
+      ...currentTodoList.slice(newTodoListIndex + 11)
+    ];
+  }
+
+  createNewTodoListObject(currentTodo: TodoListModel, updateTodoAttributes: any[]): TodoListModel {
+    return {
+      ...currentTodo,
+      ...updateTodoAttributes
+    };
+  }
 }

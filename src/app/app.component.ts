@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AuthService } from './services/auth.service';
 import { APPStore, UserModel, LoginModel, TodoListModel } from './models';
-import {Observable, SubscriptionLike} from 'rxjs';
+import { Observable, SubscriptionLike } from 'rxjs';
 import { TodosService } from './services/todos.service';
-import { TodoListsAction, PrevTodoListsAction, UserAction, CreatingNewListAction } from './actions';
+import { LoadTodoListsAction, PrevTodoListsAction, UserAction, CreateNewTodoListAction } from './actions';
 
 @Component({
   selector: 'app-root',
@@ -18,14 +18,13 @@ export class AppComponent implements OnInit, OnDestroy {
   todoListsFromServerSub: SubscriptionLike;
   creatingNewListSub: SubscriptionLike;
   creatingNewList$: Observable<boolean>;
-  // creatingNewList: boolean;
   newListName: string;
-  showLoadingSpinner: boolean;
+  showTotoListsLoadingSpinner: boolean;
 
   constructor(private authService: AuthService, private todosService: TodosService, private store: Store<APPStore>) {}
 
   ngOnInit(): void {
-    this.showLoadingSpinner = false;
+    this.showTotoListsLoadingSpinner = false;
     const currentUserFromLocalStorage = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUserFromLocalStorage && (typeof currentUserFromLocalStorage !== 'undefined')) {
       // No need for log in, but when do we need to refresh the token, app restart?
@@ -35,11 +34,11 @@ export class AppComponent implements OnInit, OnDestroy {
       this.currentUser = user;
       if (this.currentUser && (typeof this.currentUser !== 'undefined')) {
         if (this.currentUser.token) {
-          this.showLoadingSpinner = true;
+          this.showTotoListsLoadingSpinner = true;
           this.todoListsFromServerSub = this.todosService.getTodoLists().subscribe(todoLists => {
             if (todoLists) {
-              this.store.dispatch(new TodoListsAction(todoLists));
-              this.showLoadingSpinner = false;
+              this.store.dispatch(new LoadTodoListsAction(todoLists));
+              this.showTotoListsLoadingSpinner = false;
             }
           });
         }
@@ -84,11 +83,11 @@ export class AppComponent implements OnInit, OnDestroy {
       itemsCompleted: 0,
       editingName: true
     });
-    this.store.dispatch(new TodoListsAction(([
+    this.store.dispatch(new LoadTodoListsAction(([
       ...newTodoList,
       ...prevTodoLists
     ])));
-    this.store.dispatch(new CreatingNewListAction(true));
+    this.store.dispatch(new CreateNewTodoListAction(true));
   }
 
   logout(): void {
