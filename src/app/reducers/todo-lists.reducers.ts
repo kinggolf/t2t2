@@ -1,37 +1,62 @@
 import { TodoListModel } from '../models';
-import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, DeleteTodoListAction,
-         AddTodoToListAction, PrevTodoListsAction, TodoListActionTypes } from '../actions';
+import { LoadTodoListsAction, EditTodoListNameAction, CreateNewTodoListAction, DeleteTodoListAction, OpenCloseTodoListAction,
+         TodoListActionTypes } from '../actions';
 
 export function todoListsReducer(
   state: TodoListModel[],
-  action: LoadTodoListsAction | OpenCloseTodoListAction | EditTodoListNameAction | DeleteTodoListAction): TodoListModel[] {
+  action: LoadTodoListsAction | OpenCloseTodoListAction | CreateNewTodoListAction | DeleteTodoListAction |
+          EditTodoListNameAction): TodoListModel[] {
+  let i = 0;
+  let updatedList;
   switch (action.type) {
     case TodoListActionTypes.LoadTodoListsAction:
       return action.payload;
-    case TodoListActionTypes.OpenTodoListAction:
-      const listIndex = action.payload.listIndex;
-      console.log('In todoListsReducer, state = ', state);
-      // If opening a list, then iterate through all lists and close - two lists cannot be open at same time.
-      if (!state[listIndex].showListDetails) {
-        state.map(list => {
-          list.showListDetails = false;
-        });
+    case TodoListActionTypes.OpenCloseTodoListAction:
+      state.map(list => {
+        state[i].showListDetails = false;
+        i++;
+      });
+      if (action.payload.listDetails) {
+        updatedList = {
+          ...action.payload.listDetails,
+          showListDetails: !state[action.payload.listIndex].showListDetails,
+          itemsCompleted: state[action.payload.listIndex].itemsCompleted,
+          itemsPending: state[action.payload.listIndex].itemsPending,
+        };
+        return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
+      } else {
+        return state;
       }
-      const updatedList = {...action.payload.listDetails, showListDetails: !state[listIndex].showListDetails};
-      // const updatedList = {...state[listIndex], showListDetails: !state[listIndex].showListDetails};
-      console.log('In todoListsReducer, updatedList = ', updatedList);
-      return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1)];
     case TodoListActionTypes.EditTodoListNameAction:
-
-    default:
-      return state;
-  }
-}
-
-export function prevTodoListsReducer(state: TodoListModel[], action: PrevTodoListsAction): TodoListModel[] {
-  switch (action.type) {
-    case TodoListActionTypes.PrevTodoListsAction:
-      return action.payload;
+      state.map(() => {
+        state[i].editingName = false;
+        state[i].showListDetails = false;
+        i++;
+      });
+      if (action.payload.mode === 'edit') {
+        updatedList = {
+          ...state[action.payload.listIndex],
+          editingName: true,
+          name: state[action.payload.listIndex].name
+        };
+        return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
+      } else if (action.payload.mode === 'cancel') {
+        return [ ...state.slice(0)];
+      } else {
+        updatedList = {
+          ...state[action.payload.listIndex],
+          name: action.payload.listName
+        };
+        return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
+      }
+    case TodoListActionTypes.CreateNewTodoListAction:
+      state.map(() => {
+        state[i].editingName = false;
+        state[i].showListDetails = false;
+        i++;
+      });
+      const newTodoList = [ { id: '', name: '', itemsPending: 0, itemsCompleted: 0, editingName: true, creatingNewList: true } ];
+      return [ ...newTodoList, ...state.slice(0) ];
     default:
       return state;
   }

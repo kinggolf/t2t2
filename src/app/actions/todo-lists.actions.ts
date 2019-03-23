@@ -3,14 +3,13 @@ import { TodoListModel, TodoModel } from '../models';
 
 export enum TodoListActionTypes {
   LoadTodoListsAction = 'LoadTodoListsAction',
-  UpdateTodosForListAction = 'UpdateTodosForListAction',
-  UpdateListDetailsLoadingAction = 'UpdateListDetailsLoadingAction',
-  OpenTodoListAction = 'OpenTodoListAction',
+  OpenCloseTodoListAction = 'OpenCloseTodoListAction',
   EditTodoListNameAction = 'EditTodoListNameAction',
   DeleteTodoListAction = 'DeleteTodoListAction',
   CreateNewTodoListAction = 'CreateNewTodoListAction',
   AddTodoToListAction = 'AddTodoToListAction',
-  PrevTodoListsAction = 'PrevTodoListsAction',
+  UpdateTodosForListAction = 'UpdateTodosForListAction',
+  UpdateListDetailsLoadingAction = 'UpdateListDetailsLoadingAction',
 }
 
 export class LoadTodoListsAction implements Action {
@@ -20,7 +19,7 @@ export class LoadTodoListsAction implements Action {
 }
 
 export class OpenCloseTodoListAction implements Action {
-  readonly type = TodoListActionTypes.OpenTodoListAction;
+  readonly type = TodoListActionTypes.OpenCloseTodoListAction;
 
   constructor(public payload: { listIndex: number, listDetails: TodoListModel | null}) {}
 }
@@ -28,7 +27,7 @@ export class OpenCloseTodoListAction implements Action {
 export class EditTodoListNameAction implements Action {
   readonly type = TodoListActionTypes.EditTodoListNameAction;
 
-  constructor(public payload: number) {}
+  constructor(public payload: { listIndex: number, listName: string | null, mode: string}) {}
 }
 
 export class DeleteTodoListAction implements Action {
@@ -48,23 +47,6 @@ export class AddTodoToListAction implements Action {
 
   constructor(public payload: TodoModel) {}
 }
-
-export class PrevTodoListsAction implements Action {
-  readonly type = TodoListActionTypes.PrevTodoListsAction;
-
-  constructor(public payload: TodoListModel[]) {}
-}
-
-/*
-  LoadingTodoListsAction = 'LoadingTodoListsAction',
-
-export class LoadingTodoListsAction implements Action {
-  readonly type = TodoListActionTypes.LoadingTodoListsAction;
-
-  constructor(public payload: TodoListModel[]) {}
-} */
-
-
 
 export class UpdateTodosForListAction implements Action {
   readonly type = TodoListActionTypes.UpdateTodosForListAction;

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { APPStore, TodoListModel } from '../../models';
 import { Observable, SubscriptionLike } from 'rxjs';
@@ -12,38 +12,20 @@ import { LoadTodoListsAction, EditTodoLabelAction, DeleteTodoAction, ToggleTodoC
   styleUrls: ['./todo.component.css']
 })
 export class TodoComponent implements OnInit, OnDestroy {
-  todoListDetails: TodoListModel;
-  todoListDetailsSub: SubscriptionLike;
+  @Input() todoListDetails: TodoListModel;
   newTodoListLabel: FormGroup;
-  todoLists$: Observable<TodoListModel[]>;
-  todoLists: TodoListModel[];
-  todoListsSub: SubscriptionLike;
 
   constructor(private todosService: TodosService, private store: Store<APPStore>, private fb: FormBuilder) { }
 
   ngOnInit() {
-    this.todoLists$ = this.store.select('todoLists');
-    this.todoListsSub = this.todoLists$.subscribe(todoList => {
-      if (todoList) {
-        this.todoLists = todoList;
-        console.log('TodoListComponent: this.todoLists = ', this.todoLists);
-      }
-    });
-    this.todoListDetailsSub = this.store.select('todoListDetails').subscribe(listDetails => {
-      this.todoListDetails = listDetails;
-    });
+    console.log('TodoListComponent: this.todoListDetails = ', this.todoListDetails);
     this.newTodoListLabel = this.fb.group({
       newTodoLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
   }
 
   ngOnDestroy(): void {
-    if (this.todoListsSub) {
-      this.todoListsSub.unsubscribe();
-    }
-    if (this.todoListDetailsSub) {
-      this.todoListDetailsSub.unsubscribe();
-    }
+
   }
 
   toggleTodoComplete(i) {

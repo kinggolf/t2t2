@@ -9,4 +9,5 @@ export interface TodoListModel {
   showListDetails?: boolean;
   editingName?: boolean;
   addingTodo?: boolean;
+  creatingNewList?: boolean;
 }

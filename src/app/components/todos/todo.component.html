@@ -1,4 +1,4 @@
-<!-- <div *ngIf="todoListDetails"> -->
+<div *ngIf="todoListDetails.items">
   <div *ngFor="let todo of todoListDetails.items; let i = index;">
     <mat-card *ngIf="!todo.editingTask" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
       <mat-card-header>
@@ -51,4 +51,4 @@
       </form>
     </mat-card>
   </div>
-<!-- </div> -->
+</div>
