@@ -83,22 +83,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
         this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails: null}));
       } else {
         // User is opening a closed list
-        this.showTodosLoadingSpinner = true;
-        this.todoListDetailsFromServerSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
-          let offLineLoadTodosTimer;
-          if (!this.isOnline) {
-            offLineLoadTodosTimer = setTimeout(() => {
-              this.snackBar.open('Offline & list details have not previously been downloaded.', 'OK', {
-                duration: 5000,
-              });
-            }, 5000);
-          }
-          if (listDetails) {
-            clearTimeout(offLineLoadTodosTimer);
-            this.showTodosLoadingSpinner = false;
-            this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails}));
-          }
-        });
+        this.callServerForTodos(i, false);
       }
     }
   }
@@ -136,34 +121,12 @@ export class TodoListComponent implements OnInit, OnDestroy {
   }
 
   createNewTodo(i): void {
-    console.log('In createNewTodo, this.todoLists[i] = ', this.todoLists[i] +
-      ' & this.currentOpenListIndex  = ' + this.currentOpenListIndex );
     if (!this.todoLists[i].addingTodo) {
-      const newTodo: TodoModel[] = [ { id: '', label: '', completed: false, editingTask: true } ];
-      let newTodoListItems: TodoModel[];
-      if (this.currentOpenListIndex === i) {
-        // adding item to already open list details, so add blank item with open form, index 0
-        newTodoListItems = [...newTodo, ...this.todoLists[i].items];
-        const newTodoList = this.todosService.createNewTodoListObject(this.todoLists[i], [{items: newTodoListItems}]);
-        this.store.dispatch(new LoadTodoListsAction(this.todosService.createNewTodoListArray(this.todoLists, newTodoList, i)));
+      if (!this.todoLists[i].items && (this.todoLists[i].itemsPending + this.todoLists[i].itemsCompleted) > 0) {
+        // This list has items that have not been downloaded yet
+        this.callServerForTodos(i, true);
       } else {
-        if (this.currentOpenListIndex > -1) {
-          // Another list is open, so must close 1st
-          this.todoLists[this.currentOpenListIndex].showListDetails = false;
-        }
-        if ((this.todoLists[i].itemsPending + this.todoLists[i].itemsCompleted) > 0) {
-          // Fetch list details
-          this.todoListDetailsFromServerSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
-            const newListDetails = this.todosService.createNewTodoListObject(listDetails, [
-              {showListDetails: true}, {itemsCompleted: this.todoLists[i].itemsCompleted}, {itemsPending: this.todoLists[i].itemsPending}
-            ]);
-            this.store.dispatch(new LoadTodoListsAction(this.todosService.createNewTodoListArray(this.todoLists, newListDetails, i)));
-            this.currentOpenListIndex = i;
-          });
-        } else {
-          // This list has no todos
-          this.todoLists[i].showListDetails = true;
-        }
+        this.store.dispatch(new AddTodoToListAction(i));
       }
     }
   }
@@ -174,10 +137,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
       this.todosService.deleteTodoList(this.todoLists[i].id).subscribe(resp => {
         if (!resp) {
           // Remove this list from store
-          this.store.dispatch(new LoadTodoListsAction([
-            ...this.todoLists.slice(0, i),
-            ...this.todoLists.slice(i + 1)
-          ]));
+          this.store.dispatch(new DeleteTodoListAction(i));
         } else {
           console.log('deleteTodoList response = ', resp);
         }
@@ -185,4 +145,25 @@ export class TodoListComponent implements OnInit, OnDestroy {
     }
   }
 
+  callServerForTodos(i: number, callFromAddTodo: boolean): void {
+    this.showTodosLoadingSpinner = true;
+    this.todoListDetailsFromServerSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
+      let offLineLoadTodosTimer;
+      if (!this.isOnline) {
+        offLineLoadTodosTimer = setTimeout(() => {
+          this.snackBar.open('Offline & list details have not previously been downloaded.', 'OK', {
+            duration: 5000,
+          });
+        }, 5000);
+      }
+      if (listDetails) {
+        clearTimeout(offLineLoadTodosTimer);
+        this.showTodosLoadingSpinner = false;
+        this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails}));
+        if (callFromAddTodo) {
+          this.store.dispatch(new AddTodoToListAction(i));
+        }
+      }
+    });
+  }
 }

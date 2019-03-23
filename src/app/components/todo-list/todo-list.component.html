@@ -1,7 +1,7 @@
 <div *ngFor="let todoList of todoLists; let i = index;" style="margin-top: 2rem;">
-  <mat-card *ngIf="!todoList.editingName && !todoList.addingTodo"
+  <mat-card *ngIf="!todoList.editingName"
             style="margin: 2rem 0.5rem; background-color: lightgray;">
-
+    <!--  && !todoList.addingTodo -->
     <mat-card-header (click)="showListDetails(i)">
       <mat-card-title>{{ todoList.name }}</mat-card-title>
     </mat-card-header>

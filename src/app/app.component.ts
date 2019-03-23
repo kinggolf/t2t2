@@ -41,6 +41,12 @@ export class AppComponent implements OnInit, OnDestroy {
               this.store.dispatch(new LoadTodoListsAction(todoLists));
               this.showTotoListsLoadingSpinner = false;
             }
+          },
+            error => {
+              if (error.statusText === 'Unauthorized') {
+                this.showTotoListsLoadingSpinner = false;
+                this.currentUser = null;
+              }
           });
         }
       }

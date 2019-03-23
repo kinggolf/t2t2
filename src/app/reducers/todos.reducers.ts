@@ -1,3 +1,4 @@
+/*
 import { TodoModel, TodoListModel } from '../models';
 import { LoadTodosAction, EditTodoLabelAction, DeleteTodoAction, ToggleTodoCompleteAction, TodosActionTypes } from '../actions';
 
@@ -16,7 +17,7 @@ export function todosReducer(
     default:
       return state;
   }
-}
+} */
 /*
 export function prevTodosReducer(state: TodoModel[], action: TodosActionTypes): TodoModel[] {
   switch (action.type) {
