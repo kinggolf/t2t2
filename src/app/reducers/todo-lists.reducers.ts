@@ -1,26 +1,19 @@
-import {TodoListModel, TodoModel} from '../models';
-import {
-  AddTodoToListAction,
-  CreateNewTodoListAction,
-  DeleteTodoListAction,
-  EditTodoListNameAction,
-  LoadTodoListsAction,
-  OpenCloseTodoListAction,
-  TodoListActionTypes
-} from '../actions';
+import {TodoListModel} from '../models';
+import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, DeleteTodoListAction,
+         CreateNewTodoListAction, UpdateTodoListsWithUpdatedListItemsAction, TodoListsActionTypes } from '../actions';
 
 export function todoListsReducer(
   state: TodoListModel[],
-  action: LoadTodoListsAction | OpenCloseTodoListAction | CreateNewTodoListAction | DeleteTodoListAction |
-          EditTodoListNameAction | AddTodoToListAction): TodoListModel[] {
+  action: LoadTodoListsAction | OpenCloseTodoListAction | CreateNewTodoListAction |
+          DeleteTodoListAction | EditTodoListNameAction | UpdateTodoListsWithUpdatedListItemsAction): TodoListModel[] {
   let i = 0;
   let updatedList;
   switch (action.type) {
 
-    case TodoListActionTypes.LoadTodoListsAction:
+    case TodoListsActionTypes.LoadTodoListsAction:
       return action.payload;
 
-    case TodoListActionTypes.OpenCloseTodoListAction:
+    case TodoListsActionTypes.OpenCloseTodoListAction:
       state.map(list => {
         state[i].showListDetails = false;
         i++;
@@ -37,7 +30,7 @@ export function todoListsReducer(
         return state;
       }
 
-    case TodoListActionTypes.EditTodoListNameAction:
+    case TodoListsActionTypes.EditTodoListNameAction:
       state.map(() => {
         state[i].editingName = false;
         state[i].showListDetails = false;
@@ -60,7 +53,7 @@ export function todoListsReducer(
         return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
       }
 
-    case TodoListActionTypes.CreateNewTodoListAction:
+    case TodoListsActionTypes.CreateNewTodoListAction:
       state.map(() => {
         state[i].editingName = false;
         state[i].showListDetails = false;
@@ -69,31 +62,17 @@ export function todoListsReducer(
       const newTodoList = [ { id: '', name: '', itemsPending: 0, itemsCompleted: 0, editingName: true, creatingNewList: true } ];
       return [ ...newTodoList, ...state.slice(0) ];
 
-    case TodoListActionTypes.DeleteTodoListAction:
+    case TodoListsActionTypes.DeleteTodoListAction:
       return [...state.slice(0, action.payload), ...state.slice(action.payload + 1)];
 
-    case TodoListActionTypes.CreateNewTodoToAction:
-      state.map(() => {
-        state[i].editingName = false;
-        if (i === action.payload) {
-          state[i].showListDetails = true;
-          state[i].addingTodo = true;
-        } else {
-          state[i].showListDetails = false;
-          state[i].addingTodo = false;
-        }
-        i++;
-      });
-      const newTodo: TodoModel[] = [ { id: '', label: '', completed: false, editingTask: true } ];
-      // const updatedTodoListItems = [ ...newTodo, ...state[action.payload].items];
-      console.log('...state[action.payload].items = ', ...state[action.payload].items);
-      const updatedTodoList = { ...state[action.payload], items: [ ...newTodo, ...state[action.payload].items] };
-      return [ ...state.slice(0, action.payload), updatedTodoList, ...state.slice(action.payload + 1)];
-
-    /*
-    const updatedTodoListItems = [ action.payload.newTodo, ...state[action.payload.listIndex].items];
-    const updatedTodoList = { ...state[action.payload.listIndex], items: updatedTodoListItems };
-    return [ ...state.slice(0, action.payload.listIndex), updatedTodoList, ...state.slice(action.payload.listIndex + 1)]; */
+    case TodoListsActionTypes.UpdateTodoListsWithUpdatedListItemsAction:
+      if (action.payload.mode === 'editLabel' || action.payload.mode === 'toggleComplete') {
+        updatedList = { ...state[action.payload.listIndex], items: action.payload.updatedListItems };
+        return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1) ];
+      } else {
+        // Deleting a todoItem
+        return [ ...state.slice(0, action.payload.listIndex), ...state.slice(action.payload.listIndex + 1) ];
+      }
 
     default:
       return state;

@@ -7,6 +7,7 @@ export const SCOPE = '2bcf85b6-698d-4ab4-9910-ecb905b87828';
 
 export interface APPStore {
   loginObject: LoginModel;
-  todoLists: TodoListModel[];
   currentUser: UserModel;
+  todoLists: TodoListModel[];
+  activeTodoList: TodoListModel;
 }

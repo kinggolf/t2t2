@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { APPStore, TodoListModel } from '../../models';
+import { APPStore, TodoListModel, TodoModel } from '../../models';
 import { Observable, SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LoadTodoListsAction, EditTodoLabelAction, DeleteTodoAction, ToggleTodoCompleteAction } from '../../actions';
+import { EditTodoLabelAction, UpdateTodoListsWithUpdatedListItemsAction, DeleteTodoAction } from '../../actions';
 
 @Component({
   selector: 'app-todos',
@@ -12,102 +12,108 @@ import { LoadTodoListsAction, EditTodoLabelAction, DeleteTodoAction, ToggleTodoC
   styleUrls: ['./todo.component.css']
 })
 export class TodoComponent implements OnInit, OnDestroy {
-  @Input() todoListDetails: TodoListModel;
-  newTodoListLabel: FormGroup;
+  activeList: TodoListModel;
+  @Input() prevTodoListItems: TodoModel[];
+  @Input() listIndex: number;
+  @Input() listId: string;
+  newTodoLabel: FormGroup;
+  // editingExistingTodoLabel: boolean;
+  prevTodoLabel: string;
+  activeListSub: SubscriptionLike;
+  activeList$: Observable<TodoListModel>;
 
   constructor(private todosService: TodosService, private store: Store<APPStore>, private fb: FormBuilder) { }
 
   ngOnInit() {
-    console.log('TodoListComponent: this.todoListDetails = ', this.todoListDetails);
-    this.newTodoListLabel = this.fb.group({
-      newTodoLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
+    // this.editingExistingTodoLabel = false;
+    this.activeList$ = this.store.select('activeTodoList');
+    this.activeListSub = this.activeList$.subscribe(activeList => {
+      console.log('In TodoComponent, activeList = ', activeList);
+      this.activeList = activeList;
+    });
+    this.newTodoLabel = this.fb.group({
+      newItemLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
   }
 
   ngOnDestroy(): void {
-
+    if (this.activeListSub) {
+      this.activeListSub.unsubscribe();
+    }
   }
 
   toggleTodoComplete(i) {
-    this.todoListDetails.items[i].completed = !this.todoListDetails.items[i].completed;
-    this.todosService.updateTodo(this.todoListDetails.items[i].id, '', this.todoListDetails.items[i].completed)
-      .subscribe(updatedTodoItem => {
-        const updatedItems = [
-          ...this.todoListDetails.items.slice(0, i),
-          updatedTodoItem,
-          ...this.todoListDetails.items.slice(i + 1),
-        ];
-        this.store.dispatch(new ToggleTodoCompleteAction(i));
-      });
+    // this.activeList.items[i].completed = !this.activeList.items[i].completed;
+    const updatedTodo = { ...this.activeList.items[i], completed: !this.activeList.items[i].completed };
+    this.storeUpdatedListItems(i, updatedTodo, 'toggleComplete');
+    this.todosService.updateTodo(this.activeList.items[i].id, '', this.activeList.items[i].completed)
+      .subscribe(updatedTodoItem => {});
   }
 
-  editTodoInfo(i) {
-    this.todoListDetails.items[i].editingTask = true;
-    this.newTodoListLabel = this.fb.group({
-      newTodoLabel: [this.todoListDetails.items[i].label,
-        Validators.compose([Validators.required, Validators.minLength(1)])]
+  editTodoLabel(i) {
+    // this.editingExistingTodoLabel = true;
+    this.newTodoLabel = this.fb.group({
+      newItemLabel: [this.activeList.items[i].label, Validators.compose([Validators.required, Validators.minLength(1)])]
     });
+    this.prevTodoLabel = this.activeList.items[i].label.slice(0);
+    this.store.dispatch(new EditTodoLabelAction(
+      { listIndex: this.listIndex, itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, mode: 'edit' }
+    ));
   }
 
-  cancelEditLabel(i) {
-    /*
-    const updatedTodo = this.todosService.createNewTodoListObject(this.todoLists[i], [{ addingTodo: false}]);
-    this.store.dispatch(new LoadTodoListsAction(this.todosService.createNewTodoListArray(this.todoLists, updatedTodo, i)));
-    this.store.select('prevTodoListDetails').subscribe(prevTodoListDetails => {
-      if (prevTodoListDetails) {
-        this.store.dispatch(new TodoListDetailsAction(Object.assign(prevTodoListDetails)));
-        // this.todoListDetails.items[i].editingTask = false;
-      } else {
-        const todoListsNoShow = [];
-        this.store.select('todoLists').subscribe(todoLists => {
-          todoLists.map(list => {
-            todoListsNoShow.push(Object.assign(list, {showListDetails: false}));
-          });
-        }).unsubscribe();
-        this.store.dispatch(new LoadTodoListsAction([...todoListsNoShow.slice(0)]));
-        this.store.dispatch(new TodoListDetailsAction(null));
-      }
-    }).unsubscribe(); */
+  cancelEditDetails(i) {
+    if (this.activeList.items[i].editingLabel) {
+      this.store.dispatch(new EditTodoLabelAction(
+        { listIndex: this.listIndex, itemIndex: i, itemLabel: this.prevTodoLabel, mode: 'cancel' }
+      ));
+      // console.log('TodoComponent, not editing label: this.prevTodoListItems = ', this.prevTodoListItems);
+    } else {
+      // console.log('TodoComponent editing label: this.prevTodoListItems = ', this.prevTodoListItems);
+    }
   }
 
   saveEditLabel(i) {
-    /*
-    this.todoListDetails.items[i].editingTask = false;
-    if (this.todoLists[i].addingTodo) {
-      this.todosService.createNewTodo(this.todoListDetails.id, this.newTodoListLabel.value.newTodoLabel)
-        .subscribe(updatedTodoDetails => {
-          this.store.dispatch((new TodoListDetailsAction(Object.assign({}, updatedTodoDetails))));
-        });
-    } else {
-      // Updating label of an existing todo
-      this.todosService.updateTodo(this.todoListDetails.items[i].id, this.newTodoListLabel.value.newTodoLabel, false)
-        .subscribe(updatedTodoItem => {
-          const updatedItems = [
-            ...this.todoListDetails.items.slice(0, i),
-            updatedTodoItem,
-            ...this.todoListDetails.items.slice(i + 1),
-          ];
-          this.store.dispatch((new TodoListDetailsAction(Object.assign(
-            {},
-            Object.assign(this.todoListDetails, {items: updatedItems}))))
-          );
-        });
+    this.store.dispatch(
+      new EditTodoLabelAction({
+        listIndex: this.listIndex, itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, mode: 'save'
+      })
+    );
+    // Anytime the activeList is updated, then incorporate this into todoLists
+    // Todo - still need to handle previous values - TBD
+    const updatedTodo = { ...this.activeList.items[i], editingLabel: false, label: this.newTodoLabel.value.newItemLabel};
+    this.storeUpdatedListItems(i, updatedTodo, 'editLabel');
+    if (this.activeList.items[i].editingLabel) {
+      this.todosService.updateTodo(this.activeList.items[i].id, this.newTodoLabel.value.newItemLabel, this.activeList.items[i].completed)
+        .subscribe(updatedTodoItem => {});
+      // this.editingExistingTodoLabel = false;
+    } else { // From creating a new item
+      // this.todosService.createNewTodo(this.listId, this.newTodoLabel.value.newItemLabel)
+      //   .subscribe(updatedTodoDetails => {});
     }
-    const updatedTodo = this.todosService.createNewTodoListObject(this.todoLists[i], [{ addingTodo: false}]);
-    this.store.dispatch(new LoadTodoListsAction(this.todosService.createNewTodoListArray(this.todoLists, updatedTodo, i))); */
   }
 
   deleteTodo(i) {
-    const confirmDelete = window.confirm('Confirm Delete ' + this.todoListDetails.items[i].label);
+    const confirmDelete = window.confirm('Confirm Delete ' + this.activeList.items[i].label);
     if (confirmDelete) {
-      this.todosService.deleteTodo(this.todoListDetails.items[i].id).subscribe(resp => {
+      this.todosService.deleteTodo(this.activeList.items[i].id).subscribe(resp => {
         if (!resp) {
           // Remove this list from store
           this.store.dispatch(new DeleteTodoAction(i));
+          this.storeUpdatedListItems(i, null, 'deleteItem');
         } else {
           console.log('deleteTodoList response = ', resp);
         }
       });
     }
   }
+
+  storeUpdatedListItems(i, updatedTodo, mode) {
+    const updatedActiveListItems = [ ...this.activeList.items.slice(0, i), updatedTodo, ...this.activeList.items.slice(i + 1) ];
+    this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
+      listIndex: this.listIndex,
+      updatedListItems: updatedActiveListItems,
+      mode
+    }));
+  }
+
 }

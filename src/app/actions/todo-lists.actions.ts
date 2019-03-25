@@ -1,62 +1,48 @@
 import { Action } from '@ngrx/store';
 import { TodoListModel, TodoModel } from '../models';
 
-export enum TodoListActionTypes {
+export enum TodoListsActionTypes {
   LoadTodoListsAction = 'LoadTodoListsAction',
   OpenCloseTodoListAction = 'OpenCloseTodoListAction',
   EditTodoListNameAction = 'EditTodoListNameAction',
   DeleteTodoListAction = 'DeleteTodoListAction',
   CreateNewTodoListAction = 'CreateNewTodoListAction',
-  CreateNewTodoToAction = 'CreateNewTodoToAction',
-  UpdateTodosForListAction = 'UpdateTodosForListAction',
-  UpdateListDetailsLoadingAction = 'UpdateListDetailsLoadingAction',
+  UpdateTodoListsWithUpdatedListItemsAction = 'UpdateTodoListsWithUpdatedListItemsAction',
 }
 
 export class LoadTodoListsAction implements Action {
-  readonly type = TodoListActionTypes.LoadTodoListsAction;
+  readonly type = TodoListsActionTypes.LoadTodoListsAction;
 
   constructor(public payload: TodoListModel[]) {}
 }
 
 export class OpenCloseTodoListAction implements Action {
-  readonly type = TodoListActionTypes.OpenCloseTodoListAction;
+  readonly type = TodoListsActionTypes.OpenCloseTodoListAction;
 
   constructor(public payload: { listIndex: number, listDetails: TodoListModel | null}) {}
 }
 
 export class EditTodoListNameAction implements Action {
-  readonly type = TodoListActionTypes.EditTodoListNameAction;
+  readonly type = TodoListsActionTypes.EditTodoListNameAction;
 
   constructor(public payload: { listIndex: number, listName: string | null, mode: string}) {}
 }
 
 export class DeleteTodoListAction implements Action {
-  readonly type = TodoListActionTypes.DeleteTodoListAction;
+  readonly type = TodoListsActionTypes.DeleteTodoListAction;
 
   constructor(public payload: number) {}
 }
 
 export class CreateNewTodoListAction implements Action {
-  readonly type = TodoListActionTypes.CreateNewTodoListAction;
+  readonly type = TodoListsActionTypes.CreateNewTodoListAction;
 
   constructor(public payload: boolean) {}
 }
 
-export class AddTodoToListAction implements Action {
-  readonly type = TodoListActionTypes.CreateNewTodoToAction;
+export class UpdateTodoListsWithUpdatedListItemsAction implements Action {
+  readonly type = TodoListsActionTypes.UpdateTodoListsWithUpdatedListItemsAction;
 
-  constructor(public payload: number) {}
-  // constructor(public payload: { newTodo: TodoModel, listIndex: number }) {}
+  constructor(public payload: { listIndex: number, updatedListItems: TodoModel[], mode: string }) {}
 }
 
-export class UpdateTodosForListAction implements Action {
-  readonly type = TodoListActionTypes.UpdateTodosForListAction;
-
-  constructor(public payload: TodoListModel[]) {}
-}
-
-export class UpdateListDetailsLoadingAction implements Action {
-  readonly type = TodoListActionTypes.UpdateListDetailsLoadingAction;
-
-  constructor(public payload: boolean) {}
-}

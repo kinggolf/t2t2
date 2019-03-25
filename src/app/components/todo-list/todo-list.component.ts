@@ -3,8 +3,9 @@ import { Store } from '@ngrx/store';
 import { APPStore, TodoListModel, TodoModel } from '../../models';
 import { SubscriptionLike, Observable } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
+import {  AppHealthService } from '../../services/app-health.service';
 import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, DeleteTodoListAction,
-         AddTodoToListAction, UpdateListDetailsLoadingAction} from '../../actions';
+         CreateNewTodoListAction, CreateNewTodoAction, LoadActiveTodoListAction } from '../../actions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
@@ -26,9 +27,10 @@ export class TodoListComponent implements OnInit, OnDestroy {
   showTodosLoadingSpinner: boolean;
   prevListName: string;
   @Input() prevTodoLists: TodoListModel[];
+  prevTodoListItems: TodoModel[];
 
   constructor(private todosService: TodosService, private store: Store<APPStore>,
-              private fb: FormBuilder, private snackBar: MatSnackBar) { }
+              private appHealthService: AppHealthService, private fb: FormBuilder, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.showTodosLoadingSpinner = false;
@@ -41,15 +43,12 @@ export class TodoListComponent implements OnInit, OnDestroy {
     this.newTodoListName = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
-    // Use addingTodo to prevent multiple create todos from being open at the same time
     this.currentOpenListIndex = -1;
     this.todoListDetailsLoading$ = this.store.select('listDetailsLoading');
-    // Monitor online/offline
-    this.isOnline$ = this.todosService.monitorOnline();
+    this.isOnline$ = this.appHealthService.monitorOnline();
     this.isOnline = true;
     let onlineChangeCount = 0;
     this.isOnlineSub = this.isOnline$.subscribe(online => {
-      console.log('Online = ', online);
       this.isOnline = online;
       if (!online) {
         this.snackBar.open('You are now offline. Editing disabled.', 'Got it', {
@@ -112,7 +111,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
     }
   }
 
-  cancelEditListName(i): void {
+  cancelEditList(i): void {
     if (this.todoLists[i].creatingNewList) {
       this.store.dispatch(new LoadTodoListsAction(this.prevTodoLists));
     } else {
@@ -126,7 +125,8 @@ export class TodoListComponent implements OnInit, OnDestroy {
         // This list has items that have not been downloaded yet
         this.callServerForTodos(i, true);
       } else {
-        this.store.dispatch(new AddTodoToListAction(i));
+        this.prevTodoListItems = this.todoLists[i].items.slice(0);
+        this.store.dispatch(new CreateNewTodoAction(i));
       }
     }
   }
@@ -157,11 +157,15 @@ export class TodoListComponent implements OnInit, OnDestroy {
         }, 5000);
       }
       if (listDetails) {
+        console.log('In callServerForTodos, listDetails = ', listDetails);
         clearTimeout(offLineLoadTodosTimer);
         this.showTodosLoadingSpinner = false;
         this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails}));
+        this.store.dispatch(new LoadActiveTodoListAction(listDetails));
+        this.prevTodoListItems = this.todoLists[i].items.slice(0);
         if (callFromAddTodo) {
-          this.store.dispatch(new AddTodoToListAction(i));
+          // this.prevTodoListItems = this.todoLists[i].items.slice(0);
+          this.store.dispatch(new CreateNewTodoAction(i));
         }
       }
     });

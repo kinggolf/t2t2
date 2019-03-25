@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { APPStore, BASE_URL, TodoListModel, TodoModel } from '../models';
-import { Observable, fromEvent, merge, of } from 'rxjs';
-import { mapTo } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +48,7 @@ export class TodosService {
   }
 
   createNewTodo(todoListId, newTodoLabel): Observable<TodoListModel> {
+    console.log('In createNewTodo, newTodoLabel = ' + newTodoLabel);
     const createNewTodoURL = BASE_URL + '/api/docket/todo/' + todoListId;
     const createNewTodoBody = {
       label: newTodoLabel
@@ -57,6 +57,7 @@ export class TodosService {
   }
 
   updateTodo(todoItemId, updatedTodoLabel, completed): Observable<TodoListModel> {
+    console.log('In updateTodo, updatedTodoLabel = ' + updatedTodoLabel);
     const updateListURL = BASE_URL + '/api/docket/todo/item/' + todoItemId;
     let updateListBody;
     if (updatedTodoLabel !== '') {
@@ -79,15 +80,7 @@ export class TodosService {
     const deleteTodoURL = BASE_URL + '/api/docket/todo/item/' + todoItemId;
     return this.http.delete(deleteTodoURL);
   }
-
-  monitorOnline(): Observable<boolean> {
-    return merge(
-      of(navigator.onLine),
-      fromEvent(window, 'online').pipe(mapTo(true)),
-      fromEvent(window, 'offline').pipe(mapTo(false))
-    );
-  }
-
+  /*
   createNewTodoListArray(currentTodoList: TodoListModel[], newTodoListObject: TodoListModel, newTodoListIndex: number): TodoListModel[] {
     return [
       ...currentTodoList.slice(0, newTodoListIndex),
@@ -101,5 +94,5 @@ export class TodosService {
       ...currentTodo,
       ...updateTodoAttributes
     };
-  }
+  } */
 }
