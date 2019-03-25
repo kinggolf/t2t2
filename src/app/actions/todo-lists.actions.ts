@@ -5,6 +5,7 @@ export enum TodoListsActionTypes {
   LoadTodoListsAction = 'LoadTodoListsAction',
   OpenCloseTodoListAction = 'OpenCloseTodoListAction',
   EditTodoListNameAction = 'EditTodoListNameAction',
+  CreateNewTodoAction = 'CreateNewTodoAction',
   DeleteTodoListAction = 'DeleteTodoListAction',
   CreateNewTodoListAction = 'CreateNewTodoListAction',
   UpdateTodoListsWithUpdatedListItemsAction = 'UpdateTodoListsWithUpdatedListItemsAction',
@@ -26,6 +27,12 @@ export class EditTodoListNameAction implements Action {
   readonly type = TodoListsActionTypes.EditTodoListNameAction;
 
   constructor(public payload: { listIndex: number, listName: string | null, mode: string}) {}
+}
+
+export class CreateNewTodoAction implements Action {
+  readonly type = TodoListsActionTypes.CreateNewTodoAction;
+
+  constructor(public payload: number) {}
 }
 
 export class DeleteTodoListAction implements Action {

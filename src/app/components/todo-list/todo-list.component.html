@@ -8,9 +8,7 @@
 
     <mat-card-content *ngIf="todoList.showListDetails">
       <mat-spinner *ngIf="!todoList.items" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
-      <app-todos *ngIf="todoList.items" [prevTodoListItems]="prevTodoListItems"
-                 [listIndex]=i [listId]="todoList.id">
-      </app-todos>
+      <app-todos *ngIf="todoList.items" [prevTodoList]="prevTodoList" [listIndex]=i [listId]="todoList.id"></app-todos>
       <!--
       <app-todos *ngIf="todoList.items" [prevTodoListItems]="prevTodoListItems" [todoListItems]="todoList.items"
                  [listIndex]=i [listId]="todoList.id">

@@ -4,7 +4,7 @@ import { APPStore, TodoListModel, TodoModel } from '../../models';
 import { Observable, SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EditTodoLabelAction, UpdateTodoListsWithUpdatedListItemsAction, DeleteTodoAction } from '../../actions';
+import {EditTodoLabelAction, UpdateTodoListsWithUpdatedListItemsAction, DeleteTodoAction, LoadActiveTodoListAction} from '../../actions';
 
 @Component({
   selector: 'app-todos',
@@ -13,7 +13,7 @@ import { EditTodoLabelAction, UpdateTodoListsWithUpdatedListItemsAction, DeleteT
 })
 export class TodoComponent implements OnInit, OnDestroy {
   activeList: TodoListModel;
-  @Input() prevTodoListItems: TodoModel[];
+  @Input() prevTodoList: TodoListModel;
   @Input() listIndex: number;
   @Input() listId: string;
   newTodoLabel: FormGroup;
@@ -26,6 +26,7 @@ export class TodoComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // this.editingExistingTodoLabel = false;
+    console.log('In TodoComponent ngOnInit, this.prevTodoList = ', this.prevTodoList);
     this.activeList$ = this.store.select('activeTodoList');
     this.activeListSub = this.activeList$.subscribe(activeList => {
       console.log('In TodoComponent, activeList = ', activeList);
@@ -62,34 +63,36 @@ export class TodoComponent implements OnInit, OnDestroy {
   }
 
   cancelEditDetails(i) {
-    if (this.activeList.items[i].editingLabel) {
+    // if (this.activeList.items[i].editingLabel) {
+    if (this.activeList.items[i].label !== '') {
       this.store.dispatch(new EditTodoLabelAction(
         { listIndex: this.listIndex, itemIndex: i, itemLabel: this.prevTodoLabel, mode: 'cancel' }
       ));
-      // console.log('TodoComponent, not editing label: this.prevTodoListItems = ', this.prevTodoListItems);
     } else {
-      // console.log('TodoComponent editing label: this.prevTodoListItems = ', this.prevTodoListItems);
+      // Cancel from adding a todoItem
+      this.store.dispatch(new LoadActiveTodoListAction(this.prevTodoList));
     }
   }
 
   saveEditLabel(i) {
+    // Anytime the activeList is updated, then incorporate this into todoLists
+    const updatedTodo = { ...this.activeList.items[i], editingLabel: false, label: this.newTodoLabel.value.newItemLabel};
+    this.storeUpdatedListItems(i, updatedTodo, 'editLabel');
+    // if (this.activeList.items[i].editingLabel) {
+    if (this.activeList.items[i].label !== '') {
+      // From editing an existing item
+      this.todosService.updateTodo(this.activeList.items[i].id, this.newTodoLabel.value.newItemLabel, this.activeList.items[i].completed)
+        .subscribe(updatedTodoItem => {});
+    } else {
+      // From creating a new item
+      this.todosService.createNewTodo(this.activeList.id, this.newTodoLabel.value.newItemLabel)
+        .subscribe(updatedTodoDetails => {});
+    }
     this.store.dispatch(
       new EditTodoLabelAction({
         listIndex: this.listIndex, itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, mode: 'save'
       })
     );
-    // Anytime the activeList is updated, then incorporate this into todoLists
-    // Todo - still need to handle previous values - TBD
-    const updatedTodo = { ...this.activeList.items[i], editingLabel: false, label: this.newTodoLabel.value.newItemLabel};
-    this.storeUpdatedListItems(i, updatedTodo, 'editLabel');
-    if (this.activeList.items[i].editingLabel) {
-      this.todosService.updateTodo(this.activeList.items[i].id, this.newTodoLabel.value.newItemLabel, this.activeList.items[i].completed)
-        .subscribe(updatedTodoItem => {});
-      // this.editingExistingTodoLabel = false;
-    } else { // From creating a new item
-      // this.todosService.createNewTodo(this.listId, this.newTodoLabel.value.newItemLabel)
-      //   .subscribe(updatedTodoDetails => {});
-    }
   }
 
   deleteTodo(i) {

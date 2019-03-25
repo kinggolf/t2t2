@@ -27,7 +27,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
   showTodosLoadingSpinner: boolean;
   prevListName: string;
   @Input() prevTodoLists: TodoListModel[];
-  prevTodoListItems: TodoModel[];
+  prevTodoList: TodoListModel;
 
   constructor(private todosService: TodosService, private store: Store<APPStore>,
               private appHealthService: AppHealthService, private fb: FormBuilder, private snackBar: MatSnackBar) { }
@@ -121,12 +121,14 @@ export class TodoListComponent implements OnInit, OnDestroy {
 
   createNewTodo(i): void {
     if (!this.todoLists[i].addingTodo) {
-      if (!this.todoLists[i].items && (this.todoLists[i].itemsPending + this.todoLists[i].itemsCompleted) > 0) {
+      // if (!this.todoLists[i].items && (this.todoLists[i].itemsPending + this.todoLists[i].itemsCompleted) > 0) {
+      if (!this.todoLists[i].showListDetails) {
         // This list has items that have not been downloaded yet
         this.callServerForTodos(i, true);
       } else {
-        this.prevTodoListItems = this.todoLists[i].items.slice(0);
+        this.prevTodoList = { ...this.todoLists[i] };
         this.store.dispatch(new CreateNewTodoAction(i));
+        this.store.dispatch(new LoadActiveTodoListAction(this.todoLists[i]));
       }
     }
   }
@@ -157,16 +159,14 @@ export class TodoListComponent implements OnInit, OnDestroy {
         }, 5000);
       }
       if (listDetails) {
-        console.log('In callServerForTodos, listDetails = ', listDetails);
         clearTimeout(offLineLoadTodosTimer);
         this.showTodosLoadingSpinner = false;
         this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails}));
-        this.store.dispatch(new LoadActiveTodoListAction(listDetails));
-        this.prevTodoListItems = this.todoLists[i].items.slice(0);
+        this.prevTodoList = { ...this.todoLists[i] };
         if (callFromAddTodo) {
-          // this.prevTodoListItems = this.todoLists[i].items.slice(0);
           this.store.dispatch(new CreateNewTodoAction(i));
         }
+        this.store.dispatch(new LoadActiveTodoListAction(this.todoLists[i]));
       }
     });
   }

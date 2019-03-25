@@ -1,10 +1,10 @@
 import {TodoListModel} from '../models';
-import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, DeleteTodoListAction,
+import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, CreateNewTodoAction, DeleteTodoListAction,
          CreateNewTodoListAction, UpdateTodoListsWithUpdatedListItemsAction, TodoListsActionTypes } from '../actions';
 
 export function todoListsReducer(
   state: TodoListModel[],
-  action: LoadTodoListsAction | OpenCloseTodoListAction | CreateNewTodoListAction |
+  action: LoadTodoListsAction | OpenCloseTodoListAction | CreateNewTodoListAction | CreateNewTodoAction |
           DeleteTodoListAction | EditTodoListNameAction | UpdateTodoListsWithUpdatedListItemsAction): TodoListModel[] {
   let i = 0;
   let updatedList;
@@ -52,6 +52,12 @@ export function todoListsReducer(
         };
         return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
       }
+
+    case TodoListsActionTypes.CreateNewTodoAction:
+      const newTodo = { id: '', label: '', completed: false, editingLabel: true };
+      updatedList = { ...state[action.payload], items: [ newTodo, ...state[action.payload].items ] };
+      console.log('In reducers, CreateNewTodoAction: updatedList = ', updatedList);
+      return [ ...state.slice(0, action.payload), updatedList, ...state.slice(action.payload + 1) ];
 
     case TodoListsActionTypes.CreateNewTodoListAction:
       state.map(() => {

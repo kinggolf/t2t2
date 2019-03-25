@@ -1,11 +1,15 @@
-import { TodoListModel } from '../models';
-import { LoadActiveTodoListAction, EditTodoLabelAction, DeleteTodoAction, CreateNewTodoAction,
-         ToggleTodoAction, ActiveTodoListActionTypes, } from '../actions';
+import {TodoListModel} from '../models';
+import {
+  ActiveTodoListActionTypes,
+  DeleteTodoAction,
+  EditTodoLabelAction,
+  LoadActiveTodoListAction,
+  ToggleTodoAction,
+} from '../actions';
 
 export function activeTodoListReducer(
   state: TodoListModel,
-  action: LoadActiveTodoListAction | EditTodoLabelAction | DeleteTodoAction | CreateNewTodoAction |
-          ToggleTodoAction): TodoListModel {
+  action: LoadActiveTodoListAction | EditTodoLabelAction | DeleteTodoAction | ToggleTodoAction): TodoListModel {
   let i = 0;
   let updatedActiveListItems;
   let updatedTodo;
@@ -31,6 +35,11 @@ export function activeTodoListReducer(
         updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedTodo, ...state.items.slice(itemIndex + 1) ];
         return { ...state, items: updatedActiveListItems  };
       }
+    /* CreateNewTodoAction,  | CreateNewTodoAction
+    case ActiveTodoListActionTypes.CreateNewTodoAction:
+      const newTodo = { id: '', label: '', completed: false, editingTask: true };
+      updatedActiveListItems = [ newTodo, ...state[action.payload].items ];
+      return { ...state }; */
 
     default:
       return state;
