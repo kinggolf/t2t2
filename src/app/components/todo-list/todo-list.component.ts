@@ -103,15 +103,11 @@ export class TodoListComponent implements OnInit, OnDestroy {
       new EditTodoListNameAction({listIndex: i, listName: this.newTodoListName.value.newListName, mode: 'save'})
     );
     if (this.todoLists[i].creatingNewList) {
-      this.todoListsServerSub1 = this.todosService.createNewList(this.newTodoListName.value.newListName).subscribe(resp => {
-        // console.log('In saveListName for a new list, resp = ', resp);
-      });
+      this.todoListsServerSub1 = this.todosService.createNewList(this.newTodoListName.value.newListName).subscribe(resp => {});
     } else {
       this.todoListsServerSub2 = this.todosService.updateList(
         { ...this.todoLists[i], name: this.newTodoListName.value.newListName}, 'name' )
-        .subscribe(resp => {
-          // console.log('In saveListName, resp = ', resp);
-        });
+        .subscribe(resp => {});
     }
     this.newTodoListName.setValue({ newListName: '' });
     this.endCreatingNewList.emit();

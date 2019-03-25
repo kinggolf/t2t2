@@ -47,7 +47,6 @@ export class TodosService {
   }
 
   createNewTodo(todoListId, newTodoLabel): Observable<TodoListModel> {
-    console.log('In createNewTodo, newTodoLabel = ' + newTodoLabel + ' & todoListId = ' + todoListId);
     const createNewTodoURL = BASE_URL + '/api/docket/todo/' + todoListId;
     const createNewTodoBody = {
       label: newTodoLabel
@@ -56,8 +55,6 @@ export class TodosService {
   }
 
   updateTodo(todoItemId, updatedTodoLabel, completed): Observable<TodoListModel> {
-    console.log('In updateTodo, completed = ' + completed);
-    console.log('In updateTodo, updatedTodoLabel = ' + updatedTodoLabel + ' & todoItemId = ' + todoItemId);
     const updateListURL = BASE_URL + '/api/docket/todo/item/' + todoItemId;
     let updateListBody;
     if (updatedTodoLabel !== '') {
@@ -73,7 +70,6 @@ export class TodosService {
         value: completed
       };
     }
-    console.log('In updateTodo, updateListBody = ', updateListBody);
     return this.http.patch<any>(updateListURL, updateListBody);
   }
 

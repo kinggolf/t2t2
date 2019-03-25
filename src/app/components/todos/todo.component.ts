@@ -15,11 +15,9 @@ import { EditTodoLabelAction, UpdateTodoListsWithUpdatedListItemsAction, DeleteT
 })
 export class TodoComponent implements OnInit, OnDestroy {
   activeList: TodoListModel;
-  todoLists: TodoListModel[];
   newTodoLabel: FormGroup;
   prevTodoLabel: string;
   activeListSub: SubscriptionLike;
-  todoListsSub: SubscriptionLike;
   todoListsServerSub1: SubscriptionLike;
   todoListsServerSub2: SubscriptionLike;
   todoListsServerSub3: SubscriptionLike;
@@ -34,20 +32,10 @@ export class TodoComponent implements OnInit, OnDestroy {
               private fb: FormBuilder, private appHealthService: AppHealthService) { }
 
   ngOnInit() {
-    /*
-  }
-    this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
-      if (todoList) {
-        this.todoLists = todoList;
-        console.log('TodoComponent: this.todoLists = ', this.todoLists);
-        this.activeList = todoList[this.listIndex];
-        console.log('In TodoComponent, this.activeList = ', this.activeList);
-      }
-    }); */
     this.activeList$ = this.store.select('activeTodoList');
     this.activeListSub = this.activeList$.subscribe(activeList => {
-      console.log('In TodoComponent, activeList = ', activeList);
       this.activeList = activeList;
+      // console.log('TodoListComponent: this.activeList = ', this.activeList);
     });
     this.newTodoLabel = this.fb.group({
       newItemLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
@@ -79,22 +67,17 @@ export class TodoComponent implements OnInit, OnDestroy {
       newItemLabel: [this.activeList.items[i].label, Validators.compose([Validators.required, Validators.minLength(1)])]
     });
     this.prevTodoLabel = this.activeList.items[i].label.slice(0);
-    /*
-    this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
-      listIndex: this.listIndex, itemIndex: i, label: this.activeList.items[i].label, mode: 'enableEditLabel'
-    }));
-    this.newTodoLabel.setValue({ newItemLabel: this.activeList.items[i].label }); */
     this.store.dispatch(new EditTodoLabelAction({ itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, mode: 'edit' }));
   }
 
   cancelEditDetails(i) {
     if (this.activeList.items[i].label !== '') {
       this.store.dispatch(new EditTodoLabelAction({ itemIndex: i, itemLabel: this.prevTodoLabel, mode: 'cancel' }));
-      // this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
-      //   listIndex: this.listIndex, itemIndex: i, label: this.prevTodoLabel, mode: 'cancelEditLabel'
-      // }));
     } else {
       // Cancel from adding a todoItem
+      this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
+        listIndex: this.listIndex, itemIndex: i, label: this.newTodoLabel.value.newItemLabel, mode: 'cancelEditLabel'
+      }));
       this.store.dispatch(new LoadActiveTodoListAction(this.prevTodoList));
     }
   }

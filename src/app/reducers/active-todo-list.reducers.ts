@@ -28,7 +28,7 @@ export function activeTodoListReducer(
       } else { // This is from save
         updatedItem = { ...state.items[itemIndex], editingLabel: false, label: action.payload.itemLabel};
         updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ];
-        return { ...state, items: updatedActiveListItems, showListDetails: false };
+        return { ...state, items: updatedActiveListItems };
       }
 
     case ActiveTodoListActionTypes.DeleteTodoAction:
