@@ -7,20 +7,22 @@
       <mat-card-actions>
         <div style="display: table; width: 100%; text-align: center;">
           <div style="display: table-cell; width: 33.3%;">
-            <button (click)="toggleTodoComplete(i)" class="base-mat-icon" title="Completed">
+            <button (click)="toggleTodoComplete(i)" class="base-mat-icon" title="Completed"
+                    [disabled]="!(isOnline$ | async)">
               <i *ngIf="todo.completed" class="material-icons icon-font-spec">check_box</i>
               <i *ngIf="!todo.completed" class="material-icons icon-font-spec">check_box_outline_blank</i>
               <div>Complete</div>
             </button>
           </div>
           <div style="display: table-cell; width: 33.3%;">
-            <button (click)="editTodoLabel(i)" class="base-mat-icon" title="Edit Todo Info">
+            <button (click)="editTodoLabel(i)" class="base-mat-icon" title="Edit Todo Info"
+                    [disabled]="!(isOnline$ | async)">
               <i class="material-icons icon-font-spec">border_color</i>
               <div>Edit</div>
             </button>
           </div>
           <div style="display: table-cell; width: 33.3%;">
-            <button (click)="deleteTodo(i)" class="base-mat-icon" title="Delete Todo">
+            <button (click)="deleteTodo(i)" class="base-mat-icon" title="Delete Todo" [disabled]="!(isOnline$ | async)">
               <i class="material-icons icon-font-spec">delete</i>
               <div>Delete</div>
             </button>

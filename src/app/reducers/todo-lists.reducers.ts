@@ -80,7 +80,24 @@ export function todoListsReducer(
     case TodoListsActionTypes.UpdateTodoListsWithUpdatedListItemsAction:
       listIndex = action.payload.listIndex;
       itemIndex = action.payload.itemIndex;
+      console.log('In todo-list reducer, action.payload = ', action.payload);
+      /*
+      if (action.payload.mode === 'enableEditLabel') {
+        updatedListItems = [
+          ...state[listIndex].items.slice(0, itemIndex),
+          { ...state[listIndex].items[itemIndex], label: action.payload.label, editingLabel: true },
+          ...state[listIndex].items.slice(itemIndex + 1)
+        ];
+      } else if (action.payload.mode === 'cancelEditLabel') {
+        updatedListItems = [
+          ...state[listIndex].items.slice(0, itemIndex),
+          { ...state[listIndex].items[itemIndex], label: action.payload.label, editingLabel: false },
+          ...state[listIndex].items.slice(itemIndex + 1)
+        ];
+      } else */
       if (action.payload.mode === 'editLabel') {
+        completedCount = state[listIndex].itemsCompleted;
+        pendingCount = state[listIndex].itemsPending;
         updatedListItems = [
           ...state[listIndex].items.slice(0, itemIndex),
           { ...state[listIndex].items[itemIndex], label: action.payload.label },
@@ -94,6 +111,7 @@ export function todoListsReducer(
           { ...state[listIndex].items[itemIndex], itemsCompleted: completedCount, itemsPending: pendingCount },
           ...state[listIndex].items.slice(itemIndex + 1)
         ];
+        console.log('In todo-list reducers, updatedListItems = ', updatedListItems);
       } else if (action.payload.mode === 'toggleComplete') {
         const itemCompleted = state[listIndex].items[itemIndex].completed;
         if (itemCompleted) {

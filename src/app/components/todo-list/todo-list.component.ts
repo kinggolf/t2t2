@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { APPStore, TodoListModel } from '../../models';
 import { SubscriptionLike } from 'rxjs';
@@ -15,15 +15,19 @@ import { MatSnackBar } from '@angular/material';
   styleUrls: ['./todo-list.component.css']
 })
 export class TodoListComponent implements OnInit, OnDestroy {
-  todoListDetailsFromServerSub: SubscriptionLike;
   todoLists: TodoListModel[];
+  todoListsServerSub1: SubscriptionLike;
+  todoListsServerSub2: SubscriptionLike;
+  todoListsServerSub3: SubscriptionLike;
+  todoListsServerSub4: SubscriptionLike;
   todoListsSub: SubscriptionLike;
-  newTodoListName: FormGroup;
   isOnlineSub: SubscriptionLike;
+  newTodoListName: FormGroup;
   isOnline: boolean;
   prevListName: string;
   prevTodoList: TodoListModel;
   @Input() prevTodoLists: TodoListModel[];
+  @Output() endCreatingNewList = new EventEmitter();
 
   constructor(private todosService: TodosService, private store: Store<APPStore>,
               private appHealthService: AppHealthService, private fb: FormBuilder, private snackBar: MatSnackBar) { }
@@ -32,7 +36,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
     this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
       if (todoList) {
         this.todoLists = todoList;
-        console.log('TodoListComponent: this.todoLists = ', this.todoLists);
+        // console.log('TodoListComponent: this.todoLists = ', this.todoLists);
       }
     });
     this.newTodoListName = this.fb.group({
@@ -59,8 +63,17 @@ export class TodoListComponent implements OnInit, OnDestroy {
     if (this.todoListsSub) {
       this.todoListsSub.unsubscribe();
     }
-    if (this.todoListDetailsFromServerSub) {
-      this.todoListDetailsFromServerSub.unsubscribe();
+    if (this.todoListsServerSub1) {
+      this.todoListsServerSub1.unsubscribe();
+    }
+    if (this.todoListsServerSub2) {
+      this.todoListsServerSub2.unsubscribe();
+    }
+    if (this.todoListsServerSub3) {
+      this.todoListsServerSub3.unsubscribe();
+    }
+    if (this.todoListsServerSub4) {
+      this.todoListsServerSub4.unsubscribe();
     }
     if (this.isOnlineSub) {
       this.isOnlineSub.unsubscribe();
@@ -90,16 +103,18 @@ export class TodoListComponent implements OnInit, OnDestroy {
       new EditTodoListNameAction({listIndex: i, listName: this.newTodoListName.value.newListName, mode: 'save'})
     );
     if (this.todoLists[i].creatingNewList) {
-      this.todosService.createNewList(this.newTodoListName.value.newListName).subscribe(resp => {
-        console.log('In saveListName for a new list, resp = ', resp);
+      this.todoListsServerSub1 = this.todosService.createNewList(this.newTodoListName.value.newListName).subscribe(resp => {
+        // console.log('In saveListName for a new list, resp = ', resp);
       });
     } else {
-      this.todosService.updateList({...this.todoLists[i], name: this.newTodoListName.value.newListName}, 'name')
+      this.todoListsServerSub2 = this.todosService.updateList(
+        { ...this.todoLists[i], name: this.newTodoListName.value.newListName}, 'name' )
         .subscribe(resp => {
-          console.log('In saveListName, resp = ', resp);
+          // console.log('In saveListName, resp = ', resp);
         });
     }
     this.newTodoListName.setValue({ newListName: '' });
+    this.endCreatingNewList.emit();
   }
 
   cancelEditList(i): void {
@@ -108,6 +123,8 @@ export class TodoListComponent implements OnInit, OnDestroy {
     } else {
       this.store.dispatch(new EditTodoListNameAction({listIndex: i, listName: this.prevListName, mode: 'cancel'}));
     }
+    this.newTodoListName.setValue({ newListName: '' });
+    this.endCreatingNewList.emit();
   }
 
   createNewTodo(i): void {
@@ -126,7 +143,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
   confirmDeleteList(i): void {
     const confirmDelete = window.confirm('Confirm Delete ' + this.todoLists[i].name);
     if (confirmDelete) {
-      this.todosService.deleteTodoList(this.todoLists[i].id).subscribe(resp => {
+      this.todoListsServerSub3 = this.todosService.deleteTodoList(this.todoLists[i].id).subscribe(resp => {
         if (!resp) {
           // Remove this list from store
           this.store.dispatch(new DeleteTodoListAction(i));
@@ -138,24 +155,22 @@ export class TodoListComponent implements OnInit, OnDestroy {
   }
 
   callServerForTodos(i: number, callFromAddTodo: boolean): void {
-    this.todoListDetailsFromServerSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
-      let offLineLoadTodosTimer;
-      if (!this.isOnline) {
-        offLineLoadTodosTimer = setTimeout(() => {
-          this.snackBar.open('Offline & list details have not previously been downloaded.', 'OK', {
-            duration: 5000,
-          });
-        }, 5000);
-      }
-      if (listDetails) {
-        clearTimeout(offLineLoadTodosTimer);
-        this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails}));
-        this.prevTodoList = { ...this.todoLists[i] };
-        if (callFromAddTodo) {
-          this.store.dispatch(new CreateNewTodoAction(i));
+    // let offLineLoadTodosTimer;
+    if (this.isOnline || (!this.isOnline && this.todoLists[i].items)) {
+      this.todoListsServerSub4 = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
+        if (listDetails) {
+          this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails}));
+          this.prevTodoList = {...this.todoLists[i]};
+          if (callFromAddTodo) {
+            this.store.dispatch(new CreateNewTodoAction(i));
+          }
+          this.store.dispatch(new LoadActiveTodoListAction(this.todoLists[i]));
         }
-        this.store.dispatch(new LoadActiveTodoListAction(this.todoLists[i]));
-      }
-    });
+      });
+    } else {
+      this.snackBar.open('Offline & list details have not previously been downloaded.', 'OK', {
+        duration: 5000,
+      });
+    }
   }
 }

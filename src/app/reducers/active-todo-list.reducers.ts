@@ -22,13 +22,13 @@ export function activeTodoListReducer(
       if (action.payload.mode === 'edit') {
         updatedItem = { ...state.items[itemIndex], editingLabel: true, label: state.items[itemIndex].label};
         updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ];
-        return { ...state, items: updatedActiveListItems  };
+        return { ...state, items: updatedActiveListItems };
       } else if (action.payload.mode === 'cancel') {
         return { ...state };
-      } else {
+      } else { // This is from save
         updatedItem = { ...state.items[itemIndex], editingLabel: false, label: action.payload.itemLabel};
         updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ];
-        return { ...state, items: updatedActiveListItems  };
+        return { ...state, items: updatedActiveListItems, showListDetails: false };
       }
 
     case ActiveTodoListActionTypes.DeleteTodoAction:

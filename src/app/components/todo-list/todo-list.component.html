@@ -49,7 +49,6 @@
 
   <mat-card *ngIf="todoList.editingName" style="margin: 2rem 0.5rem; background-color: lightgray;">
     <form novalidate [formGroup]="newTodoListName">
-
       <mat-form-field style="margin-left: 1.2rem;">
         <input matInput placeholder="List Name" formControlName="newListName">
       </mat-form-field>
