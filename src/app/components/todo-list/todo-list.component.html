@@ -1,7 +1,6 @@
 <div *ngFor="let todoList of todoLists; let i = index;" style="margin-top: 2rem;">
   <mat-card *ngIf="!todoList.editingName"
             style="margin: 2rem 0.5rem; background-color: lightgray;">
-    <!--  && !todoList.addingTodo -->
     <mat-card-header (click)="showListDetails(i)">
       <mat-card-title>{{ todoList.name }}</mat-card-title>
     </mat-card-header>
@@ -9,10 +8,6 @@
     <mat-card-content *ngIf="todoList.showListDetails">
       <mat-spinner *ngIf="!todoList.items" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
       <app-todos *ngIf="todoList.items" [prevTodoList]="prevTodoList" [listIndex]=i [listId]="todoList.id"></app-todos>
-      <!--
-      <app-todos *ngIf="todoList.items" [prevTodoListItems]="prevTodoListItems" [todoListItems]="todoList.items"
-                 [listIndex]=i [listId]="todoList.id">
-      </app-todos> -->
     </mat-card-content>
 
     <mat-card-actions>
@@ -30,20 +25,19 @@
           </div>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name" [disabled]="!(isOnline$ | async)">
+          <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name" [disabled]="!isOnline">
             <i class="material-icons icon-font-spec">border_color</i>
             <div>Edit List Name</div>
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="createNewTodo(i)" class="base-mat-icon" title="Add Todo" [disabled]="!(isOnline$ | async)">
+          <button (click)="createNewTodo(i)" class="base-mat-icon" title="Add Todo" [disabled]="!isOnline">
             <i class="material-icons icon-font-spec">add_circle</i>
             <div>Add Todo</div>
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List"
-                  [disabled]="!(isOnline$ | async)">
+          <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List" [disabled]="!isOnline">
             <i class="material-icons icon-font-spec">delete</i>
             <div>Delete List</div>
           </button>

@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { APPStore, TodoListModel, TodoModel } from '../../models';
-import { SubscriptionLike, Observable } from 'rxjs';
+import { APPStore, TodoListModel } from '../../models';
+import { SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
-import {  AppHealthService } from '../../services/app-health.service';
+import { AppHealthService } from '../../services/app-health.service';
 import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, DeleteTodoListAction,
-         CreateNewTodoListAction, CreateNewTodoAction, LoadActiveTodoListAction } from '../../actions';
+         CreateNewTodoAction, LoadActiveTodoListAction } from '../../actions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
@@ -18,22 +18,17 @@ export class TodoListComponent implements OnInit, OnDestroy {
   todoListDetailsFromServerSub: SubscriptionLike;
   todoLists: TodoListModel[];
   todoListsSub: SubscriptionLike;
-  todoListDetailsLoading$: Observable<boolean>;
-  currentOpenListIndex: number;
   newTodoListName: FormGroup;
-  isOnline$: Observable<boolean>;
   isOnlineSub: SubscriptionLike;
   isOnline: boolean;
-  showTodosLoadingSpinner: boolean;
   prevListName: string;
-  @Input() prevTodoLists: TodoListModel[];
   prevTodoList: TodoListModel;
+  @Input() prevTodoLists: TodoListModel[];
 
   constructor(private todosService: TodosService, private store: Store<APPStore>,
               private appHealthService: AppHealthService, private fb: FormBuilder, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.showTodosLoadingSpinner = false;
     this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
       if (todoList) {
         this.todoLists = todoList;
@@ -43,12 +38,9 @@ export class TodoListComponent implements OnInit, OnDestroy {
     this.newTodoListName = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
-    this.currentOpenListIndex = -1;
-    this.todoListDetailsLoading$ = this.store.select('listDetailsLoading');
-    this.isOnline$ = this.appHealthService.monitorOnline();
     this.isOnline = true;
     let onlineChangeCount = 0;
-    this.isOnlineSub = this.isOnline$.subscribe(online => {
+    this.isOnlineSub = this.appHealthService.monitorOnline().subscribe(online => {
       this.isOnline = online;
       if (!online) {
         this.snackBar.open('You are now offline. Editing disabled.', 'Got it', {
@@ -90,9 +82,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
   editListName(i): void {
     this.prevListName = this.todoLists[i].name;
     this.store.dispatch(new EditTodoListNameAction({listIndex: i, listName: null, mode: 'edit'}));
-    this.newTodoListName = this.fb.group({
-      newListName: [this.todoLists[i].name, Validators.compose([Validators.required, Validators.minLength(1)])]
-    });
+    this.newTodoListName.setValue({ newListName: this.todoLists[i].name });
   }
 
   saveListName(i): void {
@@ -109,6 +99,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
           console.log('In saveListName, resp = ', resp);
         });
     }
+    this.newTodoListName.setValue({ newListName: '' });
   }
 
   cancelEditList(i): void {
@@ -121,7 +112,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
 
   createNewTodo(i): void {
     if (!this.todoLists[i].addingTodo) {
-      // if (!this.todoLists[i].items && (this.todoLists[i].itemsPending + this.todoLists[i].itemsCompleted) > 0) {
       if (!this.todoLists[i].showListDetails) {
         // This list has items that have not been downloaded yet
         this.callServerForTodos(i, true);
@@ -148,7 +138,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
   }
 
   callServerForTodos(i: number, callFromAddTodo: boolean): void {
-    this.showTodosLoadingSpinner = true;
     this.todoListDetailsFromServerSub = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
       let offLineLoadTodosTimer;
       if (!this.isOnline) {
@@ -160,7 +149,6 @@ export class TodoListComponent implements OnInit, OnDestroy {
       }
       if (listDetails) {
         clearTimeout(offLineLoadTodosTimer);
-        this.showTodosLoadingSpinner = false;
         this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails}));
         this.prevTodoList = { ...this.todoLists[i] };
         if (callFromAddTodo) {

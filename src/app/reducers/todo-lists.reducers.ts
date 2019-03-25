@@ -8,12 +8,18 @@ export function todoListsReducer(
           DeleteTodoListAction | EditTodoListNameAction | UpdateTodoListsWithUpdatedListItemsAction): TodoListModel[] {
   let i = 0;
   let updatedList;
+  let updatedListItems;
+  let completedCount;
+  let pendingCount;
+  let listIndex;
+  let itemIndex;
   switch (action.type) {
 
     case TodoListsActionTypes.LoadTodoListsAction:
       return action.payload;
 
     case TodoListsActionTypes.OpenCloseTodoListAction:
+      listIndex = action.payload.listIndex;
       state.map(list => {
         state[i].showListDetails = false;
         i++;
@@ -21,9 +27,9 @@ export function todoListsReducer(
       if (action.payload.listDetails) {
         updatedList = {
           ...action.payload.listDetails,
-          showListDetails: !state[action.payload.listIndex].showListDetails,
-          itemsCompleted: state[action.payload.listIndex].itemsCompleted,
-          itemsPending: state[action.payload.listIndex].itemsPending,
+          showListDetails: !state[listIndex].showListDetails,
+          itemsCompleted: state[listIndex].itemsCompleted,
+          itemsPending: state[listIndex].itemsPending,
         };
         return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
       } else {
@@ -31,33 +37,33 @@ export function todoListsReducer(
       }
 
     case TodoListsActionTypes.EditTodoListNameAction:
+      listIndex = action.payload.listIndex;
       state.map(() => {
         state[i].editingName = false;
         state[i].showListDetails = false;
         i++;
       });
       if (action.payload.mode === 'edit') {
-        updatedList = {
-          ...state[action.payload.listIndex],
-          editingName: true,
-          name: state[action.payload.listIndex].name
-        };
-        return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
+        updatedList = { ...state[listIndex], editingName: true, name: state[listIndex].name };
+        return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1)];
       } else if (action.payload.mode === 'cancel') {
         return [ ...state.slice(0)];
       } else {
         updatedList = {
-          ...state[action.payload.listIndex],
+          ...state[listIndex],
           name: action.payload.listName
         };
-        return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
+        return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1)];
       }
 
     case TodoListsActionTypes.CreateNewTodoAction:
+      listIndex = action.payload;
       const newTodo = { id: '', label: '', completed: false, editingLabel: true };
-      updatedList = { ...state[action.payload], items: [ newTodo, ...state[action.payload].items ] };
-      console.log('In reducers, CreateNewTodoAction: updatedList = ', updatedList);
-      return [ ...state.slice(0, action.payload), updatedList, ...state.slice(action.payload + 1) ];
+      updatedList = {
+        ...state[listIndex],
+        items: [ newTodo, ...state[listIndex].items ],
+      };
+      return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1) ];
 
     case TodoListsActionTypes.CreateNewTodoListAction:
       state.map(() => {
@@ -72,13 +78,49 @@ export function todoListsReducer(
       return [...state.slice(0, action.payload), ...state.slice(action.payload + 1)];
 
     case TodoListsActionTypes.UpdateTodoListsWithUpdatedListItemsAction:
-      if (action.payload.mode === 'editLabel' || action.payload.mode === 'toggleComplete') {
-        updatedList = { ...state[action.payload.listIndex], items: action.payload.updatedListItems };
-        return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1) ];
+      listIndex = action.payload.listIndex;
+      itemIndex = action.payload.itemIndex;
+      if (action.payload.mode === 'editLabel') {
+        updatedListItems = [
+          ...state[listIndex].items.slice(0, itemIndex),
+          { ...state[listIndex].items[itemIndex], label: action.payload.label },
+          ...state[listIndex].items.slice(itemIndex + 1)
+        ];
+      } else if (action.payload.mode === 'creatingItem') {
+        completedCount = state[listIndex].itemsCompleted;
+        pendingCount = state[listIndex].itemsPending + 1;
+        updatedListItems = [
+          ...state[listIndex].items.slice(0, itemIndex),
+          { ...state[listIndex].items[itemIndex], itemsCompleted: completedCount, itemsPending: pendingCount },
+          ...state[listIndex].items.slice(itemIndex + 1)
+        ];
+      } else if (action.payload.mode === 'toggleComplete') {
+        const itemCompleted = state[listIndex].items[itemIndex].completed;
+        if (itemCompleted) {
+          completedCount = state[listIndex].itemsCompleted - 1;
+          pendingCount = state[listIndex].itemsPending + 1;
+        } else {
+          completedCount = state[listIndex].itemsCompleted + 1;
+          pendingCount = state[listIndex].itemsPending - 1;
+        }
+        updatedListItems = [
+          ...state[listIndex].items.slice(0, itemIndex),
+          { ...state[listIndex].items[itemIndex], completed: !itemCompleted, itemsCompleted: completedCount, itemsPending: pendingCount },
+          ...state[listIndex].items.slice(itemIndex + 1)
+        ];
       } else {
-        // Deleting a todoItem
-        return [ ...state.slice(0, action.payload.listIndex), ...state.slice(action.payload.listIndex + 1) ];
+        // Deleting an item
+        if (state[listIndex].items[itemIndex].completed) {
+          completedCount = state[listIndex].itemsCompleted - 1;
+          pendingCount = state[listIndex].itemsPending;
+        } else {
+          completedCount = state[listIndex].itemsCompleted;
+          pendingCount = state[listIndex].itemsPending - 1;
+        }
+        updatedListItems = [ ...state[listIndex].items.slice(0, itemIndex), ...state[listIndex].items.slice(itemIndex + 1) ];
       }
+      updatedList = { ...state[listIndex], items: updatedListItems, itemsCompleted: completedCount, itemsPending: pendingCount };
+      return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1) ];
 
     default:
       return state;

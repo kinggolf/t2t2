@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { TodoListModel, TodoModel } from '../models';
+import { TodoListModel } from '../models';
 
 export enum TodoListsActionTypes {
   LoadTodoListsAction = 'LoadTodoListsAction',
@@ -50,6 +50,6 @@ export class CreateNewTodoListAction implements Action {
 export class UpdateTodoListsWithUpdatedListItemsAction implements Action {
   readonly type = TodoListsActionTypes.UpdateTodoListsWithUpdatedListItemsAction;
 
-  constructor(public payload: { listIndex: number, updatedListItems: TodoModel[], mode: string }) {}
+  constructor(public payload: { listIndex: number, itemIndex: number, label: string | null, mode: string }) {}
 }
 

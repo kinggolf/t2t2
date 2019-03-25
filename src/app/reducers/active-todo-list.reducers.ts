@@ -1,45 +1,44 @@
 import {TodoListModel} from '../models';
-import {
-  ActiveTodoListActionTypes,
-  DeleteTodoAction,
-  EditTodoLabelAction,
-  LoadActiveTodoListAction,
-  ToggleTodoAction,
-} from '../actions';
+import { ActiveTodoListActionTypes, DeleteTodoAction, EditTodoLabelAction, LoadActiveTodoListAction, ToggleTodoAction} from '../actions';
 
 export function activeTodoListReducer(
   state: TodoListModel,
-  action: LoadActiveTodoListAction | EditTodoLabelAction | DeleteTodoAction | ToggleTodoAction): TodoListModel {
+  action: LoadActiveTodoListAction | EditTodoLabelAction | DeleteTodoAction | ToggleTodoAction ): TodoListModel {
   let i = 0;
   let updatedActiveListItems;
-  let updatedTodo;
+  let updatedItem;
+  let itemIndex;
   switch (action.type) {
 
     case ActiveTodoListActionTypes.LoadActiveTodoListAction:
       return action.payload;
 
     case ActiveTodoListActionTypes.EditTodoLabelAction:
-      const itemIndex = action.payload.itemIndex;
+      itemIndex = action.payload.itemIndex;
       state.items.map(() => {
         state.items[i].editingLabel = false;
         i++;
       });
       if (action.payload.mode === 'edit') {
-        updatedTodo = { ...state.items[itemIndex], editingLabel: true, label: state.items[itemIndex].label};
-        updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedTodo, ...state.items.slice(itemIndex + 1) ];
+        updatedItem = { ...state.items[itemIndex], editingLabel: true, label: state.items[itemIndex].label};
+        updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ];
         return { ...state, items: updatedActiveListItems  };
       } else if (action.payload.mode === 'cancel') {
         return { ...state };
       } else {
-        updatedTodo = { ...state.items[itemIndex], editingLabel: false, label: action.payload.itemLabel};
-        updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedTodo, ...state.items.slice(itemIndex + 1) ];
+        updatedItem = { ...state.items[itemIndex], editingLabel: false, label: action.payload.itemLabel};
+        updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ];
         return { ...state, items: updatedActiveListItems  };
       }
-    /* CreateNewTodoAction,  | CreateNewTodoAction
-    case ActiveTodoListActionTypes.CreateNewTodoAction:
-      const newTodo = { id: '', label: '', completed: false, editingTask: true };
-      updatedActiveListItems = [ newTodo, ...state[action.payload].items ];
-      return { ...state }; */
+
+    case ActiveTodoListActionTypes.DeleteTodoAction:
+      itemIndex = action.payload;
+      return { ...state, items: [ ...state.items.slice(0, itemIndex), ...state.items.slice(itemIndex + 1) ] };
+
+    case ActiveTodoListActionTypes.ToggleTodoAction:
+      itemIndex = action.payload;
+      updatedItem = { ...state.items[itemIndex], completed: !state.items[itemIndex].completed };
+      return { ...state, items: [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ] };
 
     default:
       return state;
