@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { APPStore } from '../../models';
-import { LoginAction } from '../../actions';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +13,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   @Output() loginObject = new EventEmitter();
 
-  constructor(private fb: FormBuilder, private store: Store<APPStore>) { }
+  constructor(private fb: FormBuilder, private store: Store<APPStore>, private authService: AuthService) { }
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -23,6 +23,6 @@ export class LoginComponent implements OnInit {
   }
 
   submit() {
-    this.store.dispatch(new LoginAction(this.loginForm.value));
+    this.authService.submitLogin(this.loginForm.value);
   }
 }

@@ -11,16 +11,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './reducers/reducers';
 import { LoginComponent } from './components/login/login.component';
-import { TodoListComponent } from './components/todo-list/todo-list.component';
-import { TodoComponent } from './components/todos/todo.component';
+import { TodoListsComponent } from './components/todo-lists/todo-lists.component';
+import { TodoItemsComponent } from './components/todo-items/todo-items.component';
 import { JwtInterceptor } from './services/jwt-interceptor.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    TodoListComponent,
-    TodoComponent,
+    TodoListsComponent,
+    TodoItemsComponent,
   ],
   imports: [
     BrowserModule,

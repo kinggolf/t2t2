@@ -92,13 +92,6 @@ prefetched resources.
 
 This all seems to work on local http-server.
 
-One further note: the application will cache any data downloaded but if a user
-runs the app and then goes offline, when they try to open the details of a list
-that has not previously been opened online, the spinner will just show endlessly.
-It would be easy enough to display a message to the user that the app is
-offline or to check their internet connection, but now the spinner just 
-spins.
-
 The app currently has no ability to sync any changes made offline, so these will
 be lost. There seem to be strategies on saving these updates locally and the
 completing them when the app comes back online, e.g. in this 

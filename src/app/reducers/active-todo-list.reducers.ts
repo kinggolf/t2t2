@@ -1,9 +1,10 @@
 import {TodoListModel} from '../models';
-import { ActiveTodoListActionTypes, DeleteTodoAction, EditTodoLabelAction, LoadActiveTodoListAction, ToggleTodoAction} from '../actions';
+import { ActiveTodoListActionTypes, DeleteTodoAction, EditTodoLabelAction,
+         LoadActiveTodoListAction, ToggleTodoCompleteAction } from '../actions';
 
 export function activeTodoListReducer(
   state: TodoListModel,
-  action: LoadActiveTodoListAction | EditTodoLabelAction | DeleteTodoAction | ToggleTodoAction ): TodoListModel {
+  action: LoadActiveTodoListAction | EditTodoLabelAction | DeleteTodoAction | ToggleTodoCompleteAction ): TodoListModel {
   let i = 0;
   let updatedActiveListItems;
   let updatedItem;
@@ -25,7 +26,8 @@ export function activeTodoListReducer(
         return { ...state, items: updatedActiveListItems };
       } else if (action.payload.mode === 'cancel') {
         return { ...state };
-      } else { // This is from save
+      } else {
+        // This is from save
         updatedItem = { ...state.items[itemIndex], editingLabel: false, label: action.payload.itemLabel};
         updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ];
         return { ...state, items: updatedActiveListItems };
@@ -35,7 +37,7 @@ export function activeTodoListReducer(
       itemIndex = action.payload;
       return { ...state, items: [ ...state.items.slice(0, itemIndex), ...state.items.slice(itemIndex + 1) ] };
 
-    case ActiveTodoListActionTypes.ToggleTodoAction:
+    case ActiveTodoListActionTypes.ToggleTodoCompleteAction:
       itemIndex = action.payload;
       updatedItem = { ...state.items[itemIndex], completed: !state.items[itemIndex].completed };
       return { ...state, items: [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ] };

@@ -18,5 +18,5 @@
 
 <app-login *ngIf="!currentUser"></app-login>
 
-<app-todo-list *ngIf="currentUser" [prevTodoLists]="prevTodoLists" (endCreatingNewList)="creatingNewList = false">
-</app-todo-list>
+<app-todo-lists *ngIf="currentUser" [prevTodoLists]="prevTodoLists" (endCreatingNewList)="creatingNewList = false">
+</app-todo-lists>

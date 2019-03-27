@@ -4,8 +4,8 @@ import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, C
 
 export function todoListsReducer(
   state: TodoListModel[],
-  action: LoadTodoListsAction | OpenCloseTodoListAction | CreateNewTodoListAction | CreateNewTodoAction |
-          DeleteTodoListAction | EditTodoListNameAction | UpdateTodoListsWithUpdatedListItemsAction): TodoListModel[] {
+  action: LoadTodoListsAction | OpenCloseTodoListAction | CreateNewTodoListAction | DeleteTodoListAction |
+          CreateNewTodoAction | EditTodoListNameAction | UpdateTodoListsWithUpdatedListItemsAction): TodoListModel[] {
   let i = 0;
   let updatedList;
   let updatedListItems;
@@ -47,23 +47,12 @@ export function todoListsReducer(
         updatedList = { ...state[listIndex], editingName: true, name: state[listIndex].name };
         return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1)];
       } else if (action.payload.mode === 'cancel') {
-        return [ ...state.slice(0)];
+        return [ ...state.slice(0) ];
       } else {
-        updatedList = {
-          ...state[listIndex],
-          name: action.payload.listName
-        };
+        // Saving list name edit
+        updatedList = { ...state[listIndex], name: action.payload.listName };
         return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1)];
       }
-
-    case TodoListsActionTypes.CreateNewTodoAction:
-      listIndex = action.payload;
-      const newTodo = { id: '', label: '', completed: false, editingLabel: true };
-      updatedList = {
-        ...state[listIndex],
-        items: [ newTodo, ...state[listIndex].items ],
-      };
-      return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1) ];
 
     case TodoListsActionTypes.CreateNewTodoListAction:
       state.map(() => {
@@ -76,6 +65,12 @@ export function todoListsReducer(
 
     case TodoListsActionTypes.DeleteTodoListAction:
       return [...state.slice(0, action.payload), ...state.slice(action.payload + 1)];
+
+    case TodoListsActionTypes.CreateNewTodoAction:
+      listIndex = action.payload;
+      const newTodo = { id: '', label: '', completed: false, editingLabel: true };
+      updatedList = { ...state[listIndex], items: [ newTodo, ...state[listIndex].items ] };
+      return [ ...state.slice(0, listIndex), updatedList, ...state.slice(listIndex + 1) ];
 
     case TodoListsActionTypes.UpdateTodoListsWithUpdatedListItemsAction:
       listIndex = action.payload.listIndex;

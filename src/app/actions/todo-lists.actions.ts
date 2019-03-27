@@ -5,9 +5,9 @@ export enum TodoListsActionTypes {
   LoadTodoListsAction = 'LoadTodoListsAction',
   OpenCloseTodoListAction = 'OpenCloseTodoListAction',
   EditTodoListNameAction = 'EditTodoListNameAction',
-  CreateNewTodoAction = 'CreateNewTodoAction',
-  DeleteTodoListAction = 'DeleteTodoListAction',
   CreateNewTodoListAction = 'CreateNewTodoListAction',
+  DeleteTodoListAction = 'DeleteTodoListAction',
+  CreateNewTodoAction = 'CreateNewTodoAction',
   UpdateTodoListsWithUpdatedListItemsAction = 'UpdateTodoListsWithUpdatedListItemsAction',
 }
 
@@ -29,10 +29,10 @@ export class EditTodoListNameAction implements Action {
   constructor(public payload: { listIndex: number, listName: string | null, mode: string}) {}
 }
 
-export class CreateNewTodoAction implements Action {
-  readonly type = TodoListsActionTypes.CreateNewTodoAction;
+export class CreateNewTodoListAction implements Action {
+  readonly type = TodoListsActionTypes.CreateNewTodoListAction;
 
-  constructor(public payload: number) {}
+  constructor(public payload: boolean) {}
 }
 
 export class DeleteTodoListAction implements Action {
@@ -41,10 +41,10 @@ export class DeleteTodoListAction implements Action {
   constructor(public payload: number) {}
 }
 
-export class CreateNewTodoListAction implements Action {
-  readonly type = TodoListsActionTypes.CreateNewTodoListAction;
+export class CreateNewTodoAction implements Action {
+  readonly type = TodoListsActionTypes.CreateNewTodoAction;
 
-  constructor(public payload: boolean) {}
+  constructor(public payload: number) {}
 }
 
 export class UpdateTodoListsWithUpdatedListItemsAction implements Action {

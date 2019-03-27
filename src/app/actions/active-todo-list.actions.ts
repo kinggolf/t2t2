@@ -5,7 +5,7 @@ export enum ActiveTodoListActionTypes {
   LoadActiveTodoListAction = 'LoadActiveTodoListAction',
   EditTodoLabelAction = 'EditTodoLabelAction',
   DeleteTodoAction = 'DeleteTodoAction',
-  ToggleTodoAction = 'ToggleTodoAction',
+  ToggleTodoCompleteAction = 'ToggleTodoCompleteAction',
 }
 
 export class LoadActiveTodoListAction implements Action {
@@ -26,8 +26,8 @@ export class DeleteTodoAction implements Action {
   constructor(public payload: number) {}
 }
 
-export class ToggleTodoAction implements Action {
-  readonly type = ActiveTodoListActionTypes.ToggleTodoAction;
+export class ToggleTodoCompleteAction implements Action {
+  readonly type = ActiveTodoListActionTypes.ToggleTodoCompleteAction;
 
   constructor(public payload: number) {}
 }

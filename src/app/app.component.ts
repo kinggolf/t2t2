@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AuthService } from './services/auth.service';
-import { APPStore, UserModel, LoginModel, TodoListModel } from './models';
+import { APPStore, UserModel, TodoListModel } from './models';
 import { SubscriptionLike, Observable } from 'rxjs';
 import { TodosService } from './services/todos.service';
 import { AppHealthService } from './services/app-health.service';
@@ -14,7 +14,6 @@ import { LoadTodoListsAction, UserAction, CreateNewTodoListAction } from './acti
 })
 export class AppComponent implements OnInit, OnDestroy {
   currentUser: UserModel;
-  loginSub: SubscriptionLike;
   currentUserSub: SubscriptionLike;
   todoListsFromServerSub: SubscriptionLike;
   newListName: string;
@@ -55,20 +54,12 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       }
     });
-    this.loginSub = this.store.select<LoginModel>('loginObject').subscribe(loginObject => {
-      if (loginObject) {
-        this.authService.submitLogin(loginObject);
-      }
-    });
     this.isOnline$ = this.appHealthService.monitorOnline();
   }
 
   ngOnDestroy(): void {
     if (this.currentUserSub) {
       this.currentUserSub.unsubscribe();
-    }
-    if (this.loginSub) {
-      this.loginSub.unsubscribe();
     }
     if (this.todoListsFromServerSub) {
       this.todoListsFromServerSub.unsubscribe();

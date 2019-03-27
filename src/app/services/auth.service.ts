@@ -33,9 +33,8 @@ export class AuthService {
       });
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem('currentUser');
-    console.log(localStorage.getItem('currentUser'));
     this.store.dispatch(new UserAction(null));
   }
 

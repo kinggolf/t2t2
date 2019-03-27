@@ -10,11 +10,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
 @Component({
-  selector: 'app-todo-list',
-  templateUrl: './todo-list.component.html',
-  styleUrls: ['./todo-list.component.css']
+  selector: 'app-todo-lists',
+  templateUrl: './todo-lists.component.html',
+  styleUrls: ['./todo-lists.component.css']
 })
-export class TodoListComponent implements OnInit, OnDestroy {
+export class TodoListsComponent implements OnInit, OnDestroy {
   todoLists: TodoListModel[];
   todoListsServerSub1: SubscriptionLike;
   todoListsServerSub2: SubscriptionLike;
@@ -22,9 +22,8 @@ export class TodoListComponent implements OnInit, OnDestroy {
   todoListsServerSub4: SubscriptionLike;
   todoListsSub: SubscriptionLike;
   isOnlineSub: SubscriptionLike;
-  newTodoListName: FormGroup;
+  newTodoListNameForm: FormGroup;
   isOnline: boolean;
-  prevListName: string;
   prevTodoList: TodoListModel;
   @Input() prevTodoLists: TodoListModel[];
   @Output() endCreatingNewList = new EventEmitter();
@@ -36,10 +35,9 @@ export class TodoListComponent implements OnInit, OnDestroy {
     this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
       if (todoList) {
         this.todoLists = todoList;
-        // console.log('TodoListComponent: this.todoLists = ', this.todoLists);
       }
     });
-    this.newTodoListName = this.fb.group({
+    this.newTodoListNameForm = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
     this.isOnline = true;
@@ -93,23 +91,22 @@ export class TodoListComponent implements OnInit, OnDestroy {
   }
 
   editListName(i): void {
-    this.prevListName = this.todoLists[i].name;
     this.store.dispatch(new EditTodoListNameAction({listIndex: i, listName: null, mode: 'edit'}));
-    this.newTodoListName.setValue({ newListName: this.todoLists[i].name });
+    this.newTodoListNameForm.setValue({ newListName: this.todoLists[i].name });
   }
 
   saveListName(i): void {
     this.store.dispatch(
-      new EditTodoListNameAction({listIndex: i, listName: this.newTodoListName.value.newListName, mode: 'save'})
+      new EditTodoListNameAction({listIndex: i, listName: this.newTodoListNameForm.value.newListName, mode: 'save'})
     );
     if (this.todoLists[i].creatingNewList) {
-      this.todoListsServerSub1 = this.todosService.createNewList(this.newTodoListName.value.newListName).subscribe(resp => {});
+      this.todoListsServerSub1 = this.todosService.createNewList(this.newTodoListNameForm.value.newListName).subscribe(resp => {});
     } else {
       this.todoListsServerSub2 = this.todosService.updateList(
-        { ...this.todoLists[i], name: this.newTodoListName.value.newListName}, 'name' )
+        { ...this.todoLists[i], name: this.newTodoListNameForm.value.newListName}, 'name' )
         .subscribe(resp => {});
     }
-    this.newTodoListName.setValue({ newListName: '' });
+    this.newTodoListNameForm.setValue({ newListName: '' });
     this.endCreatingNewList.emit();
   }
 
@@ -117,9 +114,9 @@ export class TodoListComponent implements OnInit, OnDestroy {
     if (this.todoLists[i].creatingNewList) {
       this.store.dispatch(new LoadTodoListsAction(this.prevTodoLists));
     } else {
-      this.store.dispatch(new EditTodoListNameAction({listIndex: i, listName: this.prevListName, mode: 'cancel'}));
+      this.store.dispatch(new EditTodoListNameAction({listIndex: i, listName: null, mode: 'cancel'}));
     }
-    this.newTodoListName.setValue({ newListName: '' });
+    this.newTodoListNameForm.setValue({ newListName: '' });
     this.endCreatingNewList.emit();
   }
 
@@ -151,12 +148,11 @@ export class TodoListComponent implements OnInit, OnDestroy {
   }
 
   callServerForTodos(i: number, callFromAddTodo: boolean): void {
-    // let offLineLoadTodosTimer;
     if (this.isOnline || (!this.isOnline && this.todoLists[i].items)) {
       this.todoListsServerSub4 = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
         if (listDetails) {
-          this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails}));
-          this.prevTodoList = {...this.todoLists[i]};
+          this.store.dispatch(new OpenCloseTodoListAction({ listIndex: i, listDetails }));
+          this.prevTodoList = { ...this.todoLists[i] };
           if (callFromAddTodo) {
             this.store.dispatch(new CreateNewTodoAction(i));
           }

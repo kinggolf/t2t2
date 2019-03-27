@@ -6,14 +6,14 @@ import { TodosService } from '../../services/todos.service';
 import { AppHealthService } from '../../services/app-health.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EditTodoLabelAction, UpdateTodoListsWithUpdatedListItemsAction, DeleteTodoAction,
-         LoadActiveTodoListAction, ToggleTodoAction } from '../../actions';
+         LoadActiveTodoListAction, ToggleTodoCompleteAction } from '../../actions';
 
 @Component({
-  selector: 'app-todos',
-  templateUrl: './todo.component.html',
-  styleUrls: ['./todo.component.css']
+  selector: 'app-todo-items',
+  templateUrl: './todo-items.component.html',
+  styleUrls: ['./todo-items.component.css']
 })
-export class TodoComponent implements OnInit, OnDestroy {
+export class TodoItemsComponent implements OnInit, OnDestroy {
   activeList: TodoListModel;
   newTodoLabel: FormGroup;
   prevTodoLabel: string;
@@ -35,7 +35,6 @@ export class TodoComponent implements OnInit, OnDestroy {
     this.activeList$ = this.store.select('activeTodoList');
     this.activeListSub = this.activeList$.subscribe(activeList => {
       this.activeList = activeList;
-      // console.log('TodoListComponent: this.activeList = ', this.activeList);
     });
     this.newTodoLabel = this.fb.group({
       newItemLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
@@ -56,7 +55,7 @@ export class TodoComponent implements OnInit, OnDestroy {
     this.todoListsServerSub1 = this.todosService.updateTodo(this.activeList.items[i].id, '',
       !this.activeList.items[i].completed)
       .subscribe(updatedTodoItem => {});
-    this.store.dispatch(new ToggleTodoAction(i));
+    this.store.dispatch(new ToggleTodoCompleteAction(i));
     this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
       listIndex: this.listIndex, itemIndex: i, label: null, mode: 'toggleComplete'
     }));
