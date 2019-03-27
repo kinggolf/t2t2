@@ -17,7 +17,7 @@ export class LoadActiveTodoListAction implements Action {
 export class EditTodoLabelAction implements Action {
   readonly type = ActiveTodoListActionTypes.EditTodoLabelAction;
 
-  constructor(public payload: { itemIndex: number,  itemLabel: string | null, mode: string }) {}
+  constructor(public payload: { itemIndex: number, itemLabel: string | null, newList: TodoListModel | null, mode: string }) {}
 }
 
 export class DeleteTodoAction implements Action {

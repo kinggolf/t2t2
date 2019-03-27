@@ -4,7 +4,7 @@ import { APPStore, TodoListModel } from '../../models';
 import { SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { AppHealthService } from '../../services/app-health.service';
-import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, DeleteTodoListAction,
+import { LoadTodoListsAction, OpenCloseOrUpdateTodoListAction, EditTodoListNameAction, DeleteTodoListAction,
          CreateNewTodoAction, LoadActiveTodoListAction } from '../../actions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
@@ -16,8 +16,6 @@ import { MatSnackBar } from '@angular/material';
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
   todoLists: TodoListModel[];
-  todoListsServerSub1: SubscriptionLike;
-  todoListsServerSub2: SubscriptionLike;
   todoListsServerSub3: SubscriptionLike;
   todoListsServerSub4: SubscriptionLike;
   todoListsSub: SubscriptionLike;
@@ -61,12 +59,6 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     if (this.todoListsSub) {
       this.todoListsSub.unsubscribe();
     }
-    if (this.todoListsServerSub1) {
-      this.todoListsServerSub1.unsubscribe();
-    }
-    if (this.todoListsServerSub2) {
-      this.todoListsServerSub2.unsubscribe();
-    }
     if (this.todoListsServerSub3) {
       this.todoListsServerSub3.unsubscribe();
     }
@@ -82,7 +74,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     if ((this.todoLists[i].itemsPending + this.todoLists[i].itemsCompleted) > 0) {
       if (this.todoLists[i].showListDetails) {
         // User is closing an open list
-        this.store.dispatch(new OpenCloseTodoListAction({listIndex: i, listDetails: null}));
+        this.store.dispatch(new OpenCloseOrUpdateTodoListAction({listIndex: i, openOrClose: true, listDetails: null}));
       } else {
         // User is opening a closed list
         this.callServerForTodos(i, false);
@@ -100,11 +92,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       new EditTodoListNameAction({listIndex: i, listName: this.newTodoListNameForm.value.newListName, mode: 'save'})
     );
     if (this.todoLists[i].creatingNewList) {
-      this.todoListsServerSub1 = this.todosService.createNewList(this.newTodoListNameForm.value.newListName).subscribe(resp => {});
+      this.todosService.createNewList(this.newTodoListNameForm.value.newListName);
     } else {
-      this.todoListsServerSub2 = this.todosService.updateList(
-        { ...this.todoLists[i], name: this.newTodoListNameForm.value.newListName}, 'name' )
-        .subscribe(resp => {});
+      this.todosService.updateList({ ...this.todoLists[i], name: this.newTodoListNameForm.value.newListName}, 'name' );
     }
     this.newTodoListNameForm.setValue({ newListName: '' });
     this.endCreatingNewList.emit();
@@ -151,7 +141,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     if (this.isOnline || (!this.isOnline && this.todoLists[i].items)) {
       this.todoListsServerSub4 = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
         if (listDetails) {
-          this.store.dispatch(new OpenCloseTodoListAction({ listIndex: i, listDetails }));
+          this.store.dispatch(new OpenCloseOrUpdateTodoListAction({ listIndex: i, openOrClose: true, listDetails }));
           this.prevTodoList = { ...this.todoLists[i] };
           if (callFromAddTodo) {
             this.store.dispatch(new CreateNewTodoAction(i));

@@ -3,7 +3,7 @@ import { TodoListModel } from '../models';
 
 export enum TodoListsActionTypes {
   LoadTodoListsAction = 'LoadTodoListsAction',
-  OpenCloseTodoListAction = 'OpenCloseTodoListAction',
+  OpenCloseOrUpdateTodoListAction = 'OpenCloseOrUpdateTodoListAction',
   EditTodoListNameAction = 'EditTodoListNameAction',
   CreateNewTodoListAction = 'CreateNewTodoListAction',
   DeleteTodoListAction = 'DeleteTodoListAction',
@@ -17,10 +17,10 @@ export class LoadTodoListsAction implements Action {
   constructor(public payload: TodoListModel[]) {}
 }
 
-export class OpenCloseTodoListAction implements Action {
-  readonly type = TodoListsActionTypes.OpenCloseTodoListAction;
+export class OpenCloseOrUpdateTodoListAction implements Action {
+  readonly type = TodoListsActionTypes.OpenCloseOrUpdateTodoListAction;
 
-  constructor(public payload: { listIndex: number, listDetails: TodoListModel | null}) {}
+  constructor(public payload: { listIndex: number, openOrClose: boolean, listDetails: TodoListModel | null}) {}
 }
 
 export class EditTodoListNameAction implements Action {

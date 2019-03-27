@@ -35,7 +35,7 @@
         "maxSize": 50,
         "maxAge": "7d",
         "timeout": "5s",
-        "strategy": "performance"
+        "strategy": "freshness"
       }
     }
   ]

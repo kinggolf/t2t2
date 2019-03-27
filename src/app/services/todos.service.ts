@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BASE_URL, TodoListModel } from '../models';
-import { Observable } from 'rxjs';
+import { Observable, SubscriptionLike } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodosService {
+  serverSub: SubscriptionLike;
 
   constructor(private http: HttpClient) {}
 
@@ -20,15 +21,18 @@ export class TodosService {
     return this.http.get<TodoListModel>(todoListDetailsURL);
   }
 
-  createNewList(newListName): Observable<TodoListModel> {
+  createNewList(newListName): void {
     const createNewListURL = BASE_URL + '/api/docket/todo';
     const createNewListBody = {
       name: newListName
     };
-    return this.http.post<TodoListModel>(createNewListURL, createNewListBody);
+    if (this.serverSub) {
+      this.serverSub.unsubscribe();
+    }
+    this.serverSub = this.http.post<TodoListModel>(createNewListURL, createNewListBody).subscribe();
   }
 
-  updateList(updatedList, name): Observable<TodoListModel> {
+  updateList(updatedList, name): void {
     const updateListURL = BASE_URL + '/api/docket/todo/' + updatedList.id;
     let updateListBody;
     if (name === 'name') {
@@ -38,7 +42,10 @@ export class TodosService {
         value: updatedList.name
       };
     }
-    return this.http.patch<any>(updateListURL, updateListBody);
+    if (this.serverSub) {
+      this.serverSub.unsubscribe();
+    }
+    this.serverSub = this.http.patch<any>(updateListURL, updateListBody).subscribe();
   }
 
   deleteTodoList(todoListId): Observable<any> {
@@ -54,7 +61,7 @@ export class TodosService {
     return this.http.post<TodoListModel>(createNewTodoURL, createNewTodoBody);
   }
 
-  updateTodo(todoItemId, updatedTodoLabel, completed): Observable<TodoListModel> {
+  updateTodo(todoItemId, updatedTodoLabel, completed): void {
     const updateListURL = BASE_URL + '/api/docket/todo/item/' + todoItemId;
     let updateListBody;
     if (updatedTodoLabel !== '') {
@@ -70,7 +77,10 @@ export class TodosService {
         value: completed
       };
     }
-    return this.http.patch<any>(updateListURL, updateListBody);
+    if (this.serverSub) {
+      this.serverSub.unsubscribe();
+    }
+    this.serverSub = this.http.patch<any>(updateListURL, updateListBody).subscribe();
   }
 
   deleteTodo(todoItemId): Observable<any> {

@@ -6,7 +6,7 @@ import { TodosService } from '../../services/todos.service';
 import { AppHealthService } from '../../services/app-health.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EditTodoLabelAction, UpdateTodoListsWithUpdatedListItemsAction, DeleteTodoAction,
-         LoadActiveTodoListAction, ToggleTodoCompleteAction } from '../../actions';
+         LoadActiveTodoListAction, ToggleTodoCompleteAction, OpenCloseOrUpdateTodoListAction } from '../../actions';
 
 @Component({
   selector: 'app-todo-items',
@@ -18,10 +18,8 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
   newTodoLabel: FormGroup;
   prevTodoLabel: string;
   activeListSub: SubscriptionLike;
-  todoListsServerSub1: SubscriptionLike;
-  todoListsServerSub2: SubscriptionLike;
-  todoListsServerSub3: SubscriptionLike;
   todoListsServerSub4: SubscriptionLike;
+  todoListsServerSub3: SubscriptionLike;
   activeList$: Observable<TodoListModel>;
   isOnline$: Observable<boolean>;
   @Input() prevTodoList: TodoListModel;
@@ -49,12 +47,7 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
   }
 
   toggleTodoComplete(i) {
-    if (this.todoListsServerSub1) {
-      this.todoListsServerSub1.unsubscribe();
-    }
-    this.todoListsServerSub1 = this.todosService.updateTodo(this.activeList.items[i].id, '',
-      !this.activeList.items[i].completed)
-      .subscribe(updatedTodoItem => {});
+    this.todosService.updateTodo(this.activeList.items[i].id, '', !this.activeList.items[i].completed);
     this.store.dispatch(new ToggleTodoCompleteAction(i));
     this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
       listIndex: this.listIndex, itemIndex: i, label: null, mode: 'toggleComplete'
@@ -66,12 +59,13 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
       newItemLabel: [this.activeList.items[i].label, Validators.compose([Validators.required, Validators.minLength(1)])]
     });
     this.prevTodoLabel = this.activeList.items[i].label.slice(0);
-    this.store.dispatch(new EditTodoLabelAction({ itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, mode: 'edit' }));
+    this.store.dispatch(new EditTodoLabelAction(
+      { itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, newList: null, mode: 'edit' }));
   }
 
   cancelEditDetails(i) {
     if (this.activeList.items[i].label !== '') {
-      this.store.dispatch(new EditTodoLabelAction({ itemIndex: i, itemLabel: this.prevTodoLabel, mode: 'cancel' }));
+      this.store.dispatch(new EditTodoLabelAction({ itemIndex: i, itemLabel: this.prevTodoLabel, newList: null, mode: 'cancel' }));
     } else {
       // Cancel from adding a todoItem
       this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
@@ -84,27 +78,24 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
   saveEditLabel(i) {
     if (this.activeList.items[i].label !== '') {
       // From editing an existing item
-      if (this.todoListsServerSub2) {
-        this.todoListsServerSub2.unsubscribe();
-      }
-      this.todoListsServerSub2 = this.todosService.updateTodo(
-        this.activeList.items[i].id, this.newTodoLabel.value.newItemLabel, this.activeList.items[i].completed)
-        .subscribe(updatedTodoItem => {});
+      this.todosService.updateTodo(this.activeList.items[i].id, this.newTodoLabel.value.newItemLabel, this.activeList.items[i].completed);
       this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
         listIndex: this.listIndex, itemIndex: i, label: this.newTodoLabel.value.newItemLabel, mode: 'editLabel'
       }));
-      this.store.dispatch(new EditTodoLabelAction({ itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, mode: 'save'}));
+      this.store.dispatch(new EditTodoLabelAction(
+        { itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, newList: null, mode: 'save'}));
     } else {
       // From creating a new item
       if (this.todoListsServerSub3) {
         this.todoListsServerSub3.unsubscribe();
       }
       this.todoListsServerSub3 = this.todosService.createNewTodo(this.activeList.id, this.newTodoLabel.value.newItemLabel)
-        .subscribe(updatedTodoDetails => {});
-      this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
-        listIndex: this.listIndex, itemIndex: i, label: this.newTodoLabel.value.newItemLabel, mode: 'creatingItem'
-      }));
-      this.store.dispatch(new EditTodoLabelAction({ itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, mode: 'save'}));
+        .subscribe(updatedTodoListDetails => {
+          this.store.dispatch(new OpenCloseOrUpdateTodoListAction(
+            { listIndex: this.listIndex, openOrClose: false, listDetails: updatedTodoListDetails }));
+          this.store.dispatch(new EditTodoLabelAction(
+            { itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, newList: updatedTodoListDetails, mode: 'save'}));
+        });
     }
   }
 

@@ -27,10 +27,14 @@ export function activeTodoListReducer(
       } else if (action.payload.mode === 'cancel') {
         return { ...state };
       } else {
-        // This is from save
-        updatedItem = { ...state.items[itemIndex], editingLabel: false, label: action.payload.itemLabel};
-        updatedActiveListItems = [ ...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1) ];
-        return { ...state, items: updatedActiveListItems };
+        // This is from save, either creating a new item or editing label of an existing item
+        if (action.payload.newList) {
+          return { ...action.payload.newList };
+        } else {
+          updatedItem = { ...state.items[itemIndex], editingLabel: false, label: action.payload.itemLabel };
+          updatedActiveListItems = [...state.items.slice(0, itemIndex), updatedItem, ...state.items.slice(itemIndex + 1)];
+          return { ...state, items: updatedActiveListItems };
+        }
       }
 
     case ActiveTodoListActionTypes.DeleteTodoAction:

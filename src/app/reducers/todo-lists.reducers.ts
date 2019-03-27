@@ -1,10 +1,10 @@
 import {TodoListModel} from '../models';
-import { LoadTodoListsAction, OpenCloseTodoListAction, EditTodoListNameAction, CreateNewTodoAction, DeleteTodoListAction,
+import { LoadTodoListsAction, OpenCloseOrUpdateTodoListAction, EditTodoListNameAction, CreateNewTodoAction, DeleteTodoListAction,
          CreateNewTodoListAction, UpdateTodoListsWithUpdatedListItemsAction, TodoListsActionTypes } from '../actions';
 
 export function todoListsReducer(
   state: TodoListModel[],
-  action: LoadTodoListsAction | OpenCloseTodoListAction | CreateNewTodoListAction | DeleteTodoListAction |
+  action: LoadTodoListsAction | OpenCloseOrUpdateTodoListAction | CreateNewTodoListAction | DeleteTodoListAction |
           CreateNewTodoAction | EditTodoListNameAction | UpdateTodoListsWithUpdatedListItemsAction): TodoListModel[] {
   let i = 0;
   let updatedList;
@@ -18,19 +18,36 @@ export function todoListsReducer(
     case TodoListsActionTypes.LoadTodoListsAction:
       return action.payload;
 
-    case TodoListsActionTypes.OpenCloseTodoListAction:
+    case TodoListsActionTypes.OpenCloseOrUpdateTodoListAction:
       listIndex = action.payload.listIndex;
-      state.map(list => {
-        state[i].showListDetails = false;
-        i++;
-      });
+      if (action.payload.openOrClose) {
+        state.map(list => {
+          state[i].showListDetails = false;
+          i++;
+        });
+      }
       if (action.payload.listDetails) {
-        updatedList = {
-          ...action.payload.listDetails,
-          showListDetails: !state[listIndex].showListDetails,
-          itemsCompleted: state[listIndex].itemsCompleted,
-          itemsPending: state[listIndex].itemsPending,
-        };
+        if (action.payload.openOrClose) {
+          updatedList = {
+            ...action.payload.listDetails,
+            showListDetails: !state[listIndex].showListDetails,
+            itemsCompleted: state[listIndex].itemsCompleted,
+            itemsPending: state[listIndex].itemsPending,
+          };
+        } else {
+          completedCount = pendingCount = i = 0;
+          action.payload.listDetails.items.map(item => {
+            completedCount = completedCount + (item.completed ? 1 : 0);
+            pendingCount = pendingCount + (!item.completed ? 1 : 0);
+            i++;
+          });
+          updatedList = {
+            ...action.payload.listDetails,
+            showListDetails: true,
+            itemsCompleted: completedCount,
+            itemsPending: pendingCount,
+          };
+        }
         return [ ...state.slice(0, action.payload.listIndex), updatedList, ...state.slice(action.payload.listIndex + 1)];
       } else {
         return state;
@@ -88,28 +105,10 @@ export function todoListsReducer(
           ...state[listIndex].items.slice(0, itemIndex),
           ...state[listIndex].items.slice(itemIndex + 1)
         ];
-
-      } else if (action.payload.mode === 'creatingItem') {
-        completedCount = state[listIndex].itemsCompleted;
-        if (state[listIndex].itemsPending) {
-          pendingCount = state[listIndex].itemsPending + 1;
-        } else {
-          pendingCount = 1;
-        }
-        updatedListItems = [
-          ...state[listIndex].items.slice(0, itemIndex),
-          { ...state[listIndex].items[itemIndex], itemsCompleted: completedCount, itemsPending: pendingCount },
-          ...state[listIndex].items.slice(itemIndex + 1)
-        ];
       } else if (action.payload.mode === 'toggleComplete') {
         const itemCompleted = state[listIndex].items[itemIndex].completed;
-        if (itemCompleted) {
-          completedCount = state[listIndex].itemsCompleted - 1;
-          pendingCount = state[listIndex].itemsPending + 1;
-        } else {
-          completedCount = state[listIndex].itemsCompleted + 1;
-          pendingCount = state[listIndex].itemsPending - 1;
-        }
+        completedCount = state[listIndex].itemsCompleted + (!itemCompleted ? 1 : -1);
+        pendingCount = state[listIndex].itemsPending + (itemCompleted ? 1 : -1);
         updatedListItems = [
           ...state[listIndex].items.slice(0, itemIndex),
           { ...state[listIndex].items[itemIndex], completed: !itemCompleted, itemsCompleted: completedCount, itemsPending: pendingCount },
@@ -117,13 +116,8 @@ export function todoListsReducer(
         ];
       } else {
         // Deleting an item
-        if (state[listIndex].items[itemIndex].completed) {
-          completedCount = state[listIndex].itemsCompleted - 1;
-          pendingCount = state[listIndex].itemsPending;
-        } else {
-          completedCount = state[listIndex].itemsCompleted;
-          pendingCount = state[listIndex].itemsPending - 1;
-        }
+        completedCount = state[listIndex].itemsCompleted - (state[listIndex].items[itemIndex].completed ? 1 : 0);
+        pendingCount = state[listIndex].itemsPending - (!state[listIndex].items[itemIndex].completed ? 1 : 0);
         updatedListItems = [ ...state[listIndex].items.slice(0, itemIndex), ...state[listIndex].items.slice(itemIndex + 1) ];
       }
       updatedList = { ...state[listIndex], items: updatedListItems, itemsCompleted: completedCount, itemsPending: pendingCount };
