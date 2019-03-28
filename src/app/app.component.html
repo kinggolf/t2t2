@@ -6,6 +6,9 @@
     </button>
     <mat-menu #menu="matMenu" xPosition="after">
       <div *ngIf="todoLists">
+        <button *ngIf="!creatingNewList && (isOnline$ | async)" mat-menu-item (click)="refreshTodoLists()">
+          Refresh Lists
+        </button>
         <button *ngIf="!creatingNewList && (isOnline$ | async)" mat-menu-item (click)="createNewList()">
           Create A New List
         </button>

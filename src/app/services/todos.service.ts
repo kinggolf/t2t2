@@ -21,15 +21,12 @@ export class TodosService {
     return this.http.get<TodoListModel>(todoListDetailsURL);
   }
 
-  createNewList(newListName): void {
+  createNewList(newListName): Observable<TodoListModel> {
     const createNewListURL = BASE_URL + '/api/docket/todo';
     const createNewListBody = {
       name: newListName
     };
-    if (this.serverSub) {
-      this.serverSub.unsubscribe();
-    }
-    this.serverSub = this.http.post<TodoListModel>(createNewListURL, createNewListBody).subscribe();
+    return this.http.post<TodoListModel>(createNewListURL, createNewListBody);
   }
 
   updateList(updatedList, name): void {

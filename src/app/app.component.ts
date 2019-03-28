@@ -72,6 +72,26 @@ export class AppComponent implements OnInit, OnDestroy {
     this.store.dispatch(new CreateNewTodoListAction(true));
   }
 
+  refreshTodoLists(): void {
+    if (this.todoListsFromServerSub) {
+      this.todoListsFromServerSub.unsubscribe();
+    }
+    this.showTotoListsLoadingSpinner = true;
+    this.todoListsFromServerSub = this.todosService.getTodoLists().subscribe(todoLists => {
+        if (todoLists) {
+          this.todoLists = todoLists;
+          this.store.dispatch(new LoadTodoListsAction(todoLists));
+          this.showTotoListsLoadingSpinner = false;
+        }
+      },
+      error => {
+        if (error.statusText === 'Unauthorized') {
+          this.showTotoListsLoadingSpinner = false;
+          this.currentUser = null;
+        }
+      });
+  }
+
   logout(): void {
     const confirmLogout = window.confirm('Confirm Logout');
     if (confirmLogout) {

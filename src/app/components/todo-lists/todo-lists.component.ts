@@ -16,6 +16,7 @@ import { MatSnackBar } from '@angular/material';
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
   todoLists: TodoListModel[];
+  todoListsServerSub2: SubscriptionLike;
   todoListsServerSub3: SubscriptionLike;
   todoListsServerSub4: SubscriptionLike;
   todoListsSub: SubscriptionLike;
@@ -59,6 +60,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     if (this.todoListsSub) {
       this.todoListsSub.unsubscribe();
     }
+    if (this.todoListsServerSub2) {
+      this.todoListsServerSub2.unsubscribe();
+    }
     if (this.todoListsServerSub3) {
       this.todoListsServerSub3.unsubscribe();
     }
@@ -88,12 +92,17 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   saveListName(i): void {
-    this.store.dispatch(
-      new EditTodoListNameAction({listIndex: i, listName: this.newTodoListNameForm.value.newListName, mode: 'save'})
-    );
     if (this.todoLists[i].creatingNewList) {
-      this.todosService.createNewList(this.newTodoListNameForm.value.newListName);
+      this.todoListsServerSub2 = this.todosService.createNewList(this.newTodoListNameForm.value.newListName).subscribe(newList => {
+        this.store.dispatch(new OpenCloseOrUpdateTodoListAction({listIndex: i, openOrClose: false, listDetails: newList}));
+      });
+      this.store.dispatch(
+        new EditTodoListNameAction({listIndex: i, listName: this.newTodoListNameForm.value.newListName, mode: 'save'})
+      );
     } else {
+      this.store.dispatch(
+        new EditTodoListNameAction({listIndex: i, listName: this.newTodoListNameForm.value.newListName, mode: 'save'})
+      );
       this.todosService.updateList({ ...this.todoLists[i], name: this.newTodoListNameForm.value.newListName}, 'name' );
     }
     this.newTodoListNameForm.setValue({ newListName: '' });
@@ -139,6 +148,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
 
   callServerForTodos(i: number, callFromAddTodo: boolean): void {
     if (this.isOnline || (!this.isOnline && this.todoLists[i].items)) {
+      if (this.todoListsServerSub4) {
+        this.todoListsServerSub4.unsubscribe();
+      }
       this.todoListsServerSub4 = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
         if (listDetails) {
           this.store.dispatch(new OpenCloseOrUpdateTodoListAction({ listIndex: i, openOrClose: true, listDetails }));
