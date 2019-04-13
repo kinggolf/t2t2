@@ -1,6 +1,6 @@
 export interface TodoModel {
-  id: string;
-  label: string;
   completed: boolean;
+  description?: string;
+  label: string;
   editingLabel?: boolean;
 }

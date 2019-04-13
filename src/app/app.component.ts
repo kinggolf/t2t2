@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { AuthService } from './services/auth.service';
-import { APPStore, UserModel, TodoListModel } from './models';
+import { UserModel, TodoListModel } from './models';
 import { SubscriptionLike, Observable } from 'rxjs';
+import * as firebase from 'firebase/app';
+import { FirestoreService } from './services/firestore.service';
 import { TodosService } from './services/todos.service';
 import { AppHealthService } from './services/app-health.service';
-import { LoadTodoListsAction, UserAction, CreateNewTodoListAction } from './actions';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +12,7 @@ import { LoadTodoListsAction, UserAction, CreateNewTodoListAction } from './acti
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  currentUser: UserModel;
+  currentUser: firebase.User;
   currentUserSub: SubscriptionLike;
   todoListsFromServerSub: SubscriptionLike;
   newListName: string;
@@ -23,16 +22,17 @@ export class AppComponent implements OnInit, OnDestroy {
   creatingNewList: boolean;
   isOnline$: Observable<boolean>;
 
-  constructor(private authService: AuthService, private todosService: TodosService,
-              private store: Store<APPStore>, private appHealthService: AppHealthService) {}
+  constructor(private firestoreService: FirestoreService, private todosService: TodosService,
+              private appHealthService: AppHealthService) {}
 
   ngOnInit(): void {
     this.showTotoListsLoadingSpinner = this.creatingNewList = false;
-    const currentUserFromLocalStorage = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUserFromLocalStorage && (typeof currentUserFromLocalStorage !== 'undefined')) {
-      // No need for log in, but when do we need to refresh the token, app restart?
-      this.store.dispatch(new UserAction(currentUserFromLocalStorage));
-    }
+    this.currentUserSub = this.firestoreService.getUser().subscribe(user => {
+      this.currentUser = user;
+      console.log('this.currentUser = ', this.currentUser);
+    });
+    this.firestoreService.initAuthState();
+    /*
     this.currentUserSub = this.store.select('currentUser').subscribe(user => {
       this.currentUser = user;
       if (this.currentUser && (typeof this.currentUser !== 'undefined')) {
@@ -53,7 +53,7 @@ export class AppComponent implements OnInit, OnDestroy {
           });
         }
       }
-    });
+    }); */
     this.isOnline$ = this.appHealthService.monitorOnline();
   }
 
@@ -69,33 +69,13 @@ export class AppComponent implements OnInit, OnDestroy {
   createNewList(): void {
     this.creatingNewList = true;
     this.prevTodoLists = this.todoLists.slice(0);
-    this.store.dispatch(new CreateNewTodoListAction(true));
   }
 
-  refreshTodoLists(): void {
-    if (this.todoListsFromServerSub) {
-      this.todoListsFromServerSub.unsubscribe();
-    }
-    this.showTotoListsLoadingSpinner = true;
-    this.todoListsFromServerSub = this.todosService.getTodoLists().subscribe(todoLists => {
-        if (todoLists) {
-          this.todoLists = todoLists;
-          this.store.dispatch(new LoadTodoListsAction(todoLists));
-          this.showTotoListsLoadingSpinner = false;
-        }
-      },
-      error => {
-        if (error.statusText === 'Unauthorized') {
-          this.showTotoListsLoadingSpinner = false;
-          this.currentUser = null;
-        }
-      });
-  }
 
   logout(): void {
     const confirmLogout = window.confirm('Confirm Logout');
     if (confirmLogout) {
-      this.authService.logout();
+      this.firestoreService.authLogout();
     }
   }
 }

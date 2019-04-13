@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { BASE_URL, TodoListModel } from '../models';
 import { Observable, SubscriptionLike } from 'rxjs';
 
@@ -9,8 +8,8 @@ import { Observable, SubscriptionLike } from 'rxjs';
 export class TodosService {
   serverSub: SubscriptionLike;
 
-  constructor(private http: HttpClient) {}
-
+  constructor() {}
+  /*
   getTodoLists(): Observable<TodoListModel[]> {
     const todoListsURL = BASE_URL + '/api/docket/todo';
     return this.http.get<TodoListModel[]>(todoListsURL);
@@ -83,6 +82,6 @@ export class TodosService {
   deleteTodo(todoItemId): Observable<any> {
     const deleteTodoURL = BASE_URL + '/api/docket/todo/item/' + todoItemId;
     return this.http.delete(deleteTodoURL);
-  }
+  } */
 
 }

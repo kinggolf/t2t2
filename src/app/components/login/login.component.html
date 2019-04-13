@@ -8,9 +8,63 @@
     <mat-form-field style="width: 90%">
       <input type="password" matInput formControlName="password" placeholder="Password">
     </mat-form-field>
-    <button mat-button type="submit" [disabled]="!loginForm.valid" color="primary">
+    <button mat-button type="submitLogin" [disabled]="!loginForm.valid" color="primary">
       Submit
     </button>
   </form>
 
+  <div class="forminnercont">
+    <button class="sgbtn1 sgbtn0G" (click)="googleSignIn()">Login with Google</button>
+  </div>
+
+  <div style="text-align: center; margin: 15px 0;">
+    <span class="formLogin" style="cursor: pointer;" (click)="forgotPassword()">Forgot password</span>
+  </div>
+
 </div>
+<!--
+<div *ngIf="model" class="formOuter formBasic">
+  <h1 style="text-align:center;">Login</h1>
+
+  <form class="forminnercont" (ngSubmit)="onsubmit.emit(model)" #loginForm="ngForm">
+    <div class="formDT100">
+      <label class="formCol20 formLogin" style="text-align: center;">Email</label>
+      <div class="formCol05"></div>
+      <div class="formCol60">
+        <input type="email" class="formInput95" required [(ngModel)]="model.email" name="email">
+      </div>
+      <div class="formCol15"></div>
+    </div>
+    <div class="formDT100">
+      <label class="formCol20 formLogin" style="text-align: center;">Password</label>
+      <div class="formCol05"></div>
+      <div class="formCol60">
+        <input type="password" class="formInput95" required [(ngModel)]="model.password" name="password">
+      </div>
+      <div class="formCol15"></div>
+    </div>
+    <button type="submit" class="sgbtn1 sgbtn0"
+            [disabled]="!loginForm.form.valid || model.password.length < 6 || model.password.length > 12">
+      Submit
+    </button>
+  </form>
+
+  <div class="forminnercont">
+    <button class="sgbtn1 sgbtn0G" (click)="submitGoogleLogin.emit()">Login with Google</button>
+  </div>
+
+  <div style="text-align: center; margin: 15px 0;">
+    <span class="formLogin" style="cursor: pointer;" (click)="submitAnonymousLogin.emit()">Enter As Guest</span>
+  </div>
+
+  <div class="forminnercont">
+    <button class="sgbtn1 sgbtn0G" (click)="submitAnonymousLogin.emit()">Enter As Guest</button>
+  </div>
+
+  <div *ngIf="loginerror" style="color:red; font-weight:bold; margin-left:5%;">{{ errorMsg }}</div>
+
+  <div style="text-align: center; margin: 15px 0;">
+    <span class="formLogin" style="cursor: pointer;" (click)="forgotpassword.emit(model)">Forgot password</span>
+  </div>
+</div>
+-->

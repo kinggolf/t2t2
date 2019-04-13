@@ -1,51 +1,50 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { APPStore, TodoListModel } from '../../models';
+import { TodoModel } from '../../models';
 import { Observable, SubscriptionLike } from 'rxjs';
 import { TodosService } from '../../services/todos.service';
 import { AppHealthService } from '../../services/app-health.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EditTodoLabelAction, UpdateTodoListsWithUpdatedListItemsAction, DeleteTodoAction,
-         LoadActiveTodoListAction, ToggleTodoCompleteAction, OpenCloseOrUpdateTodoListAction } from '../../actions';
 
 @Component({
-  selector: 'app-todo-items',
-  templateUrl: './todo-items.component.html',
-  styleUrls: ['./todo-items.component.css']
+  selector: 'app-todos',
+  templateUrl: './todos.component.html',
+  styleUrls: ['./todos.component.css']
 })
-export class TodoItemsComponent implements OnInit, OnDestroy {
-  activeList: TodoListModel;
+export class TodosComponent implements OnInit, OnDestroy {
+  // activeList: TodoListModel;
   newTodoLabel: FormGroup;
-  prevTodoLabel: string;
-  activeListSub: SubscriptionLike;
-  todoListsServerSub4: SubscriptionLike;
-  todoListsServerSub3: SubscriptionLike;
-  activeList$: Observable<TodoListModel>;
+  // prevTodoLabel: string;
+  // activeListSub: SubscriptionLike;
+  // todoListsServerSub4: SubscriptionLike;
+  // todoListsServerSub3: SubscriptionLike;
+  // activeList$: Observable<TodoListModel>;
   isOnline$: Observable<boolean>;
-  @Input() prevTodoList: TodoListModel;
-  @Input() listIndex: number;
-  @Input() listId: string;
+  @Input() todos: TodoModel[];
+  // @Input() listIndex: number;
+  // @Input() listId: string;
 
-  constructor(private todosService: TodosService, private store: Store<APPStore>,
-              private fb: FormBuilder, private appHealthService: AppHealthService) { }
+  constructor(private todosService: TodosService, private fb: FormBuilder, private appHealthService: AppHealthService) { }
 
   ngOnInit() {
+    /*
     this.activeList$ = this.store.select('activeTodoList');
     this.activeListSub = this.activeList$.subscribe(activeList => {
       this.activeList = activeList;
-    });
+    }); */
     this.newTodoLabel = this.fb.group({
       newItemLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
     this.isOnline$ = this.appHealthService.monitorOnline();
+    console.log('In TodosComponent: this.todos = ', this.todos);
   }
 
   ngOnDestroy(): void {
+    /*
     if (this.activeListSub) {
       this.activeListSub.unsubscribe();
-    }
+    } */
   }
-
+  /*
   toggleTodoComplete(i) {
     this.todosService.updateTodo(this.activeList.items[i].id, '', !this.activeList.items[i].completed);
     this.store.dispatch(new ToggleTodoCompleteAction(i));
@@ -89,13 +88,6 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
       if (this.todoListsServerSub3) {
         this.todoListsServerSub3.unsubscribe();
       }
-      this.todoListsServerSub3 = this.todosService.createNewTodo(this.activeList.id, this.newTodoLabel.value.newItemLabel)
-        .subscribe(updatedTodoListDetails => {
-          this.store.dispatch(new OpenCloseOrUpdateTodoListAction(
-            { listIndex: this.listIndex, openOrClose: false, listDetails: updatedTodoListDetails }));
-          this.store.dispatch(new EditTodoLabelAction(
-            { itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, newList: updatedTodoListDetails, mode: 'save'}));
-        });
     }
   }
 
@@ -118,5 +110,5 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
       });
     }
   }
-
+  */
 }

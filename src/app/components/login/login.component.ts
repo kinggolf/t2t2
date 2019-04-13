@@ -1,8 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { APPStore } from '../../models';
-import { AuthService } from '../../services/auth.service';
+import { UserModel } from '../../models';
+import { FirestoreService } from '../../services/firestore.service';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +12,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   @Output() loginObject = new EventEmitter();
 
-  constructor(private fb: FormBuilder, private store: Store<APPStore>, private authService: AuthService) { }
+  constructor(private fb: FormBuilder, private firestoreService: FirestoreService) { }
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -22,7 +21,16 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  submit() {
-    this.authService.submitLogin(this.loginForm.value);
+  googleSignIn() {
+    this.firestoreService.authGoogleLogin();
   }
+
+  submitLogin() {
+    this.firestoreService.authLogin(this.loginForm.controls.email.value, this.loginForm.controls.password.value);
+  }
+
+  forgotPassword() {
+    this.firestoreService.authForgotPassword(this.loginForm.controls.email.value);
+  }
+
 }

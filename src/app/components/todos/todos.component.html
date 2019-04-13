@@ -1,5 +1,5 @@
-<div *ngIf="activeList.items">
-  <div *ngFor="let todo of activeList.items; let i = index;">
+<div *ngIf="todos">
+  <div *ngFor="let todo of todos; let i = index;">
     <mat-card *ngIf="!todo.editingLabel" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
       <mat-card-header>
         <mat-card-title style="font-size: 1rem;">{{ todo.label }}</mat-card-title>

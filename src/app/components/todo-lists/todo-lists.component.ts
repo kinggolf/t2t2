@@ -1,11 +1,8 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { APPStore, TodoListModel } from '../../models';
+import { TodoListModel } from '../../models';
 import { SubscriptionLike } from 'rxjs';
-import { TodosService } from '../../services/todos.service';
+import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
-import { LoadTodoListsAction, OpenCloseOrUpdateTodoListAction, EditTodoListNameAction, DeleteTodoListAction,
-         CreateNewTodoAction, LoadActiveTodoListAction } from '../../actions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
@@ -15,7 +12,7 @@ import { MatSnackBar } from '@angular/material';
   styleUrls: ['./todo-lists.component.css']
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
-  todoLists: TodoListModel[];
+  userTodoLists: TodoListModel[];
   todoListsServerSub2: SubscriptionLike;
   todoListsServerSub3: SubscriptionLike;
   todoListsServerSub4: SubscriptionLike;
@@ -23,19 +20,19 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   isOnlineSub: SubscriptionLike;
   newTodoListNameForm: FormGroup;
   isOnline: boolean;
-  prevTodoList: TodoListModel;
-  @Input() prevTodoLists: TodoListModel[];
-  @Output() endCreatingNewList = new EventEmitter();
+  selectedTodoList: TodoListModel;
+  @Input() userUID: string;
+  // @Output() endCreatingNewList = new EventEmitter();
 
-  constructor(private todosService: TodosService, private store: Store<APPStore>,
-              private appHealthService: AppHealthService, private fb: FormBuilder, private snackBar: MatSnackBar) { }
+  constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
+              private fb: FormBuilder, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.todoListsSub = this.store.select('todoLists').subscribe(todoList => {
-      if (todoList) {
-        this.todoLists = todoList;
-      }
+    this.todoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
+      this.userTodoLists = userTodoLists;
+      console.log(this.userTodoLists);
     });
+    this.firestoreService.initUserTodoLists(this.userUID);
     this.newTodoListNameForm = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
@@ -75,17 +72,13 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   showListDetails(i): void {
-    if ((this.todoLists[i].itemsPending + this.todoLists[i].itemsCompleted) > 0) {
-      if (this.todoLists[i].showListDetails) {
-        // User is closing an open list
-        this.store.dispatch(new OpenCloseOrUpdateTodoListAction({listIndex: i, openOrClose: true, listDetails: null}));
-      } else {
-        // User is opening a closed list
-        this.callServerForTodos(i, false);
-      }
+    if ((this.userTodoLists[i].itemsPending + this.userTodoLists[i].itemsCompleted) > 0) {
+      this.userTodoLists[i].showListTodos = !this.userTodoLists[i].showListTodos;
+      console.log('In showListDetails, i = ' + i + ' & this.userTodoLists[i] =', this.userTodoLists[i]);
     }
   }
 
+  /*
   editListName(i): void {
     this.store.dispatch(new EditTodoListNameAction({listIndex: i, listName: null, mode: 'edit'}));
     this.newTodoListNameForm.setValue({ newListName: this.todoLists[i].name });
@@ -125,7 +118,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
         // This list has items that have not been downloaded yet
         this.callServerForTodos(i, true);
       } else {
-        this.prevTodoList = { ...this.todoLists[i] };
+        this.selectedTodoList = { ...this.todoLists[i] };
         this.store.dispatch(new CreateNewTodoAction(i));
         this.store.dispatch(new LoadActiveTodoListAction(this.todoLists[i]));
       }
@@ -154,7 +147,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.todoListsServerSub4 = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
         if (listDetails) {
           this.store.dispatch(new OpenCloseOrUpdateTodoListAction({ listIndex: i, openOrClose: true, listDetails }));
-          this.prevTodoList = { ...this.todoLists[i] };
+          this.selectedTodoList = { ...this.todoLists[i] };
           if (callFromAddTodo) {
             this.store.dispatch(new CreateNewTodoAction(i));
           }
@@ -167,4 +160,5 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       });
     }
   }
+  */
 }

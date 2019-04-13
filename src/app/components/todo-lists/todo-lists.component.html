@@ -1,14 +1,14 @@
-<div *ngFor="let todoList of todoLists; let i = index;" style="margin-top: 2rem;">
+<div *ngFor="let todoList of userTodoLists; let i = index;" style="margin-top: 2rem;">
   <mat-card *ngIf="!todoList.editingName"
             style="margin: 2rem 0.5rem; background-color: lightgray;">
     <mat-card-header (click)="showListDetails(i)">
       <mat-card-title>{{ todoList.name }}</mat-card-title>
     </mat-card-header>
 
-    <mat-card-content *ngIf="todoList.showListDetails">
-      <mat-spinner *ngIf="!todoList.items" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
-      <app-todo-items *ngIf="todoList.items" [prevTodoList]="prevTodoList" [listIndex]=i [listId]="todoList.id">
-      </app-todo-items>
+    <mat-card-content>
+      <mat-spinner *ngIf="todoList.showListTodos && !todoList.todos" [diameter]="30" style="margin: 0 auto;">
+      </mat-spinner>
+      <app-todos *ngIf="todoList.showListTodos" [todos]="todoList.todos"></app-todos>
     </mat-card-content>
 
     <mat-card-actions>

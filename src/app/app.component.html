@@ -1,14 +1,11 @@
 <mat-toolbar style="position: sticky; top: 0; z-index: 100; background-color: lightskyblue;">
-  <span>The Docket</span>
+  <span>t2t2</span>
     <button *ngIf="currentUser && (isOnline$ | async)" mat-button [matMenuTriggerFor]="menu"
             style="position: absolute; right: 0;">
       <i class="material-icons icon-font-spec-more">more_horiz</i>
     </button>
     <mat-menu #menu="matMenu" xPosition="after">
       <div *ngIf="todoLists">
-        <button *ngIf="!creatingNewList && (isOnline$ | async)" mat-menu-item (click)="refreshTodoLists()">
-          Refresh Lists
-        </button>
         <button *ngIf="!creatingNewList && (isOnline$ | async)" mat-menu-item (click)="createNewList()">
           Create A New List
         </button>
@@ -21,5 +18,8 @@
 
 <app-login *ngIf="!currentUser"></app-login>
 
+<app-todo-lists *ngIf="currentUser" [userUID]="currentUser.uid"></app-todo-lists>
+
+<!--
 <app-todo-lists *ngIf="currentUser" [prevTodoLists]="prevTodoLists" (endCreatingNewList)="creatingNewList = false">
-</app-todo-lists>
+</app-todo-lists> -->
