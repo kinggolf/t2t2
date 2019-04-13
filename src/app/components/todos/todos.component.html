@@ -1,6 +1,6 @@
-<div *ngIf="todos">
-  <div *ngFor="let todo of todos; let i = index;">
-    <mat-card *ngIf="!todo.editingLabel" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
+<div *ngIf="userTodoList.todos">
+  <div *ngFor="let todo of userTodoList.todos; let i = index;">
+    <mat-card *ngIf="editingTodoLabelIndex !== i" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
       <mat-card-header>
         <mat-card-title style="font-size: 1rem;">{{ todo.label }}</mat-card-title>
       </mat-card-header>
@@ -31,10 +31,10 @@
       </mat-card-actions>
     </mat-card>
 
-    <mat-card *ngIf="todo.editingLabel" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
+    <mat-card *ngIf="editingTodoLabelIndex === i" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
       <form novalidate [formGroup]="newTodoLabel">
         <mat-form-field style="margin-left: 1.2rem;">
-          <input matInput placeholder="Item Label" formControlName="newItemLabel">
+          <input matInput placeholder="Todo Label" formControlName="newLabel">
         </mat-form-field>
         <mat-card-actions>
           <div style="display: table; width: 100%; text-align: center;">

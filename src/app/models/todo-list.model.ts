@@ -6,8 +6,4 @@ export interface TodoListModel {
   listName: string;
   itemsCompleted?: number;
   itemsPending?: number;
-  showListTodos?: boolean;
-  editingName?: boolean;
-  addingTodo?: boolean;
-  creatingNewList?: boolean;
 }

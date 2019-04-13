@@ -3,7 +3,6 @@ import { TodoListModel } from './models';
 import { SubscriptionLike, Observable } from 'rxjs';
 import * as firebase from 'firebase/app';
 import { FirestoreService } from './services/firestore.service';
-import { TodosService } from './services/todos.service';
 import { AppHealthService } from './services/app-health.service';
 
 @Component({
@@ -17,8 +16,7 @@ export class AppComponent implements OnInit, OnDestroy {
   todoLists: TodoListModel[];
   isOnline$: Observable<boolean>;
 
-  constructor(private firestoreService: FirestoreService, private todosService: TodosService,
-              private appHealthService: AppHealthService) {}
+  constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService) {}
 
   ngOnInit(): void {
     this.currentUserSub = this.firestoreService.getUser().subscribe(user => {

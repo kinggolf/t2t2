@@ -15,7 +15,7 @@
 </mat-toolbar>
 
 <div *ngFor="let todoList of userTodoLists; let i = index;" style="margin-top: 2rem;">
-  <mat-card *ngIf="!todoList.editingName"
+  <mat-card *ngIf="editingListNameIndex !== i"
             style="margin: 2rem 0.5rem; background-color: lightgray;">
     <mat-card-header (click)="showListDetails(i)">
       <mat-card-title>{{ todoList.listName }}</mat-card-title>
@@ -23,7 +23,8 @@
 
     <mat-card-content>
       <mat-spinner *ngIf="showTotoListsLoadingSpinner" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
-      <app-todos *ngIf="todoList.showListTodos" [todos]="todoList.todos"></app-todos>
+      <app-todos *ngIf="showListDetailsIndex === i" [userTodoList]="todoList" [userDocId]="userDetails.userDocId">
+      </app-todos>
     </mat-card-content>
 
     <mat-card-actions>
@@ -47,7 +48,7 @@
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="createNewTodo(i)" class="base-mat-icon" title="Add Todo" [disabled]="!isOnline">
+          <button (click)="addNewTodo(i)" class="base-mat-icon" title="Add Todo" [disabled]="!isOnline">
             <i class="material-icons icon-font-spec">add_circle</i>
             <div>Add Todo</div>
           </button>
@@ -63,7 +64,7 @@
     </mat-card-actions>
   </mat-card>
 
-  <mat-card *ngIf="todoList.editingName" style="margin: 2rem 0.5rem; background-color: lightgray;">
+  <mat-card *ngIf="editingListNameIndex === i" style="margin: 2rem 0.5rem; background-color: lightgray;">
     <form novalidate [formGroup]="newTodoListNameForm">
       <mat-form-field style="margin-left: 1.2rem;">
         <input matInput placeholder="List Name" formControlName="newListName">
@@ -72,7 +73,7 @@
       <mat-card-actions>
         <div style="display: table; width: 100%; text-align: center;">
           <div style="display: table-cell; width: 50%;">
-            <button (click)="cancelEditList(i)" class="base-mat-icon-text-only">Cancel</button>
+            <button (click)="cancelEditListName(i)" class="base-mat-icon-text-only">Cancel</button>
           </div>
           <div style="display: table-cell; width: 50%;">
             <button (click)="saveListName(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListNameForm.valid">

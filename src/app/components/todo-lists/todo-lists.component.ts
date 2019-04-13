@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import { TodoListModel, UserModel } from '../../models';
+import { TodoListModel, TodoModel, UserModel } from '../../models';
 import { SubscriptionLike } from 'rxjs';
 import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
@@ -20,15 +20,17 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   newTodoListNameForm: FormGroup;
   showTotoListsLoadingSpinner: boolean;
   isOnline: boolean;
-  selectedTodoList: TodoListModel;
   @Input() userUID: string;
-  prevTodoLists: TodoListModel[];
   creatingNewList: boolean;
+  editingListNameIndex: number;
+  showListDetailsIndex: number;
+  addingTodoListIndex: number;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
               private fb: FormBuilder, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
+    this.editingListNameIndex = this.showListDetailsIndex = this.addingTodoListIndex = -1;
     this.showTotoListsLoadingSpinner = true;
     this.userDetailsSub = this.firestoreService.getUserDetails().subscribe(userDetails => {
       this.userDetails = userDetails[0];
@@ -77,14 +79,21 @@ export class TodoListsComponent implements OnInit, OnDestroy {
 
   showListDetails(i): void {
     if ((this.userTodoLists[i].itemsPending + this.userTodoLists[i].itemsCompleted) > 0) {
-      this.userTodoLists[i].showListTodos = !this.userTodoLists[i].showListTodos;
-      console.log('In showListDetails, i = ' + i + ' & this.userTodoLists[i] =', this.userTodoLists[i]);
+      this.showListDetailsIndex === -1 ? this.showListDetailsIndex = i : this.showListDetailsIndex = -1;
     }
   }
 
   createNewList(): void {
     this.creatingNewList = true;
-    this.firestoreService.createNewTodoList(this.userDetails.userDocId);
+    this.firestoreService.createNewTodoList(this.userDetails.userDocId).then(newListDocId => {
+      let i = 0;
+      this.userTodoLists.forEach(todoList => {
+        if (todoList.todoListDocId === newListDocId) {
+          this.editingListNameIndex = i;
+        }
+        i++;
+      });
+    });
   }
 
   logout(): void {
@@ -96,18 +105,42 @@ export class TodoListsComponent implements OnInit, OnDestroy {
 
   editListName(i): void {
     this.newTodoListNameForm.setValue({ newListName: this.userTodoLists[i].listName });
-    const updatedList = { ...this.userTodoLists[i], listName: this.newTodoListNameForm.value.newListName, editingName: true };
-    this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
+    this.editingListNameIndex = i;
   }
 
   saveListName(i): void {
     this.creatingNewList = false;
-    const updatedList = { ...this.userTodoLists[i], listName: this.newTodoListNameForm.value.newListName, editingName: false };
+    this.editingListNameIndex = -1;
+    const updatedList = { ...this.userTodoLists[i], listName: this.newTodoListNameForm.value.newListName };
     this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
   }
 
-  cancelEditList(i): void {
+  cancelEditListName(i): void {
     this.creatingNewList = false;
-    this.firestoreService.deleteTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId);
+    this.editingListNameIndex = -1;
+    if (this.userTodoLists[i].listName === '') {
+      this.firestoreService.deleteTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId);
+    }
   }
+
+  addNewTodo(i): void {
+    if (this.addingTodoListIndex === -1) {
+      this.addingTodoListIndex = i;
+      let newTodosArray = [{ label: '', completed: false }];
+      if (this.userTodoLists[i].todos) {
+        newTodosArray = [ ...newTodosArray, ...this.userTodoLists[i].todos];
+      }
+      const updatedList = { ...this.userTodoLists[i], todos: newTodosArray };
+      this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
+      this.showListDetailsIndex = i;
+    }
+  }
+
+  confirmDeleteList(i): void {
+    const confirmDelete = window.confirm('Confirm Delete ' + this.userTodoLists[i].listName);
+    if (confirmDelete) {
+      this.firestoreService.deleteTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId);
+    }
+  }
+
 }

@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { TodoModel } from '../../models';
-import { Observable, SubscriptionLike } from 'rxjs';
-import { TodosService } from '../../services/todos.service';
+import { Component, OnInit, Input } from '@angular/core';
+import { TodoListModel } from '../../models';
+import { Observable } from 'rxjs';
+import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -10,105 +10,58 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   templateUrl: './todos.component.html',
   styleUrls: ['./todos.component.css']
 })
-export class TodosComponent implements OnInit, OnDestroy {
-  // activeList: TodoListModel;
+export class TodosComponent implements OnInit {
   newTodoLabel: FormGroup;
-  // prevTodoLabel: string;
-  // activeListSub: SubscriptionLike;
-  // todoListsServerSub4: SubscriptionLike;
-  // todoListsServerSub3: SubscriptionLike;
-  // activeList$: Observable<TodoListModel>;
   isOnline$: Observable<boolean>;
-  @Input() todos: TodoModel[];
-  // @Input() listIndex: number;
-  // @Input() listId: string;
+  @Input() userTodoList: TodoListModel;
+  @Input() userDocId: string;
+  editingTodoLabelIndex: number;
 
-  constructor(private todosService: TodosService, private fb: FormBuilder, private appHealthService: AppHealthService) { }
+  constructor(private fb: FormBuilder, private appHealthService: AppHealthService, private firestoreService: FirestoreService) { }
 
-  ngOnInit() {
-    /*
-    this.activeList$ = this.store.select('activeTodoList');
-    this.activeListSub = this.activeList$.subscribe(activeList => {
-      this.activeList = activeList;
-    }); */
+  ngOnInit(): void {
+    this.editingTodoLabelIndex = -1;
     this.newTodoLabel = this.fb.group({
       newItemLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
     this.isOnline$ = this.appHealthService.monitorOnline();
-    console.log('In TodosComponent: this.todos = ', this.todos);
+    console.log('In TodosComponent: this.userTodoList = ', this.userTodoList);
   }
 
-  ngOnDestroy(): void {
-    /*
-    if (this.activeListSub) {
-      this.activeListSub.unsubscribe();
-    } */
-  }
-  /*
-  toggleTodoComplete(i) {
-    this.todosService.updateTodo(this.activeList.items[i].id, '', !this.activeList.items[i].completed);
-    this.store.dispatch(new ToggleTodoCompleteAction(i));
-    this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
-      listIndex: this.listIndex, itemIndex: i, label: null, mode: 'toggleComplete'
-    }));
+  toggleTodoComplete(i): void {
+    const updatedTodo = { ...this.userTodoList.todos[i], completed: !this.userTodoList.todos[i].completed };
+    const updatedTodos = [ ...this.userTodoList.todos.slice(0, i), updatedTodo, ...this.userTodoList.todos.slice(i + 1) ];
+    this.updateTodoList(i, updatedTodos);
   }
 
-  editTodoLabel(i) {
-    this.newTodoLabel = this.fb.group({
-      newItemLabel: [this.activeList.items[i].label, Validators.compose([Validators.required, Validators.minLength(1)])]
-    });
-    this.prevTodoLabel = this.activeList.items[i].label.slice(0);
-    this.store.dispatch(new EditTodoLabelAction(
-      { itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, newList: null, mode: 'edit' }));
+  editTodoLabel(i): void {
+    this.newTodoLabel = this.fb.group({ newLabel: [this.userTodoList.todos[i].label,
+        Validators.compose([Validators.required, Validators.minLength(1)])] });
+    this.editingTodoLabelIndex = i;
   }
 
-  cancelEditDetails(i) {
-    if (this.activeList.items[i].label !== '') {
-      this.store.dispatch(new EditTodoLabelAction({ itemIndex: i, itemLabel: this.prevTodoLabel, newList: null, mode: 'cancel' }));
-    } else {
-      // Cancel from adding a todoItem
-      this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
-        listIndex: this.listIndex, itemIndex: i, label: this.newTodoLabel.value.newItemLabel, mode: 'cancelEditLabel'
-      }));
-      this.store.dispatch(new LoadActiveTodoListAction(this.prevTodoList));
-    }
+  cancelEditDetails(i): void {
+    this.editingTodoLabelIndex = -1;
   }
 
-  saveEditLabel(i) {
-    if (this.activeList.items[i].label !== '') {
-      // From editing an existing item
-      this.todosService.updateTodo(this.activeList.items[i].id, this.newTodoLabel.value.newItemLabel, this.activeList.items[i].completed);
-      this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
-        listIndex: this.listIndex, itemIndex: i, label: this.newTodoLabel.value.newItemLabel, mode: 'editLabel'
-      }));
-      this.store.dispatch(new EditTodoLabelAction(
-        { itemIndex: i, itemLabel: this.newTodoLabel.value.newItemLabel, newList: null, mode: 'save'}));
-    } else {
-      // From creating a new item
-      if (this.todoListsServerSub3) {
-        this.todoListsServerSub3.unsubscribe();
-      }
-    }
+  saveEditLabel(i): void {
+    this.editingTodoLabelIndex = -1;
+    const updatedTodo = { ...this.userTodoList.todos[i], label: this.newTodoLabel.value.newLabel };
+    const updatedTodos = [ ...this.userTodoList.todos.slice(0, i), updatedTodo, ...this.userTodoList.todos.slice(i + 1) ];
+    this.updateTodoList(i, updatedTodos);
   }
 
-  deleteTodo(i) {
-    const confirmDelete = window.confirm('Confirm Delete ' + this.activeList.items[i].label);
+  deleteTodo(i): void {
+    const confirmDelete = window.confirm('Confirm Delete ' + this.userTodoList.todos[i].label);
     if (confirmDelete) {
-      if (this.todoListsServerSub4) {
-        this.todoListsServerSub4.unsubscribe();
-      }
-      this.todoListsServerSub4 = this.todosService.deleteTodo(this.activeList.items[i].id).subscribe(resp => {
-        if (!resp) {
-          // Remove this item from store & update lists
-          this.store.dispatch(new DeleteTodoAction(i));
-          this.store.dispatch(new UpdateTodoListsWithUpdatedListItemsAction({
-            listIndex: this.listIndex, itemIndex: i, label: null, mode: 'deleteItem'
-          }));
-        } else {
-          console.log('deleteTodoList response = ', resp);
-        }
-      });
+      const updatedTodos = [ ...this.userTodoList.todos.slice(0, i), ...this.userTodoList.todos.slice(i + 1) ];
+      this.updateTodoList(i, updatedTodos);
     }
   }
-  */
+
+  updateTodoList(i, updatedTodos): void {
+    const updatedList = { ...this.userTodoList, todos: updatedTodos };
+    this.firestoreService.updateTodoList(this.userDocId, this.userTodoList.todoListDocId, updatedList);
+  }
+
 }

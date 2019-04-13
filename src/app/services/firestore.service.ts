@@ -4,7 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable, SubscriptionLike, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { auth } from 'firebase/app';
-import { UserModel, TodoListModel } from '../models';
+import { UserModel, TodoListModel, TodoModel } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -152,10 +152,13 @@ export class FirestoreService implements OnDestroy {
     });
   }
 
-  createNewTodoList(userDocId: string): void {
+  createNewTodoList(userDocId: string): Promise<string> {
     const userTodoListsRef: AngularFirestoreCollection<TodoListModel> = this.af.collection('users/' + userDocId + '/todoLists');
-    const newTodoList: TodoListModel = { listName: '', editingName: true };
-    userTodoListsRef.add(newTodoList);
+    const newTodoList: TodoListModel = { listName: '' };
+    return userTodoListsRef.add(newTodoList).then(newTodoListDoc => {
+      console.log('In createNewTodoList, newTodoListDoc = ', newTodoListDoc);
+      return newTodoListDoc.id;
+    });
   }
 
   deleteTodoList(userDocId: string, todoListDocId: string): void {
@@ -169,5 +172,12 @@ export class FirestoreService implements OnDestroy {
       this.af.doc('users/' + userDocId + '/todoLists/' + todoListDocId);
     userTodoListRef.update(todoList);
   }
+  /*
+  addNewTodo(userDocId: string, todoListDocId: string, todosArray: TodoModel[]): void {
+    const userTodoListsRef: AngularFirestoreDocument<TodoListModel> =
+      this.af.doc('users/' + userDocId + '/todoLists/' + todoListDocId);
+    // const newTodo: TodoModel = { label: '', completed: false };
+    userTodoListsRef.update(todosArray);
+  } */
 
 }
