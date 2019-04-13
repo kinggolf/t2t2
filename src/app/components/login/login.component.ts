@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
   }
 
   googleSignIn() {
-    this.firestoreService.authGoogleLogin();
+    this.firestoreService.authGoogleLoginRegistration();
   }
 
   submitLogin() {

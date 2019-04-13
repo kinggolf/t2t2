@@ -1,4 +1,10 @@
+import { TodoListModel } from './todo-list.model';
+
 export interface UserModel {
-  name: string;
   email: string;
+  firstName: string;
+  lastName: string;
+  todoLists?: TodoListModel[];
+  userDocId?: string;
+  userUID: string;
 }

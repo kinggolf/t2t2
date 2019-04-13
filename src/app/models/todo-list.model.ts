@@ -2,8 +2,8 @@ import { TodoModel } from './todo.model';
 
 export interface TodoListModel {
   todos?: TodoModel[];
+  todoListDocId?: string;
   listName: string;
-  userUID: string;
   itemsCompleted?: number;
   itemsPending?: number;
   showListTodos?: boolean;

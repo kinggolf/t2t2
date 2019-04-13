@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import { TodoListModel } from '../../models';
+import { TodoListModel, UserModel } from '../../models';
 import { SubscriptionLike } from 'rxjs';
 import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
@@ -12,27 +12,37 @@ import { MatSnackBar } from '@angular/material';
   styleUrls: ['./todo-lists.component.css']
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
+  userDetails: UserModel;
+  userDetailsSub: SubscriptionLike;
   userTodoLists: TodoListModel[];
-  todoListsServerSub2: SubscriptionLike;
-  todoListsServerSub3: SubscriptionLike;
-  todoListsServerSub4: SubscriptionLike;
-  todoListsSub: SubscriptionLike;
+  userTodoListsSub: SubscriptionLike;
   isOnlineSub: SubscriptionLike;
   newTodoListNameForm: FormGroup;
+  showTotoListsLoadingSpinner: boolean;
   isOnline: boolean;
   selectedTodoList: TodoListModel;
   @Input() userUID: string;
-  // @Output() endCreatingNewList = new EventEmitter();
+  prevTodoLists: TodoListModel[];
+  creatingNewList: boolean;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
               private fb: FormBuilder, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.todoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
-      this.userTodoLists = userTodoLists;
-      console.log(this.userTodoLists);
+    this.showTotoListsLoadingSpinner = true;
+    this.userDetailsSub = this.firestoreService.getUserDetails().subscribe(userDetails => {
+      this.userDetails = userDetails[0];
+      console.log('userDetails = ', this.userDetails);
+      this.userTodoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
+        if (userTodoLists) {
+          this.showTotoListsLoadingSpinner = false;
+        }
+        this.userTodoLists = userTodoLists;
+        console.log('userTodoLists = ', this.userTodoLists);
+      });
+      this.firestoreService.initUserTodoLists(this.userDetails.userDocId);
     });
-    this.firestoreService.initUserTodoLists(this.userUID);
+    this.firestoreService.initUserDetails(this.userUID);
     this.newTodoListNameForm = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
@@ -54,17 +64,11 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.todoListsSub) {
-      this.todoListsSub.unsubscribe();
+    if (this.userDetailsSub) {
+      this.userDetailsSub.unsubscribe();
     }
-    if (this.todoListsServerSub2) {
-      this.todoListsServerSub2.unsubscribe();
-    }
-    if (this.todoListsServerSub3) {
-      this.todoListsServerSub3.unsubscribe();
-    }
-    if (this.todoListsServerSub4) {
-      this.todoListsServerSub4.unsubscribe();
+    if (this.userTodoListsSub) {
+      this.userTodoListsSub.unsubscribe();
     }
     if (this.isOnlineSub) {
       this.isOnlineSub.unsubscribe();
@@ -78,87 +82,32 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /*
+  createNewList(): void {
+    this.creatingNewList = true;
+    this.firestoreService.createNewTodoList(this.userDetails.userDocId);
+  }
+
+  logout(): void {
+    const confirmLogout = window.confirm('Confirm Logout');
+    if (confirmLogout) {
+      this.firestoreService.authLogout();
+    }
+  }
+
   editListName(i): void {
-    this.store.dispatch(new EditTodoListNameAction({listIndex: i, listName: null, mode: 'edit'}));
-    this.newTodoListNameForm.setValue({ newListName: this.todoLists[i].name });
+    this.newTodoListNameForm.setValue({ newListName: this.userTodoLists[i].listName });
+    const updatedList = { ...this.userTodoLists[i], listName: this.newTodoListNameForm.value.newListName, editingName: true };
+    this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
   }
 
   saveListName(i): void {
-    if (this.todoLists[i].creatingNewList) {
-      this.todoListsServerSub2 = this.todosService.createNewList(this.newTodoListNameForm.value.newListName).subscribe(newList => {
-        this.store.dispatch(new OpenCloseOrUpdateTodoListAction({listIndex: i, openOrClose: false, listDetails: newList}));
-      });
-      this.store.dispatch(
-        new EditTodoListNameAction({listIndex: i, listName: this.newTodoListNameForm.value.newListName, mode: 'save'})
-      );
-    } else {
-      this.store.dispatch(
-        new EditTodoListNameAction({listIndex: i, listName: this.newTodoListNameForm.value.newListName, mode: 'save'})
-      );
-      this.todosService.updateList({ ...this.todoLists[i], name: this.newTodoListNameForm.value.newListName}, 'name' );
-    }
-    this.newTodoListNameForm.setValue({ newListName: '' });
-    this.endCreatingNewList.emit();
+    this.creatingNewList = false;
+    const updatedList = { ...this.userTodoLists[i], listName: this.newTodoListNameForm.value.newListName, editingName: false };
+    this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
   }
 
   cancelEditList(i): void {
-    if (this.todoLists[i].creatingNewList) {
-      this.store.dispatch(new LoadTodoListsAction(this.prevTodoLists));
-    } else {
-      this.store.dispatch(new EditTodoListNameAction({listIndex: i, listName: null, mode: 'cancel'}));
-    }
-    this.newTodoListNameForm.setValue({ newListName: '' });
-    this.endCreatingNewList.emit();
+    this.creatingNewList = false;
+    this.firestoreService.deleteTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId);
   }
-
-  createNewTodo(i): void {
-    if (!this.todoLists[i].addingTodo) {
-      if (!this.todoLists[i].showListDetails) {
-        // This list has items that have not been downloaded yet
-        this.callServerForTodos(i, true);
-      } else {
-        this.selectedTodoList = { ...this.todoLists[i] };
-        this.store.dispatch(new CreateNewTodoAction(i));
-        this.store.dispatch(new LoadActiveTodoListAction(this.todoLists[i]));
-      }
-    }
-  }
-
-  confirmDeleteList(i): void {
-    const confirmDelete = window.confirm('Confirm Delete ' + this.todoLists[i].name);
-    if (confirmDelete) {
-      this.todoListsServerSub3 = this.todosService.deleteTodoList(this.todoLists[i].id).subscribe(resp => {
-        if (!resp) {
-          // Remove this list from store
-          this.store.dispatch(new DeleteTodoListAction(i));
-        } else {
-          console.log('deleteTodoList response = ', resp);
-        }
-      });
-    }
-  }
-
-  callServerForTodos(i: number, callFromAddTodo: boolean): void {
-    if (this.isOnline || (!this.isOnline && this.todoLists[i].items)) {
-      if (this.todoListsServerSub4) {
-        this.todoListsServerSub4.unsubscribe();
-      }
-      this.todoListsServerSub4 = this.todosService.getTodoListDetails(this.todoLists[i].id).subscribe(listDetails => {
-        if (listDetails) {
-          this.store.dispatch(new OpenCloseOrUpdateTodoListAction({ listIndex: i, openOrClose: true, listDetails }));
-          this.selectedTodoList = { ...this.todoLists[i] };
-          if (callFromAddTodo) {
-            this.store.dispatch(new CreateNewTodoAction(i));
-          }
-          this.store.dispatch(new LoadActiveTodoListAction(this.todoLists[i]));
-        }
-      });
-    } else {
-      this.snackBar.open('Offline & list details have not previously been downloaded.', 'OK', {
-        duration: 5000,
-      });
-    }
-  }
-  */
 }
