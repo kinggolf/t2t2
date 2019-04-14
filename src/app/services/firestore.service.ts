@@ -81,10 +81,12 @@ export class FirestoreService implements OnDestroy {
   addNewUserToFirestore(user: firebase.User): void {
     let firstName = '';
     let lastName = '';
-    if (user.displayName.length > 2 && user.displayName.indexOf(' ') > 0) {
-      const splitUserName = user.displayName.split(' ');
-      firstName = splitUserName[0];
-      lastName = splitUserName[1];
+    if (user.displayName) {
+      if (user.displayName.length > 2 && user.displayName.indexOf(' ') > 0) {
+        const splitUserName = user.displayName.split(' ');
+        firstName = splitUserName[0];
+        lastName = splitUserName[1];
+      }
     }
     const newUser: UserModel = {
       firstName,

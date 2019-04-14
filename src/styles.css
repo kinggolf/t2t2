@@ -37,3 +37,17 @@ body {
   font-size: 12pt;
   font-weight: bold;
 }
+.googleBtn {
+  background-color: red;
+  color: #ffffff;
+  border-radius: 0.2em;
+  font-size: 0.8em;
+  margin: 0 10%;
+  height: 2em;
+  width: 80%;
+}
+.submitBtn {
+  width: 80%;
+  margin: 0 10%;
+  border: #673ab7 solid 1px;
+}

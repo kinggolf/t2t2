@@ -2,8 +2,8 @@
   <span>t2t2</span>
 </mat-toolbar>
 
-<div class="formOuter formBasic">
-  <h1 style="text-align:center;">Login</h1>
+<div *ngIf="showLogin" class="formOuter formBasic">
+  <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Login</p>
 
   <form (ngSubmit)="submitLogin()" novalidate [formGroup]="loginForm">
     <mat-form-field style="width: 90%">
@@ -12,17 +12,55 @@
     <mat-form-field style="width: 90%">
       <input type="password" matInput formControlName="password" placeholder="Password">
     </mat-form-field>
-    <button mat-button type="submit" [disabled]="!loginForm.valid" color="primary">
+    <button mat-button type="submit" [disabled]="!loginForm.valid"
+            style="width: 80%; margin: 0 10%; border: #673ab7 solid 1px;">
       Submit
     </button>
   </form>
 
+  <p style="text-align:center; font-size: 1em; margin: 1em 0;">- Or -</p>
+
   <div class="forminnercont">
-    <button class="sgbtn1 sgbtn0G" (click)="googleSignIn()">Login with Google</button>
+    <button class="googleBtn" (click)="googleSignIn()">Login with Google</button>
   </div>
 
   <div style="text-align: center; margin: 15px 0;">
     <span class="formLogin" style="cursor: pointer;" (click)="forgotPassword()">Forgot password</span>
   </div>
 
+  <button mat-button (click)="this.showLogin = false"
+          style="width: 80%; margin: 1em 10% 2em; border: #673ab7 solid 1px;">
+    New User? Register Here
+  </button>
+</div>
+
+<div *ngIf="!showLogin" class="formOuter formBasic">
+  <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Register</p>
+
+  <form (ngSubmit)="submitRegister()" novalidate [formGroup]="registerForm">
+    <mat-form-field style="width: 90%">
+      <input type="email" matInput formControlName="email" placeholder="Email (Must be a valid email)">
+    </mat-form-field>
+    <mat-form-field style="width: 90%">
+      <input type="password" matInput formControlName="password" placeholder="Password (At least 5 characters)">
+    </mat-form-field>
+    <mat-form-field style="width: 90%">
+      <input type="password" matInput formControlName="confirmPassword"
+             placeholder="Confirm Password (Must match password)">
+    </mat-form-field>
+    <button mat-button type="submit" [disabled]="!registerForm.valid"
+            style="width: 80%; margin: 0 10%; border: #673ab7 solid 1px;">
+      Submit
+    </button>
+  </form>
+
+  <p style="text-align:center; font-size: 1em; margin: 1em 0;">- Or -</p>
+
+  <div class="forminnercont">
+    <button class="googleBtn" (click)="googleSignIn()">Register with Google</button>
+  </div>
+
+  <button mat-button (click)="this.showLogin = true" style="width: 80%; margin: 2em 10%; border: #673ab7 solid 1px;">
+    Already registered? Login
+  </button>
 </div>
