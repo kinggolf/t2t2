@@ -1,15 +1,15 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import { TodoListModel, TodoModel, UserModel } from '../../models';
+import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
+import { TodoListModel, UserModel } from '../../models';
 import { SubscriptionLike } from 'rxjs';
 import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
+import { TodosComponent } from '../todos/todos.component';
 
 @Component({
   selector: 'app-todo-lists',
-  templateUrl: './todo-lists.component.html',
-  styleUrls: ['./todo-lists.component.css']
+  templateUrl: './todo-lists.component.html'
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
   userDetails: UserModel;
@@ -25,6 +25,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   editingListNameIndex: number;
   showListDetailsIndex: number;
   addingTodoListIndex: number;
+  @ViewChild(TodosComponent) private todosComp: TodosComponent;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
               private fb: FormBuilder, private snackBar: MatSnackBar) { }
@@ -53,11 +54,11 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     this.isOnlineSub = this.appHealthService.monitorOnline().subscribe(online => {
       this.isOnline = online;
       if (!online) {
-        this.snackBar.open('You are now offline. Editing disabled.', 'Got it', {
+        this.snackBar.open('Offline - limited functionality.', 'Got it', {
           duration: 5000,
         });
       } else if (onlineChangeCount > 0) {
-        this.snackBar.open('Back online. Editing enabled.', 'OK', {
+        this.snackBar.open('Online - full functionality.', 'OK', {
           duration: 5000,
         });
       }
@@ -85,7 +86,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
 
   createNewList(): void {
     this.creatingNewList = true;
-    this.firestoreService.createNewTodoList(this.userDetails.userDocId).then(newListDocId => {
+    this.firestoreService.createNewTodoList(this.userDetails.userDocId, '').then(newListDocId => {
       let i = 0;
       this.userTodoLists.forEach(todoList => {
         if (todoList.todoListDocId === newListDocId) {
@@ -133,6 +134,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       const updatedList = { ...this.userTodoLists[i], todos: newTodosArray };
       this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
       this.showListDetailsIndex = i;
+      setTimeout(() => {
+        this.todosComp.editTodoLabel(0);
+      }, 250);
     }
   }
 

@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { TodoListModel } from './models';
 import { SubscriptionLike, Observable } from 'rxjs';
 import * as firebase from 'firebase/app';
 import { FirestoreService } from './services/firestore.service';
@@ -7,13 +6,11 @@ import { AppHealthService } from './services/app-health.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit, OnDestroy {
   currentUser: firebase.User;
   currentUserSub: SubscriptionLike;
-  todoLists: TodoListModel[];
   isOnline$: Observable<boolean>;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService) {}

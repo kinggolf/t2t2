@@ -6,7 +6,7 @@
   </button>
   <mat-menu #menu="matMenu" xPosition="after">
     <div *ngIf="userTodoLists">
-      <button *ngIf="!creatingNewList && isOnline" mat-menu-item (click)="createNewList()">
+      <button *ngIf="!creatingNewList" mat-menu-item (click)="createNewList()">
         Create A New List
       </button>
       <button mat-menu-item (click)="logout()">Logout</button>
@@ -42,19 +42,19 @@
           </div>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name" [disabled]="!isOnline">
+          <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name">
             <i class="material-icons icon-font-spec">border_color</i>
             <div>Edit List Name</div>
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="addNewTodo(i)" class="base-mat-icon" title="Add Todo" [disabled]="!isOnline">
+          <button (click)="addNewTodo(i)" class="base-mat-icon" title="Add Todo">
             <i class="material-icons icon-font-spec">add_circle</i>
             <div>Add Todo</div>
           </button>
         </div>
         <div style="display: table-cell; width: 20%;">
-          <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List" [disabled]="!isOnline">
+          <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List">
             <i class="material-icons icon-font-spec">delete</i>
             <div>Delete List</div>
           </button>

@@ -4,7 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable, SubscriptionLike, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { auth } from 'firebase/app';
-import { UserModel, TodoListModel, TodoModel } from '../models';
+import { UserModel, TodoListModel } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -44,10 +44,6 @@ export class FirestoreService implements OnDestroy {
     });
   }
 
-  getAuthState() {
-    return this.firebaseAuth.authState;
-  }
-
   authLogin(email: string, password: string): void {
     this.firebaseAuth.auth.signInWithEmailAndPassword(email, password);
   }
@@ -57,17 +53,11 @@ export class FirestoreService implements OnDestroy {
       .then(userCredentials => {
         if (userCredentials.additionalUserInfo.isNewUser) {
           this.addNewUserToFirestore(userCredentials.user);
-        } else {
-          console.log('User logged in with Google!, userCredentials = ', userCredentials);
         }
       })
       .catch(error => {
         console.log(error);
       });
-  }
-
-  authAnonymousLogin(): void {
-    this.firebaseAuth.auth.signInAnonymously();
   }
 
   authLogout(): void {
@@ -89,7 +79,6 @@ export class FirestoreService implements OnDestroy {
   }
 
   addNewUserToFirestore(user: firebase.User): void {
-    console.log('In addNewUserToFirestore, user.uid = ', user.uid);
     let firstName = '';
     let lastName = '';
     if (user.displayName.length > 2 && user.displayName.indexOf(' ') > 0) {
@@ -101,12 +90,11 @@ export class FirestoreService implements OnDestroy {
       firstName,
       lastName,
       email: user.email,
-      todoLists: [{ listName: 'My First List of Todos' }],
       userUID: user.uid,
     };
     const newUserRef: AngularFirestoreCollection<UserModel> = this.af.collection('users/');
     newUserRef.add(newUser).then(newUserObj => {
-      console.log('In addNewUserToFirestore, newUserObj = ', newUserObj);
+      const newTodoListDoc = this.createNewTodoList(newUserObj.id, 'My First List');
     });
   }
 
@@ -152,11 +140,10 @@ export class FirestoreService implements OnDestroy {
     });
   }
 
-  createNewTodoList(userDocId: string): Promise<string> {
+  createNewTodoList(userDocId: string, listName: string): Promise<string> {
     const userTodoListsRef: AngularFirestoreCollection<TodoListModel> = this.af.collection('users/' + userDocId + '/todoLists');
-    const newTodoList: TodoListModel = { listName: '' };
-    return userTodoListsRef.add(newTodoList).then(newTodoListDoc => {
-      console.log('In createNewTodoList, newTodoListDoc = ', newTodoListDoc);
+    // const newTodoList: TodoListModel = { listName: listName };
+    return userTodoListsRef.add({ listName }).then(newTodoListDoc => {
       return newTodoListDoc.id;
     });
   }
@@ -172,12 +159,5 @@ export class FirestoreService implements OnDestroy {
       this.af.doc('users/' + userDocId + '/todoLists/' + todoListDocId);
     userTodoListRef.update(todoList);
   }
-  /*
-  addNewTodo(userDocId: string, todoListDocId: string, todosArray: TodoModel[]): void {
-    const userTodoListsRef: AngularFirestoreDocument<TodoListModel> =
-      this.af.doc('users/' + userDocId + '/todoLists/' + todoListDocId);
-    // const newTodo: TodoModel = { label: '', completed: false };
-    userTodoListsRef.update(todosArray);
-  } */
 
 }

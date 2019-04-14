@@ -5,14 +5,14 @@
 <div class="formOuter formBasic">
   <h1 style="text-align:center;">Login</h1>
 
-  <form (ngSubmit)="submit()" novalidate [formGroup]="loginForm">
+  <form (ngSubmit)="submitLogin()" novalidate [formGroup]="loginForm">
     <mat-form-field style="width: 90%">
       <input type="email" matInput formControlName="email" placeholder="Email">
     </mat-form-field>
     <mat-form-field style="width: 90%">
       <input type="password" matInput formControlName="password" placeholder="Password">
     </mat-form-field>
-    <button mat-button type="submitLogin" [disabled]="!loginForm.valid" color="primary">
+    <button mat-button type="submit" [disabled]="!loginForm.valid" color="primary">
       Submit
     </button>
   </form>
