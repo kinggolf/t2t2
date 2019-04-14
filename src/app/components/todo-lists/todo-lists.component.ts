@@ -82,6 +82,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     if ((this.userTodoLists[i].itemsPending + this.userTodoLists[i].itemsCompleted) > 0) {
       this.showListDetailsIndex === -1 ? this.showListDetailsIndex = i : this.showListDetailsIndex = -1;
     }
+    this.addingTodoListIndex = -1;
   }
 
   createNewList(): void {
@@ -94,6 +95,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
         }
         i++;
       });
+      this.newTodoListNameForm.setValue({ newListName: '' });
     });
   }
 
@@ -114,6 +116,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     this.editingListNameIndex = -1;
     const updatedList = { ...this.userTodoLists[i], listName: this.newTodoListNameForm.value.newListName };
     this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
+    this.newTodoListNameForm.setValue({ newListName: '' });
   }
 
   cancelEditListName(i): void {
@@ -122,6 +125,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     if (this.userTodoLists[i].listName === '') {
       this.firestoreService.deleteTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId);
     }
+    this.newTodoListNameForm.setValue({ newListName: '' });
   }
 
   addNewTodo(i): void {
@@ -139,6 +143,10 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       }, 250);
     }
   }
+  /*
+  cancelEditTodoLabel(): void {
+    this.addingTodoListIndex = -1;
+  } */
 
   confirmDeleteList(i): void {
     const confirmDelete = window.confirm('Confirm Delete ' + this.userTodoLists[i].listName);

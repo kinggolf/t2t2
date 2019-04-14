@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { TodoListModel } from '../../models';
 import { FirestoreService } from '../../services/firestore.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -10,6 +10,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class TodosComponent implements OnInit {
   @Input() userTodoList: TodoListModel;
   @Input() userDocId: string;
+  @Output() cancelEditTodoLabel = new EventEmitter();
   editingTodoLabelIndex: number;
   newTodoLabel: FormGroup;
 
@@ -41,6 +42,7 @@ export class TodosComponent implements OnInit {
       const updatedTodos = [ ...this.userTodoList.todos.slice(0, i), ...this.userTodoList.todos.slice(i + 1) ];
       this.updateTodoList(i, updatedTodos);
     }
+    this.cancelEditTodoLabel.emit();
   }
 
   saveEditLabel(i): void {

@@ -1,3 +1,22 @@
+<!--
+<mat-toolbar style="position: sticky; top: 0; z-index: 100; background-color: lightskyblue;">
+  <span>t2t2</span>
+  <span *ngIf="currentUser">
+    <button *ngIf="(isOnline$ | async)" mat-button [matMenuTriggerFor]="menu"
+            style="position: absolute; right: 0;">
+    <i class="material-icons icon-font-spec-more">more_horiz</i>
+    </button>
+    <mat-menu #menu="matMenu" xPosition="after">
+      <div *ngIf="userTodoLists">
+        <button *ngIf="!creatingNewList" mat-menu-item (click)="createNewList()">
+          Create A New List
+        </button>
+        <button mat-menu-item (click)="logout()">Logout</button>
+      </div>
+    </mat-menu>
+  </span>
+</mat-toolbar> -->
+
 <app-login *ngIf="!currentUser"></app-login>
 
 <app-todo-lists *ngIf="currentUser" [userUID]="currentUser.uid"></app-todo-lists>
