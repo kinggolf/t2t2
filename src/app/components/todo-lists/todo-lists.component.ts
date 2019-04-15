@@ -33,6 +33,8 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.editingListNameIndex = this.showListDetailsIndex = this.addingTodoListIndex = -1;
     this.showTotoListsLoadingSpinner = true;
+    this.initAndSubscribeToData();
+    /*
     this.userDetailsSub = this.firestoreService.getUserDetails().subscribe(userDetails => {
       this.userDetails = userDetails[0];
       console.log('userDetails = ', this.userDetails);
@@ -46,6 +48,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.firestoreService.initUserTodoLists(this.userDetails.userDocId);
     });
     this.firestoreService.initUserDetails(this.userUID);
+    */
     this.newTodoListNameForm = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
@@ -54,10 +57,23 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     this.isOnlineSub = this.appHealthService.monitorOnline().subscribe(online => {
       this.isOnline = online;
       if (!online) {
-        this.snackBar.open('Offline - limited functionality.', 'Got it', {
-          duration: 5000,
-        });
+        if (!this.userTodoLists) {
+          this.snackBar.open('Offline - must be online to initially load data.', 'Got it', {
+            duration: 5000,
+          });
+        } else {
+          this.snackBar.open('Offline - limited functionality.', 'Got it', {
+            duration: 5000,
+          });
+        }
       } else if (onlineChangeCount > 0) {
+        console.log('userDetails 1 = ', this.userDetails);
+        console.log('userTodoLists 1 = ', this.userTodoLists);
+        if (!this.userDetails) {
+          this.initAndSubscribeToData();
+          // this.firestoreService.initUserDetails(this.userUID);
+          // this.firestoreService.initUserTodoLists(this.userDetails.userDocId);
+        }
         this.snackBar.open('Online - full functionality.', 'OK', {
           duration: 5000,
         });
@@ -76,6 +92,30 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     if (this.isOnlineSub) {
       this.isOnlineSub.unsubscribe();
     }
+  }
+
+  initAndSubscribeToData(): void {
+    if (this.userDetailsSub) {
+      this.userDetailsSub.unsubscribe();
+    }
+    if (this.userTodoListsSub) {
+      this.userTodoListsSub.unsubscribe();
+    }
+    this.userDetailsSub = this.firestoreService.getUserDetails().subscribe(userDetails => {
+      this.userDetails = userDetails[0];
+      console.log('userDetails 0 = ', this.userDetails);
+      this.userTodoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
+        if (userTodoLists) {
+          this.showTotoListsLoadingSpinner = false;
+        }
+        this.userTodoLists = userTodoLists;
+        console.log('userTodoLists 0 = ', this.userTodoLists);
+      });
+      if (this.userDetails) {
+        this.firestoreService.initUserTodoLists(this.userDetails.userDocId);
+      }
+    });
+    this.firestoreService.initUserDetails(this.userUID);
   }
 
   showListDetails(i): void {

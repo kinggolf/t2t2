@@ -105,15 +105,21 @@ export class FirestoreService implements OnDestroy {
   }
 
   initUserDetails(userUID: string): void {
+    console.log('In FirestoreService - initUserDetails, userUID = ', userUID);
+    if (this.userDetailsSub) {
+      this.userDetailsSub.unsubscribe();
+    }
     const userDetailsRef: AngularFirestoreCollection<UserModel> =
       this.af.collection('users/', user => user.where('userUID', '==', userUID));
     this.userDetailsSub = userDetailsRef.snapshotChanges().pipe(
       map(actions => actions.map(a => {
+          console.log('In FirestoreService - initUserDetails, a = ', a);
           const data = a.payload.doc.data() as UserModel;
           const userDocId = a.payload.doc.id;
           return { userDocId, ...data };
         }))
       ).subscribe(user => {
+        console.log('In FirestoreService - initUserDetails, user = ', user);
         this.userDetailsSubject.next(user);
     });
   }
@@ -123,9 +129,14 @@ export class FirestoreService implements OnDestroy {
   }
 
   initUserTodoLists(userDocId: string): void {
+    console.log('In FirestoreService - initUserTodoLists, userDocId = ', userDocId);
+    if (this.userTodoListsSub) {
+      this.userTodoListsSub.unsubscribe();
+    }
     const userTodoListsRef: AngularFirestoreCollection<TodoListModel> = this.af.collection('users/' + userDocId + '/todoLists');
     this.userTodoListsSub = userTodoListsRef.snapshotChanges().pipe(
       map(actions => actions.map(a => {
+        console.log('In FirestoreService - initUserTodoLists, a = ', a);
         const data = a.payload.doc.data() as TodoListModel;
         const todoListDocId = a.payload.doc.id;
         let itemsCompleted = 0;
@@ -138,6 +149,7 @@ export class FirestoreService implements OnDestroy {
         return { todoListDocId, ...data, itemsCompleted, itemsPending };
       }))
     ).subscribe(userTodoLists => {
+      console.log('In FirestoreService - initUserTodoLists, userTodoLists = ', userTodoLists);
       this.userTodoListsSubject.next(userTodoLists);
     });
   }
