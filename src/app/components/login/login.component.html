@@ -1,8 +1,3 @@
-<!--
-<mat-toolbar style="position: sticky; top: 0; z-index: 100; background-color: lightskyblue;">
-  <span>t2t2</span>
-</mat-toolbar> -->
-
 <div *ngIf="showLogin" class="formOuter formBasic">
   <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Login</p>
 
@@ -19,13 +14,21 @@
     </button>
   </form>
 
-  <p style="text-align:center; font-size: 1em; margin: 1em 0;">- Or -</p>
+  <p style="text-align:center; font-size: 1em; margin: 0.5em 0;">- Or -</p>
 
   <div class="forminnercont">
-    <button class="googleBtn" (click)="googleSignIn()">Login with Google</button>
+    <!--
+    <button mat-button (click)="googleSignIn()"
+            style="width: 80%; margin: 1em 10%; border: red solid 1px; color: red;">
+      Login with Google
+    </button> -->
+    <button mat-button (click)="googleSignIn()"
+            style="width: 80%; margin: 1em 10%; border: #673ab7 solid 1px; color: #673ab7;">
+      Login with Google
+    </button>
   </div>
 
-  <div style="text-align: center; margin: 15px 0;">
+  <div style="text-align: center; margin: 0.75em 0;">
     <span class="formLogin" style="cursor: pointer;" (click)="forgotPassword()">Forgot password</span>
   </div>
 
@@ -55,13 +58,21 @@
     </button>
   </form>
 
-  <p style="text-align:center; font-size: 1em; margin: 1em 0;">- Or -</p>
+  <p style="text-align:center; font-size: 1em; margin: 0.5em 0;">- Or -</p>
 
   <div class="forminnercont">
-    <button class="googleBtn" (click)="googleSignIn()">Register with Google</button>
+    <!--
+    <button mat-button (click)="googleSignIn()"
+            style="width: 80%; margin: 1em 10%; border: red solid 1px; color: red;">
+      Register with Google
+    </button> -->
+    <button mat-button (click)="googleSignIn()"
+            style="width: 80%; margin: 1em 10%; border: #673ab7 solid 1px; color: #673ab7;">
+      Register with Google
+    </button>
   </div>
 
-  <button mat-button (click)="this.showLogin = true" style="width: 80%; margin: 2em 10%; border: #673ab7 solid 1px;">
+  <button mat-button (click)="this.showLogin = true" style="width: 80%; margin: 1em 10%; border: #673ab7 solid 1px;">
     Already registered? Login
   </button>
 </div>

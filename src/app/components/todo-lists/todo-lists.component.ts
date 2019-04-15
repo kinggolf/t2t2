@@ -18,7 +18,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   userTodoListsSub: SubscriptionLike;
   isOnlineSub: SubscriptionLike;
   newTodoListNameForm: FormGroup;
-  showTotoListsLoadingSpinner: boolean;
+  showLoadingSpinner: boolean;
   isOnline: boolean;
   @Input() userUID: string;
   creatingNewList: boolean;
@@ -32,23 +32,8 @@ export class TodoListsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.editingListNameIndex = this.showListDetailsIndex = this.addingTodoListIndex = -1;
-    this.showTotoListsLoadingSpinner = true;
-    this.initAndSubscribeToData();
-    /*
-    this.userDetailsSub = this.firestoreService.getUserDetails().subscribe(userDetails => {
-      this.userDetails = userDetails[0];
-      console.log('userDetails = ', this.userDetails);
-      this.userTodoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
-        if (userTodoLists) {
-          this.showTotoListsLoadingSpinner = false;
-        }
-        this.userTodoLists = userTodoLists;
-        console.log('userTodoLists = ', this.userTodoLists);
-      });
-      this.firestoreService.initUserTodoLists(this.userDetails.userDocId);
-    });
-    this.firestoreService.initUserDetails(this.userUID);
-    */
+    this.showLoadingSpinner = true;
+    this.initAndSubscribeToData(false);
     this.newTodoListNameForm = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
     });
@@ -58,25 +43,24 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.isOnline = online;
       if (!online) {
         if (!this.userTodoLists) {
+          this.showLoadingSpinner = false;
           this.snackBar.open('Offline - must be online to initially load data.', 'Got it', {
             duration: 5000,
           });
         } else {
-          this.snackBar.open('Offline - limited functionality.', 'Got it', {
+          this.snackBar.open('Offline - updates will be sync\'d when back online.', 'Got it', {
             duration: 5000,
           });
         }
       } else if (onlineChangeCount > 0) {
-        console.log('userDetails 1 = ', this.userDetails);
-        console.log('userTodoLists 1 = ', this.userTodoLists);
         if (!this.userDetails) {
-          this.initAndSubscribeToData();
-          // this.firestoreService.initUserDetails(this.userUID);
-          // this.firestoreService.initUserTodoLists(this.userDetails.userDocId);
+          this.showLoadingSpinner = true;
+          this.initAndSubscribeToData(true);
+        } else {
+          this.snackBar.open('Online - full functionality.', 'OK', {
+            duration: 5000,
+          });
         }
-        this.snackBar.open('Online - full functionality.', 'OK', {
-          duration: 5000,
-        });
       }
       onlineChangeCount++;
     });
@@ -94,7 +78,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     }
   }
 
-  initAndSubscribeToData(): void {
+  initAndSubscribeToData(transitionToOnline: boolean): void {
     if (this.userDetailsSub) {
       this.userDetailsSub.unsubscribe();
     }
@@ -103,13 +87,17 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     }
     this.userDetailsSub = this.firestoreService.getUserDetails().subscribe(userDetails => {
       this.userDetails = userDetails[0];
-      console.log('userDetails 0 = ', this.userDetails);
       this.userTodoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
         if (userTodoLists) {
-          this.showTotoListsLoadingSpinner = false;
+          this.showLoadingSpinner = false;
+          if (transitionToOnline) {
+            this.snackBar.open('Online - full functionality.', 'OK', {
+              duration: 5000,
+            });
+            transitionToOnline = false;
+          }
         }
         this.userTodoLists = userTodoLists;
-        console.log('userTodoLists 0 = ', this.userTodoLists);
       });
       if (this.userDetails) {
         this.firestoreService.initUserTodoLists(this.userDetails.userDocId);
@@ -179,14 +167,10 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
       this.showListDetailsIndex = i;
       setTimeout(() => {
-        this.todosComp.editTodoLabel(0);
+        this.todosComp.editTodo(0);
       }, 250);
     }
   }
-  /*
-  cancelEditTodoLabel(): void {
-    this.addingTodoListIndex = -1;
-  } */
 
   confirmDeleteList(i): void {
     const confirmDelete = window.confirm('Confirm Delete ' + this.userTodoLists[i].listName);

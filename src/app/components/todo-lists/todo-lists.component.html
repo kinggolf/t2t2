@@ -1,20 +1,17 @@
-<!--
-<mat-toolbar style="position: sticky; top: 0; z-index: 100; background-color: lightskyblue;">
-  <span>t2t2</span> *ngIf="isOnline" -->
-  <button mat-button [matMenuTriggerFor]="menu"
-          style="position: absolute; right: 0; margin-top: -45px;">
-    <i class="material-icons icon-font-spec-more">more_horiz</i>
-  </button>
-  <mat-menu #menu="matMenu" xPosition="after">
-    <div *ngIf="userTodoLists">
-      <button *ngIf="!creatingNewList" mat-menu-item (click)="createNewList()">
-        Create A New List
-      </button>
-      <button *ngIf="isOnline" mat-menu-item (click)="logout()">Logout</button>
-    </div>
-  </mat-menu>
-<!--
-</mat-toolbar> -->
+<button mat-button [matMenuTriggerFor]="menu"
+        style="position: absolute; right: 0; margin-top: -45px;">
+  <i class="material-icons icon-font-spec-more">more_horiz</i>
+</button>
+<mat-menu #menu="matMenu" xPosition="after">
+  <div *ngIf="userTodoLists">
+    <button *ngIf="!creatingNewList" mat-menu-item (click)="createNewList()">
+      Create A New List
+    </button>
+    <button *ngIf="isOnline" mat-menu-item (click)="logout()">Logout</button>
+  </div>
+</mat-menu>
+
+<mat-spinner *ngIf="showLoadingSpinner" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
 
 <div *ngFor="let todoList of userTodoLists; let i = index;" style="margin-top: 1em;">
   <mat-card *ngIf="editingListNameIndex !== i" style="margin: 1em 0.5em; background-color: lightgray;">
@@ -23,7 +20,6 @@
     </mat-card-header>
 
     <mat-card-content>
-      <mat-spinner *ngIf="showTotoListsLoadingSpinner" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
       <app-todos *ngIf="showListDetailsIndex === i" [userTodoList]="todoList" [userDocId]="userDetails.userDocId"
                  (cancelEditTodoLabel)="addingTodoListIndex = -1">
       </app-todos>

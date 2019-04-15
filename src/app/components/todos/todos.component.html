@@ -4,6 +4,7 @@
       <mat-card-header>
         <mat-card-title style="font-size: 1rem;">{{ todo.label }}</mat-card-title>
       </mat-card-header>
+      <mat-card-content *ngIf="todo.description">{{ todo.description }}</mat-card-content>
       <mat-card-actions>
         <div style="display: table; width: 100%; text-align: center;">
           <div style="display: table-cell; width: 33.3%;">
@@ -14,7 +15,7 @@
             </button>
           </div>
           <div style="display: table-cell; width: 33.3%;">
-            <button (click)="editTodoLabel(i)" class="base-mat-icon" title="Edit Todo Info">
+            <button (click)="editTodo(i)" class="base-mat-icon" title="Edit Todo Info">
               <i class="material-icons icon-font-spec">border_color</i>
               <div>Edit</div>
             </button>
@@ -30,9 +31,12 @@
     </mat-card>
 
     <mat-card *ngIf="editingTodoLabelIndex === i" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
-      <form novalidate [formGroup]="newTodoLabel">
+      <form novalidate [formGroup]="editTodoForm">
         <mat-form-field style="margin-left: 1.2rem;">
-          <input matInput placeholder="Todo Label" formControlName="newLabel">
+          <input matInput placeholder="Label" formControlName="label">
+        </mat-form-field>
+        <mat-form-field style="margin-left: 1.2rem;">
+          <input matInput placeholder="Description" formControlName="description">
         </mat-form-field>
         <mat-card-actions>
           <div style="display: table; width: 100%; text-align: center;">
@@ -41,7 +45,7 @@
                 <button (click)="cancelEditDetails(i)" class="base-mat-icon-text-only">Cancel</button>
               </div>
               <div style="display: table-cell; width: 50%;">
-                <button (click)="saveEditLabel(i)" class="base-mat-icon-text-only" [disabled]="!newTodoLabel.valid">
+                <button (click)="saveEditTodo(i)" class="base-mat-icon-text-only" [disabled]="!editTodoForm.valid">
                   Save
                 </button>
               </div>

@@ -12,16 +12,16 @@ export class TodosComponent implements OnInit {
   @Input() userDocId: string;
   @Output() cancelEditTodoLabel = new EventEmitter();
   editingTodoLabelIndex: number;
-  newTodoLabel: FormGroup;
+  editTodoForm: FormGroup;
 
   constructor(private fb: FormBuilder, private firestoreService: FirestoreService) { }
 
   ngOnInit(): void {
     this.editingTodoLabelIndex = -1;
-    this.newTodoLabel = this.fb.group({
-      newItemLabel: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
+    this.editTodoForm = this.fb.group({
+      label: ['', Validators.compose([Validators.required, Validators.minLength(1)])],
+      description: ['']
     });
-    console.log('In TodosComponent: this.userTodoList = ', this.userTodoList);
   }
 
   toggleTodoComplete(i): void {
@@ -30,9 +30,10 @@ export class TodosComponent implements OnInit {
     this.updateTodoList(i, updatedTodos);
   }
 
-  editTodoLabel(i): void {
-    this.newTodoLabel = this.fb.group({ newLabel: [this.userTodoList.todos[i].label,
-        Validators.compose([Validators.required, Validators.minLength(1)])] });
+  editTodo(i): void {
+    this.editTodoForm = this.fb.group({ label: [this.userTodoList.todos[i].label,
+        Validators.compose([Validators.required, Validators.minLength(1)])],
+      description: [this.userTodoList.todos[i].description] });
     this.editingTodoLabelIndex = i;
   }
 
@@ -45,9 +46,13 @@ export class TodosComponent implements OnInit {
     this.cancelEditTodoLabel.emit();
   }
 
-  saveEditLabel(i): void {
+  saveEditTodo(i): void {
     this.editingTodoLabelIndex = -1;
-    const updatedTodo = { ...this.userTodoList.todos[i], label: this.newTodoLabel.value.newLabel };
+    const updatedTodo = {
+      ...this.userTodoList.todos[i],
+      label: this.editTodoForm.value.label,
+      description: this.editTodoForm.value.description
+    };
     const updatedTodos = [ ...this.userTodoList.todos.slice(0, i), updatedTodo, ...this.userTodoList.todos.slice(i + 1) ];
     this.updateTodoList(i, updatedTodos);
   }
@@ -63,6 +68,7 @@ export class TodosComponent implements OnInit {
   updateTodoList(i, updatedTodos): void {
     const updatedList = { ...this.userTodoList, todos: updatedTodos };
     this.firestoreService.updateTodoList(this.userDocId, this.userTodoList.todoListDocId, updatedList);
+    this.cancelEditTodoLabel.emit();
   }
 
 }
