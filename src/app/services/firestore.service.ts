@@ -129,7 +129,8 @@ export class FirestoreService implements OnDestroy {
     if (this.userTodoListsSub) {
       this.userTodoListsSub.unsubscribe();
     }
-    const userTodoListsRef: AngularFirestoreCollection<TodoListModel> = this.af.collection('users/' + userDocId + '/todoLists');
+    const userTodoListsRef: AngularFirestoreCollection<TodoListModel> = this.af.collection('users/' + userDocId + '/todoLists',
+        lists => lists.orderBy('orderIndex'));
     this.userTodoListsSub = userTodoListsRef.snapshotChanges().pipe(
       map(actions => actions.map(a => {
         const data = a.payload.doc.data() as TodoListModel;
@@ -151,7 +152,7 @@ export class FirestoreService implements OnDestroy {
   createNewTodoList(userDocId: string, listName: string): Promise<string> {
     const userTodoListsRef: AngularFirestoreCollection<TodoListModel> = this.af.collection('users/' + userDocId + '/todoLists');
     // const newTodoList: TodoListModel = { listName: listName };
-    return userTodoListsRef.add({ listName }).then(newTodoListDoc => {
+    return userTodoListsRef.add({ listName, orderIndex: 0 }).then(newTodoListDoc => {
       return newTodoListDoc.id;
     });
   }

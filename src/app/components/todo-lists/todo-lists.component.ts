@@ -107,6 +107,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.userDetails = userDetails[0];
       this.userTodoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
         if (userTodoLists) {
+          console.log('In initAndSubscribeToData, userTodoLists = ', userTodoLists);
           this.showLoadingSpinner = false;
           if (transitionToOnline) {
             this.snackBar.open('Online - full functionality.', 'OK', {
@@ -124,9 +125,33 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     this.firestoreService.initUserDetails(this.userUID);
   }
 
-
   drop(event: CdkDragDrop<TodoListModel[]>) {
-    moveItemInArray(this.userTodoLists, event.previousIndex, event.currentIndex);
+    console.log('In drop, this.userTodoLists 1 = ', this.userTodoLists);
+    // moveItemInArray(this.userTodoLists, event.previousIndex, event.currentIndex);
+    console.log('In drop, event.previousIndex = ', event.previousIndex + ' & event.currentIndex = ', event.currentIndex);
+    console.log('In drop, this.userTodoLists 2 = ', this.userTodoLists);
+    this.moveList(event.previousIndex, event.currentIndex);
+  }
+
+  moveList(prevIndex, curIndex) {
+    if (prevIndex > curIndex) {
+      // Then moving a list up
+      const copyOfTodoList = { ...this.userTodoLists };
+      const movedTodoList = { ...copyOfTodoList[prevIndex], orderIndex: curIndex };
+      const movedTodoListDocId = movedTodoList.todoListDocId;
+      delete movedTodoList.todoListDocId;
+      let tempTodoList: TodoListModel;
+      let tempTodoListDocId: string;
+      for (let i = prevIndex - 1; i > curIndex - 1; i--) {
+        tempTodoList = { ...copyOfTodoList[i], orderIndex: i + 1 };
+        tempTodoListDocId = copyOfTodoList[i].todoListDocId;
+        delete tempTodoList.todoListDocId;
+        console.log('In moveList, i = ', i + ' & tempTodoListDocId = ' + tempTodoListDocId + ' & tempTodoList = ', tempTodoList);
+        this.firestoreService.updateTodoList(this.userDetails.userDocId, tempTodoListDocId, tempTodoList);
+      }
+      console.log('In moveList, movedTodoListDocId = ', movedTodoListDocId + ' & movedTodoList = ', movedTodoList);
+      this.firestoreService.updateTodoList(this.userDetails.userDocId, movedTodoListDocId, movedTodoList);
+    }
   }
 
   showListDetails(i): void {

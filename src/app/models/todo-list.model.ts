@@ -6,4 +6,5 @@ export interface TodoListModel {
   listName: string;
   itemsCompleted?: number;
   itemsPending?: number;
+  orderIndex?: number;
 }
