@@ -151,7 +151,6 @@ export class FirestoreService implements OnDestroy {
 
   createNewTodoList(userDocId: string, listName: string): Promise<string> {
     const userTodoListsRef: AngularFirestoreCollection<TodoListModel> = this.af.collection('users/' + userDocId + '/todoLists');
-    // const newTodoList: TodoListModel = { listName: listName };
     return userTodoListsRef.add({ listName, orderIndex: 0 }).then(newTodoListDoc => {
       return newTodoListDoc.id;
     });

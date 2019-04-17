@@ -3,9 +3,10 @@ import { trigger, animate, style, transition, state } from '@angular/animations'
 import { SubscriptionLike } from 'rxjs';
 import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
+import { TodosUtilService } from '../../services/todos-util.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Platform } from '@angular/cdk/platform';
 import { TodosComponent } from '../todos/todos.component';
 import { TodoListModel, UserModel } from '../../models';
@@ -40,7 +41,8 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   @ViewChild(TodosComponent) private todosComp: TodosComponent;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
-              private fb: FormBuilder, private snackBar: MatSnackBar, private platform: Platform) { }
+              private fb: FormBuilder, private snackBar: MatSnackBar, private platform: Platform,
+              private todosUtilService: TodosUtilService) { }
 
   ngOnInit() {
     this.editingListNameIndex = this.showListDetailsIndex = this.addingTodoListIndex = -1;
@@ -126,32 +128,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   drop(event: CdkDragDrop<TodoListModel[]>) {
-    console.log('In drop, this.userTodoLists 1 = ', this.userTodoLists);
-    // moveItemInArray(this.userTodoLists, event.previousIndex, event.currentIndex);
-    console.log('In drop, event.previousIndex = ', event.previousIndex + ' & event.currentIndex = ', event.currentIndex);
-    console.log('In drop, this.userTodoLists 2 = ', this.userTodoLists);
-    this.moveList(event.previousIndex, event.currentIndex);
-  }
-
-  moveList(prevIndex, curIndex) {
-    if (prevIndex > curIndex) {
-      // Then moving a list up
-      const copyOfTodoList = { ...this.userTodoLists };
-      const movedTodoList = { ...copyOfTodoList[prevIndex], orderIndex: curIndex };
-      const movedTodoListDocId = movedTodoList.todoListDocId;
-      delete movedTodoList.todoListDocId;
-      let tempTodoList: TodoListModel;
-      let tempTodoListDocId: string;
-      for (let i = prevIndex - 1; i > curIndex - 1; i--) {
-        tempTodoList = { ...copyOfTodoList[i], orderIndex: i + 1 };
-        tempTodoListDocId = copyOfTodoList[i].todoListDocId;
-        delete tempTodoList.todoListDocId;
-        console.log('In moveList, i = ', i + ' & tempTodoListDocId = ' + tempTodoListDocId + ' & tempTodoList = ', tempTodoList);
-        this.firestoreService.updateTodoList(this.userDetails.userDocId, tempTodoListDocId, tempTodoList);
-      }
-      console.log('In moveList, movedTodoListDocId = ', movedTodoListDocId + ' & movedTodoList = ', movedTodoList);
-      this.firestoreService.updateTodoList(this.userDetails.userDocId, movedTodoListDocId, movedTodoList);
-    }
+    this.todosUtilService.moveTodoList(
+      event.previousIndex, event.currentIndex, this.userDetails.userDocId, { ...this.userTodoLists}, true
+    );
   }
 
   showListDetails(i): void {
@@ -163,6 +142,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
 
   createNewList(): void {
     this.creatingNewList = true;
+    this.todosUtilService.moveTodoList(
+      this.userTodoLists.length, 0, this.userDetails.userDocId, { ...this.userTodoLists}, false
+    );
     this.firestoreService.createNewTodoList(this.userDetails.userDocId, '').then(newListDocId => {
       let i = 0;
       this.userTodoLists.forEach(todoList => {
@@ -223,7 +205,13 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   confirmDeleteList(i): void {
     const confirmDelete = window.confirm('Confirm Delete ' + this.userTodoLists[i].listName);
     if (confirmDelete) {
-      this.firestoreService.deleteTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId);
+      const deleteTodoListDocId = this.userTodoLists[i].todoListDocId;
+      if (i < this.userTodoLists.length - 1) {
+        this.todosUtilService.moveTodoList(
+          i, this.userTodoLists.length - 1, this.userDetails.userDocId, { ...this.userTodoLists}, false
+        );
+      }
+      this.firestoreService.deleteTodoList(this.userDetails.userDocId, deleteTodoListDocId);
     }
   }
 
