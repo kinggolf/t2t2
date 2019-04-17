@@ -20,7 +20,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.loginTimerExpired = false;
     setTimeout(() => {
       this.loginTimerExpired = true;
-    }, 1000);
+    }, 1500);
     this.currentUserSub = this.firestoreService.getUser().subscribe(user => {
       this.currentUser = user;
       console.log('this.currentUser = ', this.currentUser);

@@ -1,15 +1,27 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
-import { TodoListModel, UserModel } from '../../models';
+import { trigger, animate, style, transition, state } from '@angular/animations';
 import { SubscriptionLike } from 'rxjs';
 import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Platform } from '@angular/cdk/platform';
 import { TodosComponent } from '../todos/todos.component';
+import { TodoListModel, UserModel } from '../../models';
 
 @Component({
   selector: 'app-todo-lists',
-  templateUrl: './todo-lists.component.html'
+  templateUrl: './todo-lists.component.html',
+  animations: [
+    trigger('showTodos', [
+      state('show', style({height: '*', })),
+      state('hide', style({height: '0px'})),
+      transition('hide <=> show', [
+        animate('250ms ease-out')
+      ])
+    ]),
+  ]
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
   userDetails: UserModel;
@@ -28,7 +40,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   @ViewChild(TodosComponent) private todosComp: TodosComponent;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
-              private fb: FormBuilder, private snackBar: MatSnackBar) { }
+              private fb: FormBuilder, private snackBar: MatSnackBar, private platform: Platform) { }
 
   ngOnInit() {
     this.editingListNameIndex = this.showListDetailsIndex = this.addingTodoListIndex = -1;
@@ -64,6 +76,12 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       }
       onlineChangeCount++;
     });
+    const isInStandaloneMode = () => ('standalone' in (window as any).navigator) && ((window as any).navigator.standalone);
+    if (this.platform.IOS && !isInStandaloneMode()) {
+      this.snackBar.open('Add to Home Screen by tapping share icon below and then Add to Home Screen', 'Got it', {
+        duration: 8000,
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -104,6 +122,11 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       }
     });
     this.firestoreService.initUserDetails(this.userUID);
+  }
+
+
+  drop(event: CdkDragDrop<TodoListModel[]>) {
+    moveItemInArray(this.userTodoLists, event.previousIndex, event.currentIndex);
   }
 
   showListDetails(i): void {

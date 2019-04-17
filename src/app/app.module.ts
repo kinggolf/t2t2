@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule, MatInputModule, MatFormFieldModule, MatCardModule, MatSnackBarModule,
          MatToolbarModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule } from '@angular/material';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { PlatformModule } from '@angular/cdk/platform';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
@@ -25,6 +27,7 @@ import { TodosComponent } from './components/todos/todos.component';
     BrowserModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     BrowserAnimationsModule,
+    DragDropModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatInputModule,
@@ -33,6 +36,7 @@ import { TodosComponent } from './components/todos/todos.component';
     MatToolbarModule,
     MatMenuModule,
     MatDialogModule,
+    PlatformModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),

@@ -6,12 +6,24 @@ body {
   font-family: "Raleway";
   font-size: 20px;
 }
+/*
+.mat-card-header-text {
+  margin: 0;
+} */
 .base-mat-icon {
   border: none;
   background-color: transparent;
   font-size: 0.6rem;
   text-align: center;
   outline: none;
+}
+.base-mat-icon-hide {
+  border: none;
+  background-color: transparent;
+  font-size: 0.6rem;
+  text-align: center;
+  outline: none;
+  display: none;
 }
 .base-mat-icon-text-only {
   border: none;
@@ -36,4 +48,12 @@ body {
   background-color: #ffffff;
   font-size: 12pt;
   font-weight: bold;
+}
+.todoListsFooter {
+  display: table-cell;
+  width: 16.66%;
+}
+.removeDragHandle {
+  width: 16.66%;
+  display: none;
 }

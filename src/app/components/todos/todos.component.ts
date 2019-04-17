@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { TodoListModel } from '../../models';
+import { TodoListModel, TodoModel } from '../../models';
 import { FirestoreService } from '../../services/firestore.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-todos',
@@ -22,6 +23,10 @@ export class TodosComponent implements OnInit {
       label: ['', Validators.compose([Validators.required, Validators.minLength(1)])],
       description: ['']
     });
+  }
+
+  drop(event: CdkDragDrop<TodoModel[]>) {
+    moveItemInArray(this.userTodoList.todos, event.previousIndex, event.currentIndex);
   }
 
   toggleTodoComplete(i): void {

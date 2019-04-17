@@ -12,75 +12,85 @@
 </mat-menu>
 
 <mat-spinner *ngIf="showLoadingSpinner" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
+<div cdkDropList (cdkDropListDropped)="drop($event)">
+  <div *ngFor="let todoList of userTodoLists; let i = index;" style="margin-top: 1em;"
+       cdkDragDisabled="{{ editingListNameIndex > -1 || showListDetailsIndex > -1 || addingTodoListIndex > -1 }}"
+       cdkDragLockAxis="y" cdkDrag>
+    <mat-card *ngIf="editingListNameIndex !== i"
+              style="margin: 1em 0.5em; background-color: lightgray; padding: 0.5em 0;">
 
-<div *ngFor="let todoList of userTodoLists; let i = index;" style="margin-top: 1em;">
-  <mat-card *ngIf="editingListNameIndex !== i" style="margin: 1em 0.5em; background-color: lightgray;">
-    <mat-card-header (click)="showListDetails(i)">
-      <mat-card-title>{{ todoList.listName }}</mat-card-title>
-    </mat-card-header>
+      <mat-card-header (click)="showListDetails(i)" style="margin: 0;">
+        <mat-card-title style="margin-bottom: 6px; font-size: 0.8em;">{{ todoList.listName }}</mat-card-title>
+      </mat-card-header>
 
-    <mat-card-content>
-      <app-todos *ngIf="showListDetailsIndex === i" [userTodoList]="todoList" [userDocId]="userDetails.userDocId"
-                 (cancelEditTodoLabel)="addingTodoListIndex = -1">
-      </app-todos>
-    </mat-card-content>
-
-    <mat-card-actions>
-      <div style="display: table; width: 100%; text-align: center;">
-        <div style="display: table-cell; width: 20%;">
-          <div class="base-mat-icon">
-            <div class="icon-font-spec">{{ todoList.itemsCompleted }}</div>
-            <div>Completed</div>
-          </div>
+      <mat-card-content style="margin-bottom: 0;">
+        <div [@showTodos]="showListDetailsIndex === i ? 'show' : 'hide'" style="overflow: hidden;">
+          <app-todos [userTodoList]="todoList" [userDocId]="userDetails.userDocId"
+                     (cancelEditTodoLabel)="addingTodoListIndex = -1">
+          </app-todos>
         </div>
-        <div style="display: table-cell; width: 20%;">
-          <div class="base-mat-icon">
-            <div class="icon-font-spec">{{ todoList.itemsPending }}</div>
-            <div>Pending</div>
-          </div>
-        </div>
-        <div style="display: table-cell; width: 20%;">
-          <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name">
-            <i class="material-icons icon-font-spec">border_color</i>
-            <div>Edit List Name</div>
-          </button>
-        </div>
-        <div style="display: table-cell; width: 20%;">
-          <button (click)="addNewTodo(i)" class="base-mat-icon" title="Add Todo">
-            <i class="material-icons icon-font-spec">add_circle</i>
-            <div>Add Todo</div>
-          </button>
-        </div>
-        <div style="display: table-cell; width: 20%;">
-          <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List">
-            <i class="material-icons icon-font-spec">delete</i>
-            <div>Delete List</div>
-          </button>
-        </div>
-      </div>
-
-    </mat-card-actions>
-  </mat-card>
-
-  <mat-card *ngIf="editingListNameIndex === i" style="margin: 2rem 0.5rem; background-color: lightgray;">
-    <form novalidate [formGroup]="newTodoListNameForm">
-      <mat-form-field style="margin-left: 1.2rem;">
-        <input matInput placeholder="List Name" formControlName="newListName">
-      </mat-form-field>
+      </mat-card-content>
 
       <mat-card-actions>
         <div style="display: table; width: 100%; text-align: center;">
-          <div style="display: table-cell; width: 50%;">
-            <button (click)="cancelEditListName(i)" class="base-mat-icon-text-only">Cancel</button>
-          </div>
-          <div style="display: table-cell; width: 50%;">
-            <button (click)="saveListName(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListNameForm.valid">
-              Save
+          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
+            <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name">
+              <i class="material-icons icon-font-spec">border_color</i>
             </button>
           </div>
+          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
+            <button (click)="addNewTodo(i)" class="base-mat-icon" title="Add Todo">
+              <i class="material-icons icon-font-spec">add_circle</i>
+            </button>
+          </div>
+          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
+            <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List">
+              <i class="material-icons icon-font-spec">delete</i>
+            </button>
+          </div>
+          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;" cdkDragHandle>
+            <button [ngClass]="editingListNameIndex === -1 && showListDetailsIndex === -1 && addingTodoListIndex === -1
+                               ? 'base-mat-icon' : 'base-mat-icon-hide'">
+              <i class="material-icons icon-font-spec">drag_indicator</i>
+            </button>
+          </div>
+          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
+            <div class="base-mat-icon">
+              <div>Completed</div>
+              <div class="icon-font-spec">{{ todoList.itemsCompleted }}</div>
+            </div>
+          </div>
+          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
+            <div class="base-mat-icon">
+              <div>Pending</div>
+              <div class="icon-font-spec">{{ todoList.itemsPending }}</div>
+            </div>
+          </div>
         </div>
-      </mat-card-actions>
 
-    </form>
-  </mat-card>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card *ngIf="editingListNameIndex === i" style="margin: 2rem 0.5rem; background-color: lightgray;">
+      <form novalidate [formGroup]="newTodoListNameForm">
+        <mat-form-field style="margin-left: 1.2rem;">
+          <input matInput placeholder="List Name" formControlName="newListName">
+        </mat-form-field>
+
+        <mat-card-actions>
+          <div style="display: table; width: 100%; text-align: center;">
+            <div style="display: table-cell; width: 50%;">
+              <button (click)="cancelEditListName(i)" class="base-mat-icon-text-only">Cancel</button>
+            </div>
+            <div style="display: table-cell; width: 50%;">
+              <button (click)="saveListName(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListNameForm.valid">
+                Save
+              </button>
+            </div>
+          </div>
+        </mat-card-actions>
+
+      </form>
+    </mat-card>
+  </div>
 </div>
