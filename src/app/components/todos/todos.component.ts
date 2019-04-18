@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { TodoListModel, TodoModel } from '../../models';
 import { FirestoreService } from '../../services/firestore.service';
+import { TodosUtilService } from '../../services/todos-util.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
@@ -15,7 +16,7 @@ export class TodosComponent implements OnInit {
   editingTodoLabelIndex: number;
   editTodoForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private firestoreService: FirestoreService) { }
+  constructor(private fb: FormBuilder, private firestoreService: FirestoreService, private todosUtilService: TodosUtilService) {}
 
   ngOnInit(): void {
     this.editingTodoLabelIndex = -1;
@@ -26,39 +27,7 @@ export class TodosComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<TodoModel[]>) {
-    this.moveTodo(event.previousIndex, event.currentIndex);
-  }
-
-  moveTodo(prevIndex, curIndex) {
-    const copyOfTodos = [ ...this.userTodoList.todos ];
-    let tempTodo: TodoModel[];
-    let reorderedTodos: TodoModel[];
-    if (prevIndex < copyOfTodos.length - 1) {
-      tempTodo = copyOfTodos.slice(prevIndex, prevIndex + 1);
-    } else {
-      tempTodo = copyOfTodos.slice(prevIndex);
-    }
-    if (prevIndex > curIndex) {
-      // Then moving an item up
-      reorderedTodos = [
-        ...copyOfTodos.slice(0, curIndex),
-        ...tempTodo,
-        ...copyOfTodos.slice(curIndex, prevIndex),
-        ...copyOfTodos.slice(prevIndex + 1)
-      ];
-      const updatedList = { ...this.userTodoList, todos: reorderedTodos };
-      this.firestoreService.updateTodoList(this.userDocId, this.userTodoList.todoListDocId, updatedList);
-    } else if (prevIndex < curIndex) {
-      // Then moving an item down
-      reorderedTodos = [
-        ...copyOfTodos.slice(0, prevIndex),
-        ...copyOfTodos.slice(prevIndex + 1, curIndex + 1),
-        ...tempTodo,
-        ...copyOfTodos.slice(curIndex + 1)
-      ];
-      const updatedList = { ...this.userTodoList, todos: reorderedTodos };
-      this.firestoreService.updateTodoList(this.userDocId, this.userTodoList.todoListDocId, updatedList);
-    }
+    this.todosUtilService.moveTodo(event.previousIndex, event.currentIndex, this.userDocId, this.userTodoList, true);
   }
 
   toggleTodoComplete(i): void {

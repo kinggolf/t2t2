@@ -33,11 +33,11 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   newTodoListNameForm: FormGroup;
   showLoadingSpinner: boolean;
   isOnline: boolean;
-  @Input() userUID: string;
   creatingNewList: boolean;
   editingListNameIndex: number;
   showListDetailsIndex: number;
   addingTodoListIndex: number;
+  @Input() userUID: string;
   @ViewChild(TodosComponent) private todosComp: TodosComponent;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
