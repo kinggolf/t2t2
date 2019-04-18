@@ -23,7 +23,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }, 1500);
     this.currentUserSub = this.firestoreService.getUser().subscribe(user => {
       this.currentUser = user;
-      console.log('this.currentUser = ', this.currentUser);
+      // console.log('this.currentUser = ', this.currentUser);
     });
     this.firestoreService.initAuthState();
     this.isOnline$ = this.appHealthService.monitorOnline();

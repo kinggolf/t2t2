@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ViewChildren, QueryList } from '@angular/core';
 import { trigger, animate, style, transition, state } from '@angular/animations';
 import { SubscriptionLike } from 'rxjs';
 import { FirestoreService } from '../../services/firestore.service';
@@ -38,7 +38,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   showListDetailsIndex: number;
   addingTodoListIndex: number;
   @Input() userUID: string;
-  @ViewChild(TodosComponent) private todosComp: TodosComponent;
+  @ViewChildren(TodosComponent) todosComps: QueryList<TodosComponent>;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
               private fb: FormBuilder, private snackBar: MatSnackBar, private platform: Platform,
@@ -109,7 +109,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.userDetails = userDetails[0];
       this.userTodoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
         if (userTodoLists) {
-          console.log('In initAndSubscribeToData, userTodoLists = ', userTodoLists);
+          // console.log('In initAndSubscribeToData, userTodoLists = ', userTodoLists);
           this.showLoadingSpinner = false;
           if (transitionToOnline) {
             this.snackBar.open('Online - full functionality.', 'OK', {
@@ -197,7 +197,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
       this.showListDetailsIndex = i;
       setTimeout(() => {
-        this.todosComp.editTodo(0);
+        this.todosComps.toArray()[i].editTodo(0);
       }, 250);
     }
   }
