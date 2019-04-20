@@ -1,4 +1,4 @@
-<div *ngIf="showLogin" class="formOuter formBasic">
+<div *ngIf="showLogin" class="formOuter formBasic screenMargin">
   <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Login</p>
 
   <form (ngSubmit)="submitLogin()" novalidate [formGroup]="loginForm">
@@ -17,11 +17,6 @@
   <p style="text-align:center; font-size: 1em; margin: 0.5em 0;">- Or -</p>
 
   <div class="forminnercont">
-    <!--
-    <button mat-button (click)="googleSignIn()"
-            style="width: 80%; margin: 1em 10%; border: red solid 1px; color: red;">
-      Login with Google
-    </button> -->
     <button mat-button (click)="googleSignIn()"
             style="width: 80%; margin: 1em 10%; border: #673ab7 solid 1px; color: #673ab7;">
       Login with Google
@@ -38,7 +33,7 @@
   </button>
 </div>
 
-<div *ngIf="!showLogin" class="formOuter formBasic">
+<div *ngIf="!showLogin" class="formOuter formBasic screenMargin">
   <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Register</p>
 
   <form (ngSubmit)="submitRegister()" novalidate [formGroup]="registerForm">
@@ -61,11 +56,6 @@
   <p style="text-align:center; font-size: 1em; margin: 0.5em 0;">- Or -</p>
 
   <div class="forminnercont">
-    <!--
-    <button mat-button (click)="googleSignIn()"
-            style="width: 80%; margin: 1em 10%; border: red solid 1px; color: red;">
-      Register with Google
-    </button> -->
     <button mat-button (click)="googleSignIn()"
             style="width: 80%; margin: 1em 10%; border: #673ab7 solid 1px; color: #673ab7;">
       Register with Google

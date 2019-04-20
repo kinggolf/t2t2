@@ -97,6 +97,15 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.isOnlineSub.unsubscribe();
     }
   }
+  /* import HostListener
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    // console.log(event);
+    console.log('In keyEvent, this.editingListNameIndex = ', this.editingListNameIndex);
+    if (event.key === 'Enter') {
+      // this.saveListName(this.editingListNameIndex);
+    }
+  } */
 
   initAndSubscribeToData(transitionToOnline: boolean): void {
     if (this.userDetailsSub) {
@@ -169,12 +178,12 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     this.editingListNameIndex = i;
   }
 
-  saveListName(i): void {
+  saveListName(i: number): void {
     this.creatingNewList = false;
-    this.editingListNameIndex = -1;
-    const updatedList = { ...this.userTodoLists[i], listName: this.newTodoListNameForm.value.newListName };
+    const updatedList = {...this.userTodoLists[i], listName: this.newTodoListNameForm.value.newListName};
     this.firestoreService.updateTodoList(this.userDetails.userDocId, this.userTodoLists[i].todoListDocId, updatedList);
     this.newTodoListNameForm.setValue({ newListName: '' });
+    this.editingListNameIndex = -1;
   }
 
   cancelEditListName(i): void {

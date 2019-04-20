@@ -50,12 +50,12 @@
             <div style="display: table; width: 100%; text-align: center;">
               <div style="display: table; width: 100%; text-align: center;">
                 <div style="display: table-cell; width: 50%;">
-                  <button (click)="cancelEditDetails(i)" class="base-mat-icon-text-only">Cancel</button>
-                </div>
-                <div style="display: table-cell; width: 50%;">
                   <button (click)="saveEditTodo(i)" class="base-mat-icon-text-only" [disabled]="!editTodoForm.valid">
                     Save
                   </button>
+                </div>
+                <div style="display: table-cell; width: 50%;">
+                  <button (click)="cancelEditDetails(i)" class="base-mat-icon-text-only">Cancel</button>
                 </div>
               </div>
             </div>

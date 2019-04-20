@@ -6,10 +6,25 @@ body {
   font-family: "Raleway";
   font-size: 20px;
 }
-/*
-.mat-card-header-text {
-  margin: 0;
-} */
+p, div, span {
+  font-family: "Raleway";
+}
+
+@media screen and (min-width: 781px) {
+  .screenMargin {
+    margin: 0 15%;
+  }
+}
+@media screen and (min-width: 481px) and (max-width: 780px) {
+  .screenMargin {
+    margin: 0 7.5%;
+  }
+}
+@media screen and (max-width: 480px) {
+  .screenMargin {
+    margin: 0;
+  }
+}
 .base-mat-icon {
   border: none;
   background-color: transparent;
@@ -39,7 +54,7 @@ body {
 }
 .formOuter {
   border: thin solid #212CC2;
-  margin: 20px 0;
+  margin-top: 1em;
   padding: 5px;
   color: #212CC2;
 }
