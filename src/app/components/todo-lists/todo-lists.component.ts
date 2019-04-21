@@ -14,6 +14,7 @@ import { TodoListModel, UserModel } from '../../models';
 @Component({
   selector: 'app-todo-lists',
   templateUrl: './todo-lists.component.html',
+  styleUrls: ['../../app.component.css', './todo-lists.component.css'],
   animations: [
     trigger('showTodos', [
       state('show', style({height: '*', })),

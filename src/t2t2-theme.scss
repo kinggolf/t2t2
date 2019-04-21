@@ -1,0 +1,16 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+$t2t2-primary: mat-palette($mat-brown, 600);
+$t2t2-accent: mat-palette($mat-gray, 900);
+$t2t2-warn: mat-palette($mat-blue, 900);
+/* #673ab7, #3f51b5, #0d47a1 */
+
+/*$t2t2-primary: mat-palette($mat-deep-purple, 500);
+$t2t2-accent: mat-palette($mat-indigo, 500);
+$t2t2-warn: mat-palette($mat-blue, 900);*/
+/* #673ab7, #3f51b5, #0d47a1 */
+
+$t2t2-theme: mat-light-theme($t2t2-primary, $t2t2-accent, $t2t2-warn);
+@include angular-material-theme($t2t2-theme);

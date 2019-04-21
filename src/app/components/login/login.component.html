@@ -1,4 +1,4 @@
-<div *ngIf="showLogin" class="formOuter formBasic screenMargin">
+<div *ngIf="showLogin" class="formOuter screenMarginLogin">
   <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Login</p>
 
   <form (ngSubmit)="submitLogin()" novalidate [formGroup]="loginForm">
@@ -8,7 +8,7 @@
     <mat-form-field style="width: 90%">
       <input type="password" matInput formControlName="password" placeholder="Password">
     </mat-form-field>
-    <button mat-button type="submit" [disabled]="!loginForm.valid"
+    <button mat-button type="submit" color="accent" [disabled]="!loginForm.valid"
             style="width: 80%; margin: 0 10%; border: #673ab7 solid 1px;">
       Submit
     </button>
@@ -33,7 +33,7 @@
   </button>
 </div>
 
-<div *ngIf="!showLogin" class="formOuter formBasic screenMargin">
+<div *ngIf="!showLogin" class="formOuter screenMarginLogin">
   <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Register</p>
 
   <form (ngSubmit)="submitRegister()" novalidate [formGroup]="registerForm">
@@ -47,7 +47,7 @@
       <input type="password" matInput formControlName="confirmPassword"
              placeholder="Confirm Password (Must match password)">
     </mat-form-field>
-    <button mat-button type="submit" [disabled]="!registerForm.valid"
+    <button class="sgbtn1" mat-button type="submit" [disabled]="!registerForm.valid"
             style="width: 80%; margin: 0 10%; border: #673ab7 solid 1px;">
       Submit
     </button>

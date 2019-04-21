@@ -2,8 +2,7 @@
   <div cdkDropList (cdkDropListDropped)="drop($event)">
     <div *ngFor="let todo of userTodoList.todos; let i = index;"
          cdkDragDisabled="{{ editingTodoLabelIndex > -1 }}" cdkDragLockAxis="y" cdkDrag>
-      <mat-card *ngIf="editingTodoLabelIndex !== i"
-                style="margin: 0.25rem 0.5rem; background-color: lightblue; padding: 0.5em 0;">
+      <mat-card *ngIf="editingTodoLabelIndex !== i">
         <mat-card-header style="margin: 0;">
           <mat-card-title style="margin-bottom: 6px; font-size: 1em;">{{ todo.label }}</mat-card-title>
         </mat-card-header>
@@ -11,28 +10,32 @@
           {{ todo.description }}
         </mat-card-content>
         <mat-card-actions style="margin-bottom: 0;">
-          <div style="display: table; width: 100%; text-align: center;">
-            <div style="display: table-cell; width: 25%; vertical-align: bottom;">
-              <button (click)="editTodo(i)" class="base-mat-icon" title="Edit Todo Info">
-                <i class="material-icons icon-font-spec">border_color</i>
+          <div class="actionRow">
+            <div class="actionCell16">
+              <button (click)="editTodo(i)" class="baseMatIconTodos" title="Edit Todo Info">
+                <i class="material-icons iconFontSpec">border_color</i>
               </button>
             </div>
-            <div style="display: table-cell; width: 25%; vertical-align: bottom;">
-              <button (click)="deleteTodo(i)" class="base-mat-icon" title="Delete Todo">
-                <i class="material-icons icon-font-spec">delete</i>
+            <div class="actionCell16">
+              <button (click)="deleteTodo(i)" class="baseMatIconTodos" title="Delete Todo">
+                <i class="material-icons iconFontSpec">delete</i>
               </button>
             </div>
-            <div style="display: table-cell; width: 25%; vertical-align: bottom;">
-              <div [ngClass]="editingTodoLabelIndex === -1 ? 'base-mat-icon' : 'base-mat-icon-hide'" cdkDragHandle>
-                <i class="material-icons icon-font-spec">drag_indicator</i>
+            <div class="actionCell16">
+              <div [ngClass]="editingTodoLabelIndex === -1 ? 'baseMatIconTodos' : 'baseMatIconHide'" cdkDragHandle>
+                <i class="material-icons iconFontSpec">drag_indicator</i>
               </div>
             </div>
-            <div style="display: table-cell; width: 25%; vertical-align: bottom;">
+            <div class="actionCell33">
+              <mat-checkbox (click)="toggleTodoComplete(i)" class="baseMatIconTodos" [checked]="todo.completed">
+                Complete
+              </mat-checkbox>
+              <!--
               <button (click)="toggleTodoComplete(i)" class="base-mat-icon" title="Completed">
                 <div>Complete</div>
                 <i *ngIf="todo.completed" class="material-icons icon-font-spec">check_box</i>
                 <i *ngIf="!todo.completed" class="material-icons icon-font-spec">check_box_outline_blank</i>
-              </button>
+              </button> -->
             </div>
           </div>
         </mat-card-actions>
@@ -50,12 +53,12 @@
             <div style="display: table; width: 100%; text-align: center;">
               <div style="display: table; width: 100%; text-align: center;">
                 <div style="display: table-cell; width: 50%;">
-                  <button (click)="saveEditTodo(i)" class="base-mat-icon-text-only" [disabled]="!editTodoForm.valid">
+                  <button (click)="saveEditTodo(i)" class="baseMatIconTextOnly" [disabled]="!editTodoForm.valid">
                     Save
                   </button>
                 </div>
                 <div style="display: table-cell; width: 50%;">
-                  <button (click)="cancelEditDetails(i)" class="base-mat-icon-text-only">Cancel</button>
+                  <button (click)="cancelEditDetails(i)" class="baseMatIconTextOnly">Cancel</button>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 <button mat-button [matMenuTriggerFor]="menu"
         style="position: absolute; right: 0; margin-top: -45px;">
-  <i class="material-icons icon-font-spec-more">more_horiz</i>
+  <i class="material-icons iconFontSpecMore">more_horiz</i>
 </button>
 <mat-menu #menu="matMenu" xPosition="after">
   <div *ngIf="userTodoLists">
@@ -16,11 +16,12 @@
   <div *ngFor="let todoList of userTodoLists; let i = index;" style="margin-top: 1em;"
        cdkDragDisabled="{{ editingListNameIndex > -1 || showListDetailsIndex > -1 || addingTodoListIndex > -1 }}"
        cdkDragLockAxis="y" cdkDrag>
-    <mat-card *ngIf="editingListNameIndex !== i"
-              style="margin: 1em 0.5em; background-color: lightgray; padding: 0.5em 0;">
+    <mat-card *ngIf="editingListNameIndex !== i">
 
       <mat-card-header (click)="showListDetails(i)" style="margin: 0;">
-        <mat-card-title style="margin-bottom: 6px; font-size: 0.8em;">{{ todoList.listName }}</mat-card-title>
+        <mat-card-title style="margin-bottom: 6px; font-size: 0.8em; color: #6D4C41;">
+          {{ todoList.listName }}
+        </mat-card-title>
       </mat-card-header>
 
       <mat-card-content style="margin-bottom: 0;">
@@ -32,38 +33,38 @@
       </mat-card-content>
 
       <mat-card-actions>
-        <div style="display: table; width: 100%; text-align: center;">
-          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
-            <button (click)="editListName(i)" class="base-mat-icon" title="Edit Name">
-              <i class="material-icons icon-font-spec">border_color</i>
+        <div class="actionRow">
+          <div class="actionCell16">
+            <button (click)="editListName(i)" class="baseMatIconLists" title="Edit Name">
+              <i class="material-icons iconFontSpec">border_color</i>
             </button>
           </div>
-          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
-            <button (click)="addNewTodo(i)" class="base-mat-icon" title="Add Todo">
-              <i class="material-icons icon-font-spec">add_circle</i>
+          <div class="actionCell16">
+            <button (click)="addNewTodo(i)" class="baseMatIconLists" title="Add Todo">
+              <i class="material-icons iconFontSpec">add_circle</i>
             </button>
           </div>
-          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
-            <button (click)="confirmDeleteList(i)" class="base-mat-icon" title="Delete List">
-              <i class="material-icons icon-font-spec">delete</i>
+          <div class="actionCell16">
+            <button (click)="confirmDeleteList(i)" class="baseMatIconLists" title="Delete List">
+              <i class="material-icons iconFontSpec">delete</i>
             </button>
           </div>
-          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;" cdkDragHandle>
+          <div class="actionCell16" cdkDragHandle>
             <button [ngClass]="editingListNameIndex === -1 && showListDetailsIndex === -1 && addingTodoListIndex === -1
-                               ? 'base-mat-icon' : 'base-mat-icon-hide'">
-              <i class="material-icons icon-font-spec">drag_indicator</i>
+                               ? 'baseMatIconLists' : 'baseMatIconHide'">
+              <i class="material-icons iconFontSpec">drag_indicator</i>
             </button>
           </div>
-          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
-            <div class="base-mat-icon">
+          <div class="actionCell16">
+            <div class="baseMatIconLists">
               <div>Completed</div>
-              <div class="icon-font-spec">{{ todoList.itemsCompleted }}</div>
+              <div class="iconFontSpec">{{ todoList.itemsCompleted }}</div>
             </div>
           </div>
-          <div style="display: table-cell; width: 16.66%; vertical-align: bottom;">
-            <div class="base-mat-icon">
+          <div class="actionCell16">
+            <div class="baseMatIconLists">
               <div>Pending</div>
-              <div class="icon-font-spec">{{ todoList.itemsPending }}</div>
+              <div class="iconFontSpec">{{ todoList.itemsPending }}</div>
             </div>
           </div>
         </div>
@@ -80,12 +81,12 @@
         <mat-card-actions>
           <div style="display: table; width: 100%; text-align: center;">
             <div style="display: table-cell; width: 50%;">
-              <button (click)="saveListName(i)" class="base-mat-icon-text-only" [disabled]="!newTodoListNameForm.valid">
+              <button (click)="saveListName(i)" class="baseMatIconTextOnly" [disabled]="!newTodoListNameForm.valid">
                 Save
               </button>
             </div>
             <div style="display: table-cell; width: 50%;">
-              <button (click)="cancelEditListName(i)" class="base-mat-icon-text-only">Cancel</button>
+              <button (click)="cancelEditListName(i)" class="baseMatIconTextOnly">Cancel</button>
             </div>
           </div>
         </mat-card-actions>

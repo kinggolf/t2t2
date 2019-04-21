@@ -7,7 +7,8 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-todos',
-  templateUrl: './todos.component.html'
+  templateUrl: './todos.component.html',
+  styleUrls: ['../../app.component.css', './todos.component.css'],
 })
 export class TodosComponent implements OnInit {
   @Input() userTodoList: TodoListModel;

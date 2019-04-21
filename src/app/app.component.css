@@ -1,0 +1,53 @@
+.baseMatIconLists {
+  border: none;
+  background-color: transparent;
+  font-size: 0.5rem;
+  font-weight: bold;
+  text-align: center;
+  outline: none;
+  color: #6D4C41;
+}
+.baseMatIconTodos {
+  border: none;
+  background-color: transparent;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-align: center;
+  outline: none;
+  color: black;
+}
+.baseMatIconHide {
+  border: none;
+  background-color: transparent;
+  text-align: center;
+  outline: none;
+  display: none;
+}
+.baseMatIconTextOnly {
+  border: none;
+  background-color: transparent;
+  font-size: 1.6rem;
+  text-align: center;
+}
+.iconFontSpec {
+  font-size: 0.9rem;
+}
+.iconFontSpecMore {
+  font-size: 2.5rem;
+  color: #ffffff;
+}
+.actionRow {
+  display: table;
+  width: 100%;
+  text-align: center;
+}
+.actionCell16 {
+  display: table-cell;
+  width: 16.66%;
+  vertical-align: bottom;
+}
+.actionCell33 {
+  display: table-cell;
+  width: 33.33%;
+  vertical-align: bottom;
+}
