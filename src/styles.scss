@@ -12,9 +12,6 @@ body {
 p, div, span {
   font-family: "Raleway";
 }
-.mat-card-title {
-  color: #000000;
-}
 
 @media screen and (min-width: 781px) {
   .screenMargin {
@@ -40,42 +37,3 @@ p, div, span {
     margin: 0 1em;
   }
 }
-
-.formOuter {
-  border: thin solid #3f51b5;
-  color: #3f51b5;
-  background-color: #ffffff;
-  margin-top: 1em;
-  padding: 5px;
-  font-size: 0.6em;
-  font-weight: bold;
-}
-/*
-.sgbtn1 {
-  background-color: #0b2db5;
-  color: #ffffff;
-}
-.sgbtn1:disabled {
-  background-color: #b9daf0;
-  color: #ffffff;
-}
-*/
-/*
-.formOuter {
-  border: thin solid #212CC2;
-  margin-top: 1em;
-  padding: 5px;
-  color: #212CC2;
-  background-color: #ffffff;
-  font-size: 0.6em;
-  font-weight: bold;
-}
-.sgbtn1 {
-  background-color: #0b2db5;
-  color: #ffffff;
-}
-.sgbtn1:disabled {
-  background-color: #b9daf0;
-  color: #ffffff;
-}
- */

@@ -3,6 +3,8 @@ import { SubscriptionLike, Observable } from 'rxjs';
 import * as firebase from 'firebase/app';
 import { FirestoreService } from './services/firestore.service';
 import { AppHealthService } from './services/app-health.service';
+import { MatBottomSheet } from '@angular/material';
+import { WizardComponent } from './components/wizard/wizard.component';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +16,8 @@ export class AppComponent implements OnInit, OnDestroy {
   isOnline$: Observable<boolean>;
   loginTimerExpired: boolean;
 
-  constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService) {}
+  constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
+              private bottomSheet: MatBottomSheet) {}
 
   ngOnInit(): void {
     this.loginTimerExpired = false;
@@ -33,6 +36,10 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.currentUserSub) {
       this.currentUserSub.unsubscribe();
     }
+  }
+
+  showHelp() {
+    this.bottomSheet.open(WizardComponent);
   }
 
 }

@@ -1,68 +1,63 @@
 <div *ngIf="showLogin" class="formOuter screenMarginLogin">
-  <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Login</p>
+  <p class="logRegP">Login</p>
 
   <form (ngSubmit)="submitLogin()" novalidate [formGroup]="loginForm">
-    <mat-form-field style="width: 90%">
-      <input type="email" matInput formControlName="email" placeholder="Email">
+    <mat-form-field>
+      <input type="email" matInput formControlName="email" placeholder="Email (Must be a valid email)">
     </mat-form-field>
-    <mat-form-field style="width: 90%">
-      <input type="password" matInput formControlName="password" placeholder="Password">
+    <mat-form-field>
+      <input type="password" matInput formControlName="password" placeholder="Password (At least 5 characters)">
     </mat-form-field>
-    <button mat-button type="submit" color="accent" [disabled]="!loginForm.valid"
-            style="width: 80%; margin: 0 10%; border: #673ab7 solid 1px;">
+    <button mat-button type="submit" [disabled]="!loginForm.valid" class="logRegBtn logRegMrg0">
       Submit
     </button>
   </form>
 
-  <p style="text-align:center; font-size: 1em; margin: 0.5em 0;">- Or -</p>
+  <p class="logRegP">- Or -</p>
 
   <div class="forminnercont">
-    <button mat-button (click)="googleSignIn()"
-            style="width: 80%; margin: 1em 10%; border: #673ab7 solid 1px; color: #673ab7;">
+    <button mat-button (click)="googleSignIn()" class="logRegBtn logRegMrg1">
       Login with Google
     </button>
   </div>
 
-  <div style="text-align: center; margin: 0.75em 0;">
-    <span class="formLogin" style="cursor: pointer;" (click)="forgotPassword()">Forgot password</span>
+  <div style="text-align: center; font-size: 1rem;  margin: 0.75rem 0;">
+    <span style="cursor: pointer;" (click)="forgotPassword()">Forgot password</span>
   </div>
 
-  <button mat-button (click)="this.showLogin = false"
-          style="width: 80%; margin: 1em 10% 2em; border: #673ab7 solid 1px;">
+  <button mat-button (click)="this.showLogin = false" class="logRegBtn logRegMrg1">
     New User? Register Here
   </button>
 </div>
 
 <div *ngIf="!showLogin" class="formOuter screenMarginLogin">
-  <p style="text-align: center; font-size: 1.2em; margin: 1em 0;">Register</p>
+  <p class="logRegP">Register</p>
 
   <form (ngSubmit)="submitRegister()" novalidate [formGroup]="registerForm">
-    <mat-form-field style="width: 90%">
+    <mat-form-field>
       <input type="email" matInput formControlName="email" placeholder="Email (Must be a valid email)">
     </mat-form-field>
-    <mat-form-field style="width: 90%">
+    <mat-form-field>
       <input type="password" matInput formControlName="password" placeholder="Password (At least 5 characters)">
     </mat-form-field>
-    <mat-form-field style="width: 90%">
+    <mat-form-field>
       <input type="password" matInput formControlName="confirmPassword"
              placeholder="Confirm Password (Must match password)">
     </mat-form-field>
-    <button class="sgbtn1" mat-button type="submit" [disabled]="!registerForm.valid"
-            style="width: 80%; margin: 0 10%; border: #673ab7 solid 1px;">
+    <button mat-button type="submit" [disabled]="!registerForm.valid" class="logRegBtn logRegMrg0">
       Submit
     </button>
   </form>
 
-  <p style="text-align:center; font-size: 1em; margin: 0.5em 0;">- Or -</p>
+  <p class="logRegP">- Or -</p>
 
   <div class="forminnercont">
-    <button mat-button (click)="googleSignIn()"
-            style="width: 80%; margin: 1em 10%; border: #673ab7 solid 1px; color: #673ab7;">
+    <button mat-button (click)="googleSignIn()" class="logRegBtn logRegMrg1">
       Register with Google
     </button>
   </div>
 
-  <button mat-button (click)="this.showLogin = true" style="width: 80%; margin: 1em 10%; border: #673ab7 solid 1px;">
+  <button mat-button (click)="this.showLogin = true" class="logRegBtn logRegMrg1">
     Already registered? Login
   </button>
 </div>

@@ -2,4 +2,6 @@
 
 <app-login *ngIf="!currentUser && loginTimerExpired"></app-login>
 
-<app-todo-lists *ngIf="currentUser && loginTimerExpired" [userUID]="currentUser.uid"></app-todo-lists>
+<app-todo-lists *ngIf="currentUser && loginTimerExpired" [userUID]="currentUser.uid" (showHelp)="showHelp($event)">
+</app-todo-lists>
+

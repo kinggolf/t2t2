@@ -1,0 +1,36 @@
+.formOuter {
+  border: thin solid #6D4C41;
+  color: #6D4C41;
+  background-color: #ffffff;
+  margin-top: 1em;
+  padding: 0 0.5rem 1rem;
+  font-size: 0.6em;
+  font-weight: bold;
+}
+.logRegBtn {
+  background-color: #6D4C41;
+  color: #ffffff;
+  border: #6D4C41 solid 1px;
+  width: 80%;
+}
+.logRegBtn:disabled {
+  background-color: #d3b4a7;
+  color: #ffffff;
+  border: #6D4C41 solid 1px;
+  width: 80%;
+}
+.logRegMrg0 {
+  margin: 0 10%
+}
+.logRegMrg1 {
+  margin: 0.5rem 10%
+}
+.logRegP {
+  text-align: center;
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+mat-form-field {
+  width: 90%;
+  font-size: 0.8rem;
+}

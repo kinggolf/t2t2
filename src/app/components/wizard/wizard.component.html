@@ -1,0 +1,38 @@
+<div>t2t2 Help - {{ helpCount + 1 }} of 5</div>
+
+<div *ngIf="helpCount === 0">
+  <p>Create multiple lists of items with t2t2.</p>
+  <p>Lists can be anything, e.g. projects, notes, reminders, trips, days, ...</p>
+</div>
+
+<div *ngIf="helpCount === 1">
+  <p>Select menu button at top right to create a new list.</p>
+  <p>Open a list if it has at least one item by tapping the top of the list, e.g. on the list name.</p>
+</div>
+
+<div *ngIf="helpCount === 2">
+  <p>List items, e.g. tasks, reminders, thoughts, ..., can be added to a list by tapping the add icon on the list.</p>
+  <p>Edit the list name or title by tapping the edit icon.</p>
+</div>
+
+<div *ngIf="helpCount === 3">
+  <p>Delete a list by tapping the delete icon. You will be asked to confirm before a list is deleted.</p>
+  <p>If you have multiple lists, then you can reorder them by grabbing/moving the drag and drop icon.</p>
+</div>
+
+<div *ngIf="helpCount === 4">
+  <p>
+    On an open list you can edit item name & description, delete an item, reorder the list of items, and mark complete.
+  </p>
+  <p>Only one list can be open at a time.</p>
+</div>
+
+<div class="actionRow">
+  <div class="actionCell50">
+    <button *ngIf="helpCount > 0" mat-raised-button (click)="incrementHelp(-1)" color="accent">Back</button>
+  </div>
+  <div class="actionCell50">
+    <button mat-raised-button (click)="incrementHelp(1)" color="accent">{{ nextTitle }}</button>
+  </div>
+</div>
+

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { TodoListModel, TodoModel } from '../../models';
 import { FirestoreService } from '../../services/firestore.service';
 import { TodosUtilService } from '../../services/todos-util.service';
@@ -16,6 +16,7 @@ export class TodosComponent implements OnInit {
   @Output() cancelEditTodoLabel = new EventEmitter();
   editingTodoLabelIndex: number;
   editTodoForm: FormGroup;
+  @ViewChildren('todoList', { read: ElementRef }) todoList: QueryList<ElementRef>;
 
   constructor(private fb: FormBuilder, private firestoreService: FirestoreService, private todosUtilService: TodosUtilService) {}
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { trigger, animate, style, transition, state } from '@angular/animations';
 import { SubscriptionLike } from 'rxjs';
 import { FirestoreService } from '../../services/firestore.service';
@@ -39,7 +39,12 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   showListDetailsIndex: number;
   addingTodoListIndex: number;
   @Input() userUID: string;
+  @Output() showHelp = new EventEmitter();
   @ViewChildren(TodosComponent) todosComps: QueryList<TodosComponent>;
+  @ViewChildren('todoListCard', { read: ElementRef }) todoListCard: QueryList<ElementRef>;
+  @ViewChildren('todoListCardContent', { read: ElementRef }) todoListCardContent: QueryList<ElementRef>;
+  @ViewChildren('todoListCardAction', { read: ElementRef }) todoListCardAction: QueryList<ElementRef>;
+  screenHeight: number;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
               private fb: FormBuilder, private snackBar: MatSnackBar, private platform: Platform,
@@ -48,6 +53,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.editingListNameIndex = this.showListDetailsIndex = this.addingTodoListIndex = -1;
     this.showLoadingSpinner = true;
+    this.screenHeight = window.screen.height;
     this.initAndSubscribeToData(false);
     this.newTodoListNameForm = this.fb.group({
       newListName: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
@@ -144,8 +150,16 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   showListDetails(i): void {
-    if ((this.userTodoLists[i].itemsPending + this.userTodoLists[i].itemsCompleted) > 0) {
-      this.showListDetailsIndex === -1 ? this.showListDetailsIndex = i : this.showListDetailsIndex = -1;
+    if (this.showListDetailsIndex === i) {
+      this.showListDetailsIndex = -1;
+    } else if ((this.userTodoLists[i].itemsPending + this.userTodoLists[i].itemsCompleted) > 0) {
+      this.showListDetailsIndex = i;
+      const bottomTodoIndex = this.userTodoLists[i].todos.length - 1;
+      setTimeout(() => {
+        if (i > 0) {
+          this.todoListCardAction.toArray()[i - 1].nativeElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+      }, 200);
     }
     this.addingTodoListIndex = -1;
   }

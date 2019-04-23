@@ -1,10 +1,10 @@
 <div *ngIf="userTodoList.todos">
   <div cdkDropList (cdkDropListDropped)="drop($event)">
     <div *ngFor="let todo of userTodoList.todos; let i = index;"
-         cdkDragDisabled="{{ editingTodoLabelIndex > -1 }}" cdkDragLockAxis="y" cdkDrag>
+         cdkDragDisabled="{{ editingTodoLabelIndex > -1 }}" cdkDragLockAxis="y" cdkDrag #todoList>
       <mat-card *ngIf="editingTodoLabelIndex !== i">
         <mat-card-header style="margin: 0;">
-          <mat-card-title style="margin-bottom: 6px; font-size: 1em;">{{ todo.label }}</mat-card-title>
+          <mat-card-title style="margin-bottom: 6px; font-size: 1em; color: #3a47ff;">{{ todo.label }}</mat-card-title>
         </mat-card-header>
         <mat-card-content *ngIf="todo.description" style="margin: 0 2em; font-size: 0.8em;">
           {{ todo.description }}
@@ -30,24 +30,18 @@
               <mat-checkbox (click)="toggleTodoComplete(i)" class="baseMatIconTodos" [checked]="todo.completed">
                 Complete
               </mat-checkbox>
-              <!--
-              <button (click)="toggleTodoComplete(i)" class="base-mat-icon" title="Completed">
-                <div>Complete</div>
-                <i *ngIf="todo.completed" class="material-icons icon-font-spec">check_box</i>
-                <i *ngIf="!todo.completed" class="material-icons icon-font-spec">check_box_outline_blank</i>
-              </button> -->
             </div>
           </div>
         </mat-card-actions>
       </mat-card>
 
-      <mat-card *ngIf="editingTodoLabelIndex === i" style="margin: 0.25rem 0.5rem; background-color: lightblue;">
+      <mat-card *ngIf="editingTodoLabelIndex === i" style="margin: 0.25rem 0.5rem;">
         <form novalidate [formGroup]="editTodoForm">
           <mat-form-field style="margin-left: 1.2rem;">
-            <input matInput placeholder="Label" formControlName="label">
+            <input matInput placeholder="Item Name" formControlName="label">
           </mat-form-field>
           <mat-form-field style="margin-left: 1.2rem;">
-            <input matInput placeholder="Description" formControlName="description">
+            <input matInput placeholder="Item Description (optional)" formControlName="description">
           </mat-form-field>
           <mat-card-actions>
             <div style="display: table; width: 100%; text-align: center;">

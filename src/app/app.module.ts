@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule, MatInputModule, MatFormFieldModule, MatCardModule, MatSnackBarModule,
+import { MatButtonModule, MatInputModule, MatFormFieldModule, MatCardModule, MatSnackBarModule, MatBottomSheetModule,
          MatToolbarModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule, MatCheckboxModule } from '@angular/material';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { PlatformModule } from '@angular/cdk/platform';
@@ -15,6 +15,7 @@ import { AngularFireAuthModule } from '@angular/fire/auth';
 import { LoginComponent } from './components/login/login.component';
 import { TodoListsComponent } from './components/todo-lists/todo-lists.component';
 import { TodosComponent } from './components/todos/todos.component';
+import { WizardComponent } from './components/wizard/wizard.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,10 @@ import { TodosComponent } from './components/todos/todos.component';
     LoginComponent,
     TodoListsComponent,
     TodosComponent,
+    WizardComponent,
+  ],
+  entryComponents: [
+    WizardComponent
   ],
   imports: [
     BrowserModule,
@@ -40,6 +45,7 @@ import { TodosComponent } from './components/todos/todos.component';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatCheckboxModule,
+    MatBottomSheetModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     AngularFireAuthModule,
