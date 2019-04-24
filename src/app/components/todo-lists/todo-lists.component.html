@@ -1,20 +1,21 @@
-<button mat-button [matMenuTriggerFor]="menu"
-        style="position: absolute; right: 0; margin-top: -45px; z-index: 101;">
-  <i class="material-icons iconFontSpecMore">more_horiz</i>
-</button>
-<mat-menu #menu="matMenu" xPosition="after">
-  <div *ngIf="userTodoLists">
-    <button *ngIf="!creatingNewList" mat-menu-item (click)="createNewList()">
-      Create A New List
-    </button>
-    <button mat-menu-item (click)="showHelp.emit()">Show Help</button>
-    <button *ngIf="isOnline" mat-menu-item (click)="logout()">Logout</button>
-  </div>
-</mat-menu>
+<mat-toolbar>
+  <button mat-button [matMenuTriggerFor]="menu" style="position: fixed; right: 0;">
+    <i class="material-icons iconFontSpecMore">more_horiz</i>
+  </button>
+  <mat-menu #menu="matMenu" xPosition="after">
+    <div *ngIf="userTodoLists">
+      <button *ngIf="!creatingNewList" mat-menu-item (click)="createNewList()">
+        Create A New List
+      </button>
+      <button mat-menu-item (click)="showHelp.emit()">Show Help</button>
+      <button *ngIf="isOnline" mat-menu-item (click)="logout()">Logout</button>
+    </div>
+  </mat-menu>
+</mat-toolbar>
 
 <mat-spinner *ngIf="showLoadingSpinner" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
-<div cdkDropList (cdkDropListDropped)="drop($event)" class="screenMargin">
-  <div *ngFor="let todoList of userTodoLists; let i = index;" style="margin-top: 1em;"
+<mat-list cdkDropList (cdkDropListDropped)="drop($event)" class="screenMargin" style="margin-top: 45px;">
+  <mat-list-item *ngFor="let todoList of userTodoLists; let i = index;" style="height: 100%; padding: 0;"
        cdkDragDisabled="{{ editingListNameIndex > -1 || showListDetailsIndex > -1 || addingTodoListIndex > -1 }}"
        cdkDragLockAxis="y" cdkDrag>
     <mat-card *ngIf="editingListNameIndex !== i" #todoListCard>
@@ -94,5 +95,5 @@
 
       </form>
     </mat-card>
-  </div>
-</div>
+  </mat-list-item>
+</mat-list>

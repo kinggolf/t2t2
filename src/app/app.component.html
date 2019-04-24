@@ -1,6 +1,6 @@
 <mat-spinner *ngIf="!loginTimerExpired" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
 
-<app-login *ngIf="!currentUser && loginTimerExpired"></app-login>
+<app-login *ngIf="!currentUser && loginTimerExpired" (registering)="newUser = $event"></app-login>
 
 <app-todo-lists *ngIf="currentUser && loginTimerExpired" [userUID]="currentUser.uid" (showHelp)="showHelp($event)">
 </app-todo-lists>

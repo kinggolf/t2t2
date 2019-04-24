@@ -11,6 +11,15 @@
   font-size: 1rem;
   text-align: center;
 }
+.baseMatIconLists {
+  border: none;
+  background-color: transparent;
+  font-size: 0.5rem;
+  font-weight: bold;
+  text-align: center;
+  outline: none;
+  color: #6D4C41;
+}
 .iconFontSpec {
   font-size: 0.9rem;
 }

@@ -1,18 +1,22 @@
 mat-card {
-  margin: 1rem 0.5rem;
+  width: 100%;
+  font-size: 1rem;
   padding: 0.5rem 0;
+  margin: 0 0.5rem;
 }
 mat-menu-item {
   color: #3a47ff;
 }
-.baseMatIconLists {
-  border: none;
+mat-toolbar {
   background-color: transparent;
-  font-size: 0.5rem;
-  font-weight: bold;
-  text-align: center;
-  outline: none;
-  color: #6D4C41;
+  height: 56px;
+  position: fixed;
+  top: 0;
+  z-index: 101;
+}
+mat-list-item {
+  height: 100%;
+  margin: 1rem 0;
 }
 .iconFontSpecMore {
   font-size: 2.5rem;

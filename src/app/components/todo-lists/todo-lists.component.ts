@@ -104,15 +104,6 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.isOnlineSub.unsubscribe();
     }
   }
-  /* import HostListener
-  @HostListener('window:keyup', ['$event'])
-  keyEvent(event: KeyboardEvent) {
-    // console.log(event);
-    console.log('In keyEvent, this.editingListNameIndex = ', this.editingListNameIndex);
-    if (event.key === 'Enter') {
-      // this.saveListName(this.editingListNameIndex);
-    }
-  } */
 
   initAndSubscribeToData(transitionToOnline: boolean): void {
     if (this.userDetailsSub) {

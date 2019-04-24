@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
   registerForm: FormGroup;
   showLogin: boolean;
   isOnlineSub: SubscriptionLike;
+  @Output() registering = new EventEmitter();
 
   constructor(private fb: FormBuilder, private firestoreService: FirestoreService,
               private snackBar: MatSnackBar, private appHealthService: AppHealthService) { }
@@ -50,16 +51,19 @@ export class LoginComponent implements OnInit {
     return noMatch ? {passwordConfirmFail: true} : null;
   }
 
-  googleSignIn() {
+  googleSignIn(registering) {
     this.firestoreService.authGoogleLoginRegistration();
+    this.registering.emit(registering);
   }
 
   submitLogin() {
     this.firestoreService.authLogin(this.loginForm.controls.email.value, this.loginForm.controls.password.value);
+    this.registering.emit(false);
   }
 
   submitRegister() {
     this.firestoreService.createNewUser(this.registerForm.controls.email.value, this.registerForm.controls.password.value);
+    this.registering.emit(true);
   }
 
   forgotPassword() {

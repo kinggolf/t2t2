@@ -15,17 +15,21 @@ export class AppComponent implements OnInit, OnDestroy {
   currentUserSub: SubscriptionLike;
   isOnline$: Observable<boolean>;
   loginTimerExpired: boolean;
+  newUser: boolean;
 
   constructor(private firestoreService: FirestoreService, private appHealthService: AppHealthService,
               private bottomSheet: MatBottomSheet) {}
 
   ngOnInit(): void {
-    this.loginTimerExpired = false;
+    this.newUser = this.loginTimerExpired = false;
     setTimeout(() => {
       this.loginTimerExpired = true;
     }, 1500);
     this.currentUserSub = this.firestoreService.getUser().subscribe(user => {
       this.currentUser = user;
+      if (this.currentUser && this.newUser) {
+        this.showHelp();
+      }
       // console.log('this.currentUser = ', this.currentUser);
     });
     this.firestoreService.initAuthState();
@@ -40,6 +44,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   showHelp() {
     this.bottomSheet.open(WizardComponent);
+  }
+
+  registering(newUser) {
+    if (newUser && this.currentUser) {
+      this.bottomSheet.open(WizardComponent);
+    }
   }
 
 }

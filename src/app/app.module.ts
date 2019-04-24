@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule, MatInputModule, MatFormFieldModule, MatCardModule, MatSnackBarModule, MatBottomSheetModule,
+import { MatButtonModule, MatInputModule, MatFormFieldModule, MatCardModule, MatSnackBarModule, MatBottomSheetModule, MatListModule,
          MatToolbarModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule, MatCheckboxModule } from '@angular/material';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { PlatformModule } from '@angular/cdk/platform';
@@ -46,6 +46,7 @@ import { WizardComponent } from './components/wizard/wizard.component';
     MatSnackBarModule,
     MatCheckboxModule,
     MatBottomSheetModule,
+    MatListModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     AngularFireAuthModule,
