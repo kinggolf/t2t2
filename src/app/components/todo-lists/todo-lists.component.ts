@@ -5,7 +5,7 @@ import { FirestoreService } from '../../services/firestore.service';
 import { AppHealthService } from '../../services/app-health.service';
 import { TodosUtilService } from '../../services/todos-util.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Platform } from '@angular/cdk/platform';
 import { TodosComponent } from '../todos/todos.component';

@@ -3,7 +3,7 @@ import { SubscriptionLike, Observable } from 'rxjs';
 import * as firebase from 'firebase/app';
 import { FirestoreService } from './services/firestore.service';
 import { AppHealthService } from './services/app-health.service';
-import { MatBottomSheet } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { WizardComponent } from './components/wizard/wizard.component';
 
 @Component({
@@ -30,7 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (this.currentUser && this.newUser) {
         this.showHelp();
       }
-      // console.log('this.currentUser = ', this.currentUser);
+      console.log('this.currentUser = ', this.currentUser);
     });
     this.firestoreService.initAuthState();
     this.isOnline$ = this.appHealthService.monitorOnline();

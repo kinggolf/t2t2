@@ -17,7 +17,7 @@
 <mat-list cdkDropList (cdkDropListDropped)="drop($event)" class="screenMargin" style="margin-top: 45px;">
   <mat-list-item *ngFor="let todoList of userTodoLists; let i = index;" style="height: 100%; padding: 0;"
        cdkDragDisabled="{{ editingListNameIndex > -1 || showListDetailsIndex > -1 || addingTodoListIndex > -1 }}"
-       cdkDragLockAxis="y" cdkDrag>
+       cdkDragLockAxis="y" cdkDrag [cdkDragStartDelay]="500">
     <mat-card *ngIf="editingListNameIndex !== i" #todoListCard>
 
       <mat-card-header (click)="showListDetails(i)" style="margin: 0;">
