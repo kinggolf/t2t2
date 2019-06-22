@@ -67,6 +67,9 @@ Then run following 2 commands:
 
 `ng build --prod` and `http-server -p 8080 -c-1 dist/the-docket-client`
 
+When using Firestore, be sure to add `127.0.0.1` to Firebase auth domains
+under sign-in method.
+
 and the app will operate normally with registered service workers and offline 
 performance.
 
@@ -92,7 +95,3 @@ prefetched resources.
 
 This all seems to work on local http-server.
 
-The app currently has no ability to sync any changes made offline, so these will
-be lost. There seem to be strategies on saving these updates locally and the
-completing them when the app comes back online, e.g. in this 
-[link](https://stackoverflow.com/questions/35270702/can-service-workers-cache-post-requests).
