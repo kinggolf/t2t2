@@ -15,6 +15,6 @@ platformBrowserDynamic().bootstrapModule(AppModule).then(() => {
 }).catch(err => console.log(err));
 
 /*
-platformBrowserDynamic().bootstrapModule(AppModule)
+platformBrowserDynamic().bootstrapModule(AppModule)  , {ngZone: 'noop'}
   .catch(err => console.error(err));
 */
