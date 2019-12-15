@@ -18,7 +18,8 @@
     "@angular/core": "9.0.0-rc.6",
     "@angular/fire": "5.2.3",
     "@angular/forms": "9.0.0-rc.6",
-    "@angular/material": "8.2.2",
+    "@angular/material": "9.0.0-rc.5",
+    "@angular/material-moment-adapter": "9.0.0-rc.5",
     "@angular/platform-browser": "9.0.0-rc.6",
     "@angular/platform-browser-dynamic": "9.0.0-rc.6",
     "@angular/pwa": "0.900.0-rc.6",
@@ -28,6 +29,8 @@
     "core-js": "3.5.0",
     "firebase": "7.6.0",
     "material-design-icons-iconfont": "5.0.1",
+    "moment": "2.24.0",
+    "ngx-material-timepicker": "5.2.3",
     "rxjs": "6.5.3",
     "tslib": "1.10.0",
     "zone.js": "0.10.2"

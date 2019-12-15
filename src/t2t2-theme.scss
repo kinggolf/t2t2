@@ -21,4 +21,6 @@ $t2t2-theme: mat-light-theme($t2t2-primary, $t2t2-accent, $t2t2-warn);
 .mat-checkbox-frame {
   border-color: #3a47ff;
 }
-
+.mat-card-header-text {
+  width: 100%;
+}

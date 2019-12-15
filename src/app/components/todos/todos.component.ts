@@ -2,8 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter, ViewChildren, QueryList
 import { TodoListModel, TodoModel } from '../../models';
 import { FirestoreService } from '../../services/firestore.service';
 import { TodosUtilService } from '../../services/todos-util.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-todos',
@@ -24,7 +25,9 @@ export class TodosComponent implements OnInit {
     this.editingTodoLabelIndex = -1;
     this.editTodoForm = this.fb.group({
       label: ['', Validators.compose([Validators.required, Validators.minLength(1)])],
-      description: ['']
+      description: [''],
+      date: [''],
+      time: ['']
     });
   }
 
@@ -39,9 +42,20 @@ export class TodosComponent implements OnInit {
   }
 
   editTodo(i): void {
-    this.editTodoForm = this.fb.group({ label: [this.userTodoList.todos[i].label,
+    this.editTodoForm = this.fb.group({
+      label: [this.userTodoList.todos[i].label,
         Validators.compose([Validators.required, Validators.minLength(1)])],
-      description: [this.userTodoList.todos[i].description] });
+      description: [this.userTodoList.todos[i].description]
+    });
+    if (this.userTodoList.listName === 'Appointments') {
+      if (this.userTodoList.todos[i].date) {
+        this.editTodoForm.addControl('date', new FormControl(moment(this.userTodoList.todos[i].date)));
+        this.editTodoForm.addControl('time', new FormControl(this.userTodoList.todos[i].time));
+      } else {
+        this.editTodoForm.addControl('date', new FormControl(moment()));
+        this.editTodoForm.addControl('time', new FormControl(''));
+      }
+    }
     this.editingTodoLabelIndex = i;
   }
 
@@ -59,7 +73,10 @@ export class TodosComponent implements OnInit {
     const updatedTodo = {
       ...this.userTodoList.todos[i],
       label: this.editTodoForm.value.label,
-      description: this.editTodoForm.value.description
+      description: this.editTodoForm.value.description,
+      // dateAndTime: this.combineDateAndTime(this.editTodoForm.value.date, this.editTodoForm.value.time),
+      date: this.editTodoForm.value.date.format('ddd MMM DD, YYYY'),
+      time: this.editTodoForm.value.time
     };
     const updatedTodos = [ ...this.userTodoList.todos.slice(0, i), updatedTodo, ...this.userTodoList.todos.slice(i + 1) ];
     this.updateTodoList(i, updatedTodos);
@@ -79,4 +96,22 @@ export class TodosComponent implements OnInit {
     this.cancelEditTodoLabel.emit();
   }
 
+  combineDateAndTime(date: moment.Moment, time: string): string {
+    const timeA = time.split(':');
+    const timeB = timeA[1].split(' ');
+    timeB[1] === 'AM' ? date.hour(parseInt(timeA[0], 10)) : date.hour(parseInt(timeA[0], 10) + 12);
+    date.minute(parseInt(timeB[0], 10));
+    return date.toString();
+  }
+
+  parseDateAndTime(dateAndTime: moment.Moment): { date: moment.Moment, time: string } {
+    let hours = dateAndTime.hours();
+    let ampm = 'AM';
+    if (hours > 11) {
+      hours = hours - 12;
+      ampm = 'PM';
+    }
+    console.log('dateAndTime = ', dateAndTime);
+    return { date: dateAndTime, time: `${hours}:${dateAndTime.minutes()} ${ampm}` };
+  }
 }

@@ -16,3 +16,19 @@ mat-card {
   outline: none;
   color: #3a47ff;
 }
+.time-picker-label {
+  opacity: 0.65;
+  font-size: 0.9rem;
+  margin: 0;
+}
+.time-picker-wrapper {
+  display: flex;
+  width: 100%;
+  border-bottom: solid #5e5e5e 1px;
+}
+.time-picker-input {
+  border: 0;
+  font-size: 1rem;
+  width: 95%;
+  outline: none
+}

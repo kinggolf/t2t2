@@ -4,10 +4,16 @@
          cdkDragDisabled="{{ editingTodoLabelIndex > -1 }}" cdkDragLockAxis="y" cdkDrag [cdkDragStartDelay]="500">
       <mat-card *ngIf="editingTodoLabelIndex !== i">
         <mat-card-header style="margin: 0;">
-          <mat-card-title style="margin-bottom: 6px; font-size: 1em; color: #3a47ff;">{{ todo.label }}</mat-card-title>
+          <mat-card-title style="margin-bottom: 6px; font-size: 1em; color: #3a47ff; width: 100%;">
+            {{ todo.label }}
+          </mat-card-title>
         </mat-card-header>
-        <mat-card-content *ngIf="todo.description" style="margin: 0 2em; font-size: 0.8em;">
-          {{ todo.description }}
+        <mat-card-content style="margin: 0 2em; font-size: 0.8em;">
+          <div>
+            <span *ngIf="todo.date" style="font-weight: 500;">{{ todo.date }} - </span>
+            <span *ngIf="todo.time" style="font-weight: 500;">{{ todo.time }}</span>
+          </div>
+          <div *ngIf="todo.description">{{ todo.description }}</div>
         </mat-card-content>
         <mat-card-actions style="margin-bottom: 0;">
           <div class="actionRow">
@@ -38,11 +44,30 @@
       <mat-card *ngIf="editingTodoLabelIndex === i" style="margin: 0.25rem 0.5rem;">
         <form novalidate [formGroup]="editTodoForm">
           <mat-form-field style="margin-left: 1.2rem;">
-            <input matInput placeholder="Item Name" formControlName="label">
+            <input matInput placeholder="Item" formControlName="label">
           </mat-form-field>
           <mat-form-field style="margin-left: 1.2rem;">
-            <input matInput placeholder="Item Description (optional)" formControlName="description">
+            <input matInput placeholder="Description (optional)" formControlName="description">
           </mat-form-field>
+
+          <div *ngIf="this.userTodoList.listName === 'Appointments'" style="display: flex; flex-direction: row;">
+            <mat-form-field style="width: 50%; margin: 0 2.5%;">
+              <input matInput [matDatepicker]="datePicker" placeholder="Date" formControlName="date">
+              <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+              <mat-datepicker #datePicker></mat-datepicker>
+            </mat-form-field>
+
+            <div style="width: 40%; margin: 0 2.5%;">
+              <div class="time-picker-label">Time</div>
+              <div class="time-picker-wrapper" style="display: flex; flex-direction: row;">
+                <input matInput placeholder="time (hh:mm)" [ngxTimepicker]="timePicker" formControlName="time" readonly
+                       [format]="timeFormat" [disableClick]="true" class="time-picker-input">
+                <ngx-material-timepicker-toggle matSuffix [for]="timePicker"></ngx-material-timepicker-toggle>
+                <ngx-material-timepicker #timePicker [format]="timeFormat"></ngx-material-timepicker>
+              </div>
+            </div>
+          </div>
+
           <mat-card-actions>
             <div style="display: table; width: 100%; text-align: center;">
               <div style="display: table; width: 100%; text-align: center;">

@@ -163,6 +163,7 @@ export class FirestoreService implements OnDestroy {
   }
 
   updateTodoList(userDocId: string, todoListDocId: string, todoList: TodoListModel): void {
+    console.log('In updateTodoList: todoList = ', todoList);
     const userTodoListRef: AngularFirestoreDocument<TodoListModel> =
       this.af.doc('users/' + userDocId + '/todoLists/' + todoListDocId);
     userTodoListRef.update(todoList);
