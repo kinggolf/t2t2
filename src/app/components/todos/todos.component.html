@@ -4,7 +4,7 @@
          cdkDragDisabled="{{ editingTodoLabelIndex > -1 }}" cdkDragLockAxis="y" cdkDrag [cdkDragStartDelay]="500">
       <mat-card *ngIf="editingTodoLabelIndex !== i">
         <mat-card-header style="margin: 0;">
-          <mat-card-title style="margin-bottom: 6px; font-size: 1em; color: #3a47ff; width: 100%;">
+          <mat-card-title style="margin-bottom: 6px; font-size: 1em; width: 100%;"> <!-- 3a47ff -->
             {{ todo.label }}
           </mat-card-title>
         </mat-card-header>
@@ -33,7 +33,8 @@
               </div>
             </div>
             <div class="actionCell33">
-              <mat-checkbox (click)="toggleTodoComplete(i)" class="baseMatIconTodos" [checked]="todo.completed">
+              <mat-checkbox (click)="toggleTodoComplete(i)" class="baseMatIconTodos" [checked]="todo.completed"
+                            color="primary">
                 Complete
               </mat-checkbox>
             </div>
@@ -54,12 +55,12 @@
             <mat-form-field style="width: 50%; margin: 0 2.5%;">
               <input matInput [matDatepicker]="datePicker" placeholder="Date" formControlName="date">
               <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
-              <mat-datepicker #datePicker></mat-datepicker>
+              <mat-datepicker #datePicker panelClass="datepickerBorder"></mat-datepicker>
             </mat-form-field>
 
             <div style="width: 40%; margin: 0 2.5%;">
               <div class="time-picker-label">Time</div>
-              <div class="time-picker-wrapper" style="display: flex; flex-direction: row;">
+              <div class="time-picker-wrapper">
                 <input matInput placeholder="time (hh:mm)" [ngxTimepicker]="timePicker" formControlName="time" readonly
                        [format]="timeFormat" [disableClick]="true" class="time-picker-input">
                 <ngx-material-timepicker-toggle matSuffix [for]="timePicker"></ngx-material-timepicker-toggle>

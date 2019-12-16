@@ -1,11 +1,13 @@
+@import "../../../t2t2-theme.scss";
+
 mat-card {
   width: 100%;
   font-size: 1rem;
   background-color: #ffffff;
   margin: 0.25rem 0.5rem;
   padding: 0.5rem 0;
-  color: #3a47ff;
-  border: 2px solid #3a47ff;
+  color: map-get(color-map(), dark);
+  border: 2px solid map-get(color-map(), dark);
 }
 .baseMatIconTodos {
   border: none;
@@ -14,7 +16,7 @@ mat-card {
   font-weight: bold;
   text-align: center;
   outline: none;
-  color: #3a47ff;
+  color: map-get(color-map(), dark);
 }
 .time-picker-label {
   opacity: 0.65;
@@ -23,8 +25,8 @@ mat-card {
 }
 .time-picker-wrapper {
   display: flex;
+  flex-direction: row;
   width: 100%;
-  border-bottom: solid #5e5e5e 1px;
 }
 .time-picker-input {
   border: 0;

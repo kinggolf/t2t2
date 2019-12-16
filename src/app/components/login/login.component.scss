@@ -1,0 +1,39 @@
+@import "../../../t2t2-theme.scss";
+
+.formOuter {
+  border: map-get(color-map(), primary) solid;
+  color: map-get(color-map(), primary);
+  background-color: #ffffff;
+  margin-top: 65px;
+  padding: 0 0.5rem 1rem;
+  font-size: 0.6em;
+  font-weight: bold;
+
+  .logRegBtn {
+    background-color: map-get(color-map(), primary);
+    color: #ffffff;
+    border: solid 1px map-get(color-map(), primary);
+    width: 80%;
+  }
+  .logRegBtn:disabled {
+    background-color: map-get(color-map(), ltprimary);
+    color: #ffffff;
+    border: solid 1px map-get(color-map(), ltprimary);
+    width: 80%;
+  }
+}
+.logRegMrg0 {
+  margin: 0 10%
+}
+.logRegMrg1 {
+  margin: 0.5rem 10%
+}
+.logRegP {
+  text-align: center;
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+mat-form-field {
+  width: 90%;
+  font-size: 0.8rem;
+}

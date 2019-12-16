@@ -1,0 +1,36 @@
+@import "../../../t2t2-theme.scss";
+
+mat-card {
+  width: 100%;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  margin: 0 0.5rem;
+}
+.mat-menu-item {
+  color: map-get(color-map(), dark);
+}
+mat-toolbar {
+  height: 56px;
+  position: fixed;
+  top: 0;
+  z-index: 101;
+}
+mat-list-item {
+  height: 100%;
+  margin: 1rem 0;
+}
+.iconFontSpecMore {
+  font-size: 2.5rem;
+  color: #ffffff;
+}
+.mainBackground {
+  background-color: map-get(color-map(), background);
+}
+.mat-toolbar {
+  background-color: transparent;
+}
+.mat-card-title {
+  margin-bottom: 6px;
+  font-size: 0.8em;
+  color: map-get(color-map(), primary);
+}

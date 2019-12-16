@@ -8,7 +8,8 @@ import { WizardComponent } from './components/wizard/wizard.component';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
   currentUser: firebase.User;

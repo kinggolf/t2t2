@@ -9,7 +9,7 @@ import * as moment from 'moment';
 @Component({
   selector: 'app-todos',
   templateUrl: './todos.component.html',
-  styleUrls: ['../../app.component.css', './todos.component.css'],
+  styleUrls: ['../../app.component.scss', './todos.component.scss'],
 })
 export class TodosComponent implements OnInit {
   @Input() userTodoList: TodoListModel;

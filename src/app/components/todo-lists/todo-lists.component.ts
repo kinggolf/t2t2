@@ -14,7 +14,7 @@ import { TodoListModel, UserModel } from '../../models';
 @Component({
   selector: 'app-todo-lists',
   templateUrl: './todo-lists.component.html',
-  styleUrls: ['../../app.component.css', './todo-lists.component.css'],
+  styleUrls: ['../../app.component.scss', './todo-lists.component.scss'],
   animations: [
     trigger('showTodos', [
       state('show', style({height: '*', })),
@@ -116,7 +116,6 @@ export class TodoListsComponent implements OnInit, OnDestroy {
       this.userDetails = userDetails[0];
       this.userTodoListsSub = this.firestoreService.getUserTodoLists().subscribe(userTodoLists => {
         if (userTodoLists) {
-          // console.log('In initAndSubscribeToData, userTodoLists = ', userTodoLists);
           this.showLoadingSpinner = false;
           if (transitionToOnline) {
             this.snackBar.open('Online - full functionality.', 'OK', {

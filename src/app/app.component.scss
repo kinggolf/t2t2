@@ -1,3 +1,5 @@
+@import "../t2t2-theme";
+
 .baseMatIconHide {
   border: none;
   background-color: transparent;
@@ -18,7 +20,7 @@
   font-weight: bold;
   text-align: center;
   outline: none;
-  color: #6D4C41;
+  color: map-get(color-map(), primary);
 }
 .iconFontSpec {
   font-size: 0.9rem;

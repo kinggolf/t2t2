@@ -1,13 +1,10 @@
-@import 't2t2-theme.scss';
+@import "./t2t2-theme.scss";
 
 html, body {
   height: 100%;
   font-family: "Raleway";
   font-size: 20px;
-}
-body {
   margin: 0;
-  background-color: #d3b4a7;
 }
 p, div, span {
   font-family: "Raleway";
@@ -39,4 +36,37 @@ p, div, span {
 }
 .mat-list-item-content {
   padding: 0 !important;
+}
+
+.timepicker {
+
+  .timepicker__header {
+    background-color: map-get(color-map(), primary) !important;
+  }
+
+  .clock-face__clock-hand {
+    background-color: map-get(color-map(), primary) !important;
+
+    &::after {
+    background-color: map-get(color-map(), primary) !important;
+    }
+
+    &::before {
+    background-color: map-get(color-map(), primary) !important;
+    }
+  }
+
+  .clock-face__number {
+    > span.active {
+    background-color: map-get(color-map(), primary) !important;
+    }
+  }
+
+  button:not(.timepicker-dial__item) {
+    color: map-get(color-map(), primary) !important;
+  }
+}
+
+.datepickerBorder{
+  border: solid 2px map-get(color-map(), primary);
 }

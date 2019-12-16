@@ -8,7 +8,7 @@
     <mat-form-field>
       <input type="password" matInput formControlName="password" placeholder="Password (At least 5 characters)">
     </mat-form-field>
-    <button mat-button type="submit" [disabled]="!loginForm.valid" class="logRegBtn logRegMrg0">
+    <button mat-raised-button type="submit" [disabled]="!loginForm.valid" class="logRegBtn logRegMrg0">
       Submit
     </button>
   </form>
@@ -16,7 +16,7 @@
   <p class="logRegP">- Or -</p>
 
   <div class="forminnercont">
-    <button mat-button (click)="googleSignIn(false)" class="logRegBtn logRegMrg1">
+    <button mat-raised-button (click)="googleSignIn(false)" class="logRegBtn logRegMrg1" color="primary">
       Login with Google
     </button>
   </div>
@@ -25,7 +25,7 @@
     <span style="cursor: pointer;" (click)="forgotPassword()">Forgot password</span>
   </div>
 
-  <button mat-button (click)="this.showLogin = false" class="logRegBtn logRegMrg1">
+  <button mat-raised-button (click)="this.showLogin = false" class="logRegBtn logRegMrg1" color="primary">
     New User? Register Here
   </button>
 </div>
@@ -44,18 +44,18 @@
       <input type="password" matInput formControlName="confirmPassword"
              placeholder="Confirm Password (Must match password)">
     </mat-form-field>
-    <button mat-button type="submit" [disabled]="!registerForm.valid" class="logRegBtn logRegMrg0">
+    <button mat-raised-button type="submit" [disabled]="!registerForm.valid" class="logRegBtn logRegMrg0">
       Submit
     </button>
   </form>
 
   <p class="logRegP">- Or -</p>
 
-  <button mat-button (click)="googleSignIn(true)" class="logRegBtn logRegMrg1">
+  <button mat-raised-button (click)="googleSignIn(true)" class="logRegBtn logRegMrg1" color="primary">
     Register with Google
   </button>
 
-  <button mat-button (click)="this.showLogin = true" class="logRegBtn logRegMrg1">
+  <button mat-raised-button (click)="this.showLogin = true" class="logRegBtn logRegMrg1" color="primary">
     Already registered? Login
   </button>
 </div>

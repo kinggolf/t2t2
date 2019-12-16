@@ -4,7 +4,7 @@ import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 @Component({
   selector: 'app-wizard',
   templateUrl: './wizard.component.html',
-  styleUrls: ['./wizard.component.css', '../../app.component.css']
+  styleUrls: ['./wizard.component.scss', '../../app.component.scss']
 })
 export class WizardComponent implements OnInit {
   helpCount: number;

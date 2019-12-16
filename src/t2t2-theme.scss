@@ -2,25 +2,31 @@
 
 @include mat-core();
 
+$t2t2-primary: mat-palette($mat-deep-purple, 500);
+$t2t2-accent: mat-palette($mat-deep-purple, 200);
+$t2t2-dark: mat-palette($mat-gray, 900);
+$t2t2-warn: mat-palette($mat-red, 800);
+$t2t2-background: mat-palette($mat-deep-purple, 200);
+
+/*
 $t2t2-primary: mat-palette($mat-brown, 600);
 $t2t2-accent: mat-palette($mat-indigo, A700);
-$t2t2-warn: mat-palette($mat-orange, 800);
+$t2t2-warn: mat-palette($mat-orange, 800); */
 
 $t2t2-theme: mat-light-theme($t2t2-primary, $t2t2-accent, $t2t2-warn);
 @include angular-material-theme($t2t2-theme);
 
-.mat-card-title {
-  color: #000000;
+@function color-map() {
+  @return(
+    primary: map-get($t2t2-primary, default),
+    ltprimary: map-get($t2t2-primary, lighter),
+    accent: map-get($t2t2-accent, default),
+    warn: map-get($t2t2-warn, default),
+    dark: map-get($t2t2-dark, default),
+    background: map-get($t2t2-background, default),
+  )
 }
-.mat-snack-bar-container {
-  background-color: #3a47ff;
-}
-.mat-simple-snackbar-action, .mat-simple-snackbar {
+
+.mat-simple-snackbar-action {
   color: #ffffff;
-}
-.mat-checkbox-frame {
-  border-color: #3a47ff;
-}
-.mat-card-header-text {
-  width: 100%;
 }

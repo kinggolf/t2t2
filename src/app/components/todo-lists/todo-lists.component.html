@@ -14,14 +14,14 @@
 </mat-toolbar>
 
 <mat-spinner *ngIf="showLoadingSpinner" [diameter]="30" style="margin: 0 auto;"></mat-spinner>
-<mat-list cdkDropList (cdkDropListDropped)="drop($event)" class="screenMargin" style="margin-top: 45px;">
+<mat-list cdkDropList (cdkDropListDropped)="drop($event)" class="screenMargin mainBackground" style="margin-top: 45px;">
   <mat-list-item *ngFor="let todoList of userTodoLists; let i = index;" style="height: 100%; padding: 0;"
        cdkDragDisabled="{{ editingListNameIndex > -1 || showListDetailsIndex > -1 || addingTodoListIndex > -1 }}"
        cdkDragLockAxis="y" cdkDrag [cdkDragStartDelay]="500">
     <mat-card *ngIf="editingListNameIndex !== i" #todoListCard>
 
       <mat-card-header (click)="showListDetails(i)" style="margin: 0;">
-        <mat-card-title style="margin-bottom: 6px; font-size: 0.8em; color: #6D4C41;">
+        <mat-card-title style="" color="primary">
           {{ todoList.listName }}
         </mat-card-title>
       </mat-card-header>
