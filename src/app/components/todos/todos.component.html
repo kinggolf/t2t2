@@ -44,10 +44,10 @@
 
       <mat-card *ngIf="editingTodoLabelIndex === i" style="margin: 0.25rem 0.5rem;">
         <form novalidate [formGroup]="editTodoForm">
-          <mat-form-field style="margin-left: 1.2rem;">
+          <mat-form-field style="margin-left: 5%; width: 90%;">
             <input matInput placeholder="Item" formControlName="label">
           </mat-form-field>
-          <mat-form-field style="margin-left: 1.2rem;">
+          <mat-form-field style="margin-left: 5%; width: 90%;">
             <input matInput placeholder="Description (optional)" formControlName="description">
           </mat-form-field>
 
