@@ -49,11 +49,12 @@ export class TodosComponent implements OnInit {
     });
     if (this.userTodoList.listName === 'Appointments') {
       if (this.userTodoList.todos[i].date) {
-        this.editTodoForm.addControl('date', new FormControl(moment(this.userTodoList.todos[i].date)));
+        this.editTodoForm.
+          addControl('date', new FormControl(moment(this.userTodoList.todos[i].date.substr(4), 'MMM DD, YYYY')));
         this.editTodoForm.addControl('time', new FormControl(this.userTodoList.todos[i].time));
       } else {
         this.editTodoForm.addControl('date', new FormControl(moment()));
-        this.editTodoForm.addControl('time', new FormControl(''));
+        this.editTodoForm.addControl('time', new FormControl('10:00 AM'));
       }
     }
     this.editingTodoLabelIndex = i;
@@ -70,14 +71,18 @@ export class TodosComponent implements OnInit {
 
   saveEditTodo(i): void {
     this.editingTodoLabelIndex = -1;
-    const updatedTodo = {
+    let updatedTodo = {
       ...this.userTodoList.todos[i],
       label: this.editTodoForm.value.label,
       description: this.editTodoForm.value.description,
-      // dateAndTime: this.combineDateAndTime(this.editTodoForm.value.date, this.editTodoForm.value.time),
-      date: this.editTodoForm.value.date.format('ddd MMM DD, YYYY'),
-      time: this.editTodoForm.value.time
     };
+    if (this.userTodoList.listName === 'Appointments') {
+      updatedTodo = {
+        ...updatedTodo,
+        date: this.editTodoForm.value.date.format('ddd MMM DD, YYYY'),
+        time: this.editTodoForm.value.time
+      };
+    }
     const updatedTodos = [ ...this.userTodoList.todos.slice(0, i), updatedTodo, ...this.userTodoList.todos.slice(i + 1) ];
     this.updateTodoList(i, updatedTodos);
   }
@@ -111,7 +116,6 @@ export class TodosComponent implements OnInit {
       hours = hours - 12;
       ampm = 'PM';
     }
-    console.log('dateAndTime = ', dateAndTime);
     return { date: dateAndTime, time: `${hours}:${dateAndTime.minutes()} ${ampm}` };
   }
 }

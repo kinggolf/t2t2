@@ -61,7 +61,7 @@
             <div style="width: 40%; margin: 0 2.5%;">
               <div class="time-picker-label">Time</div>
               <div class="time-picker-wrapper">
-                <input matInput placeholder="time (hh:mm)" [ngxTimepicker]="timePicker" formControlName="time" readonly
+                <input matInput placeholder="hh:mm" [ngxTimepicker]="timePicker" formControlName="time" readonly
                        [format]="timeFormat" [disableClick]="true" class="time-picker-input">
                 <ngx-material-timepicker-toggle matSuffix [for]="timePicker"></ngx-material-timepicker-toggle>
                 <ngx-material-timepicker #timePicker [format]="timeFormat"></ngx-material-timepicker>
