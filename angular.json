@@ -30,7 +30,6 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "es5BrowserSupport": true
           },
           "configurations": {
             "production": {

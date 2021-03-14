@@ -3,7 +3,7 @@ import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument 
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable, SubscriptionLike, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { auth } from 'firebase/app';
+import firebase from 'firebase/app';
 import { UserModel, TodoListModel } from '../models';
 
 @Injectable({
@@ -44,12 +44,12 @@ export class FirestoreService implements OnDestroy {
     });
   }
 
-  authLogin(email: string, password: string): void {
-    this.firebaseAuth.auth.signInWithEmailAndPassword(email, password);
+  async authLogin(email: string, password: string): Promise<void> {
+    await this.firebaseAuth.signInWithEmailAndPassword(email, password);
   }
 
   authGoogleLoginRegistration(): void {
-    this.firebaseAuth.auth.signInWithPopup(new auth.GoogleAuthProvider())
+    this.firebaseAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .then(userCredentials => {
         if (userCredentials.additionalUserInfo.isNewUser) {
           this.addNewUserToFirestore(userCredentials.user);
@@ -60,16 +60,16 @@ export class FirestoreService implements OnDestroy {
       });
   }
 
-  authLogout(): void {
-    this.firebaseAuth.auth.signOut();
+  async authLogout(): Promise<void> {
+    await this.firebaseAuth.signOut();
   }
 
-  authForgotPassword(email: string): void {
-    this.firebaseAuth.auth.sendPasswordResetEmail(email);
+  async authForgotPassword(email: string): Promise<void> {
+    await this.firebaseAuth.sendPasswordResetEmail(email);
   }
 
   createNewUser(email: string, password: string): void {
-    this.firebaseAuth.auth.createUserWithEmailAndPassword(email, password)
+    this.firebaseAuth.createUserWithEmailAndPassword(email, password)
       .then(userCredentials => {
         this.addNewUserToFirestore(userCredentials.user);
       })

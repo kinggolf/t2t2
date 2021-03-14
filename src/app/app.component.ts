@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SubscriptionLike, Observable } from 'rxjs';
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 import { FirestoreService } from './services/firestore.service';
 import { AppHealthService } from './services/app-health.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
